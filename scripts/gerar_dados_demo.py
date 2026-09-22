@@ -87,27 +87,45 @@ def gerar_unidades(obra):
 
 
 def gerar_vendas(obra, unidades):
-    """Distribui as vendas ao longo dos meses respeitando a VSO da obra."""
+    """Distribui as vendas do inicio das vendas ate hoje respeitando o ritmo da obra.
+
+    Sorteia um peso por mes dentro da faixa de VSO e escala para fechar no alvo.
+    Sem isso o alvo era batido cedo e os ultimos meses ficavam com VSO zero.
+    """
     alvo = int(len(unidades) * obra["pct_vendido"])
     disponiveis = unidades[:]
     random.shuffle(disponiveis)
-    contratos = []
-    contador = 1
-    for mes in meses_entre(obra["inicio_vendas"], HOJE):
-        if len(contratos) >= alvo:
-            break
+    meses = list(meses_entre(obra["inicio_vendas"], HOJE))
+    pesos = []
+    for mes in meses:
         baixo, alto = obra["vso_faixa"]
         # Parque das Aguas vende bem no comeco e desacelera.
         if obra["id"] == 102 and mes < date(2025, 6, 1):
             baixo, alto = 5, 7
-        qtd = min(random.randint(baixo, alto), alvo - len(contratos), len(disponiveis))
-        for _ in range(qtd):
+        pesos.append(random.randint(baixo, alto))
+    total_pesos = sum(pesos)
+    # arredondamento acumulado: a soma fecha exata no alvo, O(meses)
+    quantidades, acumulado, anterior = [], 0.0, 0
+    for peso in pesos:
+        acumulado += peso * alvo / total_pesos
+        quantidades.append(round(acumulado) - anterior)
+        anterior = round(acumulado)
+
+    contratos = []
+    contador = 1
+    for mes, qtd in zip(meses, quantidades):
+        for _ in range(min(qtd, len(disponiveis))):
             unidade = disponiveis.pop()
             unidade["commercialStock"] = "V"
-            data_venda = mes + timedelta(days=random.randint(0, 27))
+            dias_no_mes = 27 if mes.month != HOJE.month or mes.year != HOJE.year else HOJE.day - 1
+            data_venda = mes + timedelta(days=random.randint(0, dias_no_mes))
             investidor = random.random() < 0.15
             contratos.append(montar_contrato(obra, unidade, data_venda, contador, investidor))
             contador += 1
+
+    # parte do estoque fica reservada, como acontece com proposta em analise
+    for unidade in disponiveis[: max(1, len(disponiveis) // 15)]:
+        unidade["commercialStock"] = "R"
     aplicar_distratos(obra, contratos)
     return contratos
 
