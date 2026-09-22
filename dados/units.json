@@ -1,0 +1,2164 @@
+{
+ "data": [
+  {
+   "id": 101001,
+   "enterpriseId": 101,
+   "name": "2Q-0101",
+   "propertyType": "2Q",
+   "privateArea": 55,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101002,
+   "enterpriseId": 101,
+   "name": "2Q-0102",
+   "propertyType": "2Q",
+   "privateArea": 59,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101003,
+   "enterpriseId": 101,
+   "name": "2Q-0103",
+   "propertyType": "2Q",
+   "privateArea": 55,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101004,
+   "enterpriseId": 101,
+   "name": "2Q-0104",
+   "propertyType": "2Q",
+   "privateArea": 59,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101005,
+   "enterpriseId": 101,
+   "name": "2Q-0201",
+   "propertyType": "2Q",
+   "privateArea": 58,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101006,
+   "enterpriseId": 101,
+   "name": "2Q-0202",
+   "propertyType": "2Q",
+   "privateArea": 59,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101007,
+   "enterpriseId": 101,
+   "name": "2Q-0203",
+   "propertyType": "2Q",
+   "privateArea": 61,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101008,
+   "enterpriseId": 101,
+   "name": "2Q-0204",
+   "propertyType": "2Q",
+   "privateArea": 61,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101009,
+   "enterpriseId": 101,
+   "name": "2Q-0301",
+   "propertyType": "2Q",
+   "privateArea": 58,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101010,
+   "enterpriseId": 101,
+   "name": "2Q-0302",
+   "propertyType": "2Q",
+   "privateArea": 59,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101011,
+   "enterpriseId": 101,
+   "name": "2Q-0303",
+   "propertyType": "2Q",
+   "privateArea": 57,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101012,
+   "enterpriseId": 101,
+   "name": "2Q-0304",
+   "propertyType": "2Q",
+   "privateArea": 58,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101013,
+   "enterpriseId": 101,
+   "name": "2Q-0401",
+   "propertyType": "2Q",
+   "privateArea": 60,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101014,
+   "enterpriseId": 101,
+   "name": "2Q-0402",
+   "propertyType": "2Q",
+   "privateArea": 57,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101015,
+   "enterpriseId": 101,
+   "name": "2Q-0403",
+   "propertyType": "2Q",
+   "privateArea": 57,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101016,
+   "enterpriseId": 101,
+   "name": "2Q-0404",
+   "propertyType": "2Q",
+   "privateArea": 57,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101017,
+   "enterpriseId": 101,
+   "name": "2Q-0501",
+   "propertyType": "2Q",
+   "privateArea": 60,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101018,
+   "enterpriseId": 101,
+   "name": "2Q-0502",
+   "propertyType": "2Q",
+   "privateArea": 55,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101019,
+   "enterpriseId": 101,
+   "name": "2Q-0503",
+   "propertyType": "2Q",
+   "privateArea": 55,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101020,
+   "enterpriseId": 101,
+   "name": "2Q-0504",
+   "propertyType": "2Q",
+   "privateArea": 57,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101021,
+   "enterpriseId": 101,
+   "name": "2Q-0601",
+   "propertyType": "2Q",
+   "privateArea": 56,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101022,
+   "enterpriseId": 101,
+   "name": "2Q-0602",
+   "propertyType": "2Q",
+   "privateArea": 60,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101023,
+   "enterpriseId": 101,
+   "name": "2Q-0603",
+   "propertyType": "2Q",
+   "privateArea": 57,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101024,
+   "enterpriseId": 101,
+   "name": "2Q-0604",
+   "propertyType": "2Q",
+   "privateArea": 60,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101025,
+   "enterpriseId": 101,
+   "name": "2Q-0701",
+   "propertyType": "2Q",
+   "privateArea": 58,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101026,
+   "enterpriseId": 101,
+   "name": "2Q-0702",
+   "propertyType": "2Q",
+   "privateArea": 58,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101027,
+   "enterpriseId": 101,
+   "name": "2Q-0703",
+   "propertyType": "2Q",
+   "privateArea": 59,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101028,
+   "enterpriseId": 101,
+   "name": "2Q-0704",
+   "propertyType": "2Q",
+   "privateArea": 55,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101029,
+   "enterpriseId": 101,
+   "name": "2Q-0801",
+   "propertyType": "2Q",
+   "privateArea": 61,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101030,
+   "enterpriseId": 101,
+   "name": "2Q-0802",
+   "propertyType": "2Q",
+   "privateArea": 59,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101031,
+   "enterpriseId": 101,
+   "name": "2Q-0803",
+   "propertyType": "2Q",
+   "privateArea": 58,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101032,
+   "enterpriseId": 101,
+   "name": "2Q-0804",
+   "propertyType": "2Q",
+   "privateArea": 57,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101033,
+   "enterpriseId": 101,
+   "name": "2Q-0901",
+   "propertyType": "2Q",
+   "privateArea": 59,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101034,
+   "enterpriseId": 101,
+   "name": "2Q-0902",
+   "propertyType": "2Q",
+   "privateArea": 58,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101035,
+   "enterpriseId": 101,
+   "name": "2Q-0903",
+   "propertyType": "2Q",
+   "privateArea": 61,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101036,
+   "enterpriseId": 101,
+   "name": "2Q-0904",
+   "propertyType": "2Q",
+   "privateArea": 56,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101037,
+   "enterpriseId": 101,
+   "name": "2Q-1001",
+   "propertyType": "2Q",
+   "privateArea": 61,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101038,
+   "enterpriseId": 101,
+   "name": "2Q-1002",
+   "propertyType": "2Q",
+   "privateArea": 60,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101039,
+   "enterpriseId": 101,
+   "name": "2Q-1003",
+   "propertyType": "2Q",
+   "privateArea": 60,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101040,
+   "enterpriseId": 101,
+   "name": "2Q-1004",
+   "propertyType": "2Q",
+   "privateArea": 59,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101041,
+   "enterpriseId": 101,
+   "name": "2Q-1101",
+   "propertyType": "2Q",
+   "privateArea": 56,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101042,
+   "enterpriseId": 101,
+   "name": "2Q-1102",
+   "propertyType": "2Q",
+   "privateArea": 56,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101043,
+   "enterpriseId": 101,
+   "name": "2Q-1103",
+   "propertyType": "2Q",
+   "privateArea": 55,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101044,
+   "enterpriseId": 101,
+   "name": "2Q-1104",
+   "propertyType": "2Q",
+   "privateArea": 58,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101045,
+   "enterpriseId": 101,
+   "name": "2Q-1201",
+   "propertyType": "2Q",
+   "privateArea": 60,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101046,
+   "enterpriseId": 101,
+   "name": "2Q-1202",
+   "propertyType": "2Q",
+   "privateArea": 59,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101047,
+   "enterpriseId": 101,
+   "name": "2Q-1203",
+   "propertyType": "2Q",
+   "privateArea": 58,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101048,
+   "enterpriseId": 101,
+   "name": "2Q-1204",
+   "propertyType": "2Q",
+   "privateArea": 57,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101049,
+   "enterpriseId": 101,
+   "name": "2Q-1301",
+   "propertyType": "2Q",
+   "privateArea": 60,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101050,
+   "enterpriseId": 101,
+   "name": "2Q-1302",
+   "propertyType": "2Q",
+   "privateArea": 58,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101051,
+   "enterpriseId": 101,
+   "name": "2Q-1303",
+   "propertyType": "2Q",
+   "privateArea": 58,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101052,
+   "enterpriseId": 101,
+   "name": "2Q-1304",
+   "propertyType": "2Q",
+   "privateArea": 57,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101053,
+   "enterpriseId": 101,
+   "name": "2Q-1401",
+   "propertyType": "2Q",
+   "privateArea": 55,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101054,
+   "enterpriseId": 101,
+   "name": "2Q-1402",
+   "propertyType": "2Q",
+   "privateArea": 60,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101055,
+   "enterpriseId": 101,
+   "name": "2Q-1403",
+   "propertyType": "2Q",
+   "privateArea": 58,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101056,
+   "enterpriseId": 101,
+   "name": "2Q-1404",
+   "propertyType": "2Q",
+   "privateArea": 58,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101057,
+   "enterpriseId": 101,
+   "name": "2Q-1501",
+   "propertyType": "2Q",
+   "privateArea": 56,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101058,
+   "enterpriseId": 101,
+   "name": "2Q-1502",
+   "propertyType": "2Q",
+   "privateArea": 58,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101059,
+   "enterpriseId": 101,
+   "name": "2Q-1503",
+   "propertyType": "2Q",
+   "privateArea": 61,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101060,
+   "enterpriseId": 101,
+   "name": "2Q-1504",
+   "propertyType": "2Q",
+   "privateArea": 61,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101061,
+   "enterpriseId": 101,
+   "name": "3Q-0101",
+   "propertyType": "3Q",
+   "privateArea": 76,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101062,
+   "enterpriseId": 101,
+   "name": "3Q-0102",
+   "propertyType": "3Q",
+   "privateArea": 77,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101063,
+   "enterpriseId": 101,
+   "name": "3Q-0103",
+   "propertyType": "3Q",
+   "privateArea": 74,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101064,
+   "enterpriseId": 101,
+   "name": "3Q-0104",
+   "propertyType": "3Q",
+   "privateArea": 71,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101065,
+   "enterpriseId": 101,
+   "name": "3Q-0201",
+   "propertyType": "3Q",
+   "privateArea": 76,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101066,
+   "enterpriseId": 101,
+   "name": "3Q-0202",
+   "propertyType": "3Q",
+   "privateArea": 75,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101067,
+   "enterpriseId": 101,
+   "name": "3Q-0203",
+   "propertyType": "3Q",
+   "privateArea": 72,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101068,
+   "enterpriseId": 101,
+   "name": "3Q-0204",
+   "propertyType": "3Q",
+   "privateArea": 77,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101069,
+   "enterpriseId": 101,
+   "name": "3Q-0301",
+   "propertyType": "3Q",
+   "privateArea": 71,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101070,
+   "enterpriseId": 101,
+   "name": "3Q-0302",
+   "propertyType": "3Q",
+   "privateArea": 74,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101071,
+   "enterpriseId": 101,
+   "name": "3Q-0303",
+   "propertyType": "3Q",
+   "privateArea": 72,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101072,
+   "enterpriseId": 101,
+   "name": "3Q-0304",
+   "propertyType": "3Q",
+   "privateArea": 74,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101073,
+   "enterpriseId": 101,
+   "name": "3Q-0401",
+   "propertyType": "3Q",
+   "privateArea": 71,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101074,
+   "enterpriseId": 101,
+   "name": "3Q-0402",
+   "propertyType": "3Q",
+   "privateArea": 74,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101075,
+   "enterpriseId": 101,
+   "name": "3Q-0403",
+   "propertyType": "3Q",
+   "privateArea": 77,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101076,
+   "enterpriseId": 101,
+   "name": "3Q-0404",
+   "propertyType": "3Q",
+   "privateArea": 77,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101077,
+   "enterpriseId": 101,
+   "name": "3Q-0501",
+   "propertyType": "3Q",
+   "privateArea": 71,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101078,
+   "enterpriseId": 101,
+   "name": "3Q-0502",
+   "propertyType": "3Q",
+   "privateArea": 77,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101079,
+   "enterpriseId": 101,
+   "name": "3Q-0503",
+   "propertyType": "3Q",
+   "privateArea": 73,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101080,
+   "enterpriseId": 101,
+   "name": "3Q-0504",
+   "propertyType": "3Q",
+   "privateArea": 76,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101081,
+   "enterpriseId": 101,
+   "name": "3Q-0601",
+   "propertyType": "3Q",
+   "privateArea": 71,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101082,
+   "enterpriseId": 101,
+   "name": "3Q-0602",
+   "propertyType": "3Q",
+   "privateArea": 75,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101083,
+   "enterpriseId": 101,
+   "name": "3Q-0603",
+   "propertyType": "3Q",
+   "privateArea": 77,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101084,
+   "enterpriseId": 101,
+   "name": "3Q-0604",
+   "propertyType": "3Q",
+   "privateArea": 76,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101085,
+   "enterpriseId": 101,
+   "name": "3Q-0701",
+   "propertyType": "3Q",
+   "privateArea": 75,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101086,
+   "enterpriseId": 101,
+   "name": "3Q-0702",
+   "propertyType": "3Q",
+   "privateArea": 75,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101087,
+   "enterpriseId": 101,
+   "name": "3Q-0703",
+   "propertyType": "3Q",
+   "privateArea": 75,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101088,
+   "enterpriseId": 101,
+   "name": "3Q-0704",
+   "propertyType": "3Q",
+   "privateArea": 75,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101089,
+   "enterpriseId": 101,
+   "name": "3Q-0801",
+   "propertyType": "3Q",
+   "privateArea": 74,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101090,
+   "enterpriseId": 101,
+   "name": "3Q-0802",
+   "propertyType": "3Q",
+   "privateArea": 72,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101091,
+   "enterpriseId": 101,
+   "name": "3Q-0803",
+   "propertyType": "3Q",
+   "privateArea": 75,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101092,
+   "enterpriseId": 101,
+   "name": "3Q-0804",
+   "propertyType": "3Q",
+   "privateArea": 74,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101093,
+   "enterpriseId": 101,
+   "name": "3Q-0901",
+   "propertyType": "3Q",
+   "privateArea": 72,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101094,
+   "enterpriseId": 101,
+   "name": "3Q-0902",
+   "propertyType": "3Q",
+   "privateArea": 72,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101095,
+   "enterpriseId": 101,
+   "name": "3Q-0903",
+   "propertyType": "3Q",
+   "privateArea": 71,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101096,
+   "enterpriseId": 101,
+   "name": "3Q-0904",
+   "propertyType": "3Q",
+   "privateArea": 71,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101097,
+   "enterpriseId": 101,
+   "name": "3Q-1001",
+   "propertyType": "3Q",
+   "privateArea": 73,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101098,
+   "enterpriseId": 101,
+   "name": "3Q-1002",
+   "propertyType": "3Q",
+   "privateArea": 77,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101099,
+   "enterpriseId": 101,
+   "name": "3Q-1003",
+   "propertyType": "3Q",
+   "privateArea": 71,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101100,
+   "enterpriseId": 101,
+   "name": "3Q-1004",
+   "propertyType": "3Q",
+   "privateArea": 73,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101101,
+   "enterpriseId": 101,
+   "name": "3Q-1101",
+   "propertyType": "3Q",
+   "privateArea": 74,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101102,
+   "enterpriseId": 101,
+   "name": "3Q-1102",
+   "propertyType": "3Q",
+   "privateArea": 71,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101103,
+   "enterpriseId": 101,
+   "name": "3Q-1103",
+   "propertyType": "3Q",
+   "privateArea": 74,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101104,
+   "enterpriseId": 101,
+   "name": "3Q-1104",
+   "propertyType": "3Q",
+   "privateArea": 77,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101105,
+   "enterpriseId": 101,
+   "name": "3Q-1201",
+   "propertyType": "3Q",
+   "privateArea": 75,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101106,
+   "enterpriseId": 101,
+   "name": "3Q-1202",
+   "propertyType": "3Q",
+   "privateArea": 74,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101107,
+   "enterpriseId": 101,
+   "name": "3Q-1203",
+   "propertyType": "3Q",
+   "privateArea": 74,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101108,
+   "enterpriseId": 101,
+   "name": "3Q-1204",
+   "propertyType": "3Q",
+   "privateArea": 76,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101109,
+   "enterpriseId": 101,
+   "name": "3Q-1301",
+   "propertyType": "3Q",
+   "privateArea": 75,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101110,
+   "enterpriseId": 101,
+   "name": "3Q-1302",
+   "propertyType": "3Q",
+   "privateArea": 72,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101111,
+   "enterpriseId": 101,
+   "name": "3Q-1303",
+   "propertyType": "3Q",
+   "privateArea": 72,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101112,
+   "enterpriseId": 101,
+   "name": "3Q-1304",
+   "propertyType": "3Q",
+   "privateArea": 75,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101113,
+   "enterpriseId": 101,
+   "name": "3Q-1401",
+   "propertyType": "3Q",
+   "privateArea": 71,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101114,
+   "enterpriseId": 101,
+   "name": "3Q-1402",
+   "propertyType": "3Q",
+   "privateArea": 77,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101115,
+   "enterpriseId": 101,
+   "name": "3Q-1403",
+   "propertyType": "3Q",
+   "privateArea": 74,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101116,
+   "enterpriseId": 101,
+   "name": "3Q-1404",
+   "propertyType": "3Q",
+   "privateArea": 71,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101117,
+   "enterpriseId": 101,
+   "name": "3Q-1501",
+   "propertyType": "3Q",
+   "privateArea": 75,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101118,
+   "enterpriseId": 101,
+   "name": "3Q-1502",
+   "propertyType": "3Q",
+   "privateArea": 75,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101119,
+   "enterpriseId": 101,
+   "name": "3Q-1503",
+   "propertyType": "3Q",
+   "privateArea": 72,
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 101120,
+   "enterpriseId": 101,
+   "name": "3Q-1504",
+   "propertyType": "3Q",
+   "privateArea": 77,
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30"
+  },
+  {
+   "id": 102001,
+   "enterpriseId": 102,
+   "name": "2Q-0101",
+   "propertyType": "2Q",
+   "privateArea": 56,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102002,
+   "enterpriseId": 102,
+   "name": "2Q-0102",
+   "propertyType": "2Q",
+   "privateArea": 59,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102003,
+   "enterpriseId": 102,
+   "name": "2Q-0103",
+   "propertyType": "2Q",
+   "privateArea": 58,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102004,
+   "enterpriseId": 102,
+   "name": "2Q-0104",
+   "propertyType": "2Q",
+   "privateArea": 55,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102005,
+   "enterpriseId": 102,
+   "name": "2Q-0201",
+   "propertyType": "2Q",
+   "privateArea": 59,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102006,
+   "enterpriseId": 102,
+   "name": "2Q-0202",
+   "propertyType": "2Q",
+   "privateArea": 59,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102007,
+   "enterpriseId": 102,
+   "name": "2Q-0203",
+   "propertyType": "2Q",
+   "privateArea": 58,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102008,
+   "enterpriseId": 102,
+   "name": "2Q-0204",
+   "propertyType": "2Q",
+   "privateArea": 55,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102009,
+   "enterpriseId": 102,
+   "name": "2Q-0301",
+   "propertyType": "2Q",
+   "privateArea": 58,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102010,
+   "enterpriseId": 102,
+   "name": "2Q-0302",
+   "propertyType": "2Q",
+   "privateArea": 55,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102011,
+   "enterpriseId": 102,
+   "name": "2Q-0303",
+   "propertyType": "2Q",
+   "privateArea": 57,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102012,
+   "enterpriseId": 102,
+   "name": "2Q-0304",
+   "propertyType": "2Q",
+   "privateArea": 55,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102013,
+   "enterpriseId": 102,
+   "name": "2Q-0401",
+   "propertyType": "2Q",
+   "privateArea": 57,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102014,
+   "enterpriseId": 102,
+   "name": "2Q-0402",
+   "propertyType": "2Q",
+   "privateArea": 57,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102015,
+   "enterpriseId": 102,
+   "name": "2Q-0403",
+   "propertyType": "2Q",
+   "privateArea": 58,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102016,
+   "enterpriseId": 102,
+   "name": "2Q-0404",
+   "propertyType": "2Q",
+   "privateArea": 55,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102017,
+   "enterpriseId": 102,
+   "name": "2Q-0501",
+   "propertyType": "2Q",
+   "privateArea": 55,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102018,
+   "enterpriseId": 102,
+   "name": "2Q-0502",
+   "propertyType": "2Q",
+   "privateArea": 60,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102019,
+   "enterpriseId": 102,
+   "name": "2Q-0503",
+   "propertyType": "2Q",
+   "privateArea": 61,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102020,
+   "enterpriseId": 102,
+   "name": "2Q-0504",
+   "propertyType": "2Q",
+   "privateArea": 61,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102021,
+   "enterpriseId": 102,
+   "name": "2Q-0601",
+   "propertyType": "2Q",
+   "privateArea": 57,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102022,
+   "enterpriseId": 102,
+   "name": "2Q-0602",
+   "propertyType": "2Q",
+   "privateArea": 59,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102023,
+   "enterpriseId": 102,
+   "name": "2Q-0603",
+   "propertyType": "2Q",
+   "privateArea": 59,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102024,
+   "enterpriseId": 102,
+   "name": "2Q-0604",
+   "propertyType": "2Q",
+   "privateArea": 60,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102025,
+   "enterpriseId": 102,
+   "name": "2Q-0701",
+   "propertyType": "2Q",
+   "privateArea": 59,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102026,
+   "enterpriseId": 102,
+   "name": "2Q-0702",
+   "propertyType": "2Q",
+   "privateArea": 56,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102027,
+   "enterpriseId": 102,
+   "name": "2Q-0703",
+   "propertyType": "2Q",
+   "privateArea": 56,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102028,
+   "enterpriseId": 102,
+   "name": "2Q-0704",
+   "propertyType": "2Q",
+   "privateArea": 60,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102029,
+   "enterpriseId": 102,
+   "name": "2Q-0801",
+   "propertyType": "2Q",
+   "privateArea": 58,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102030,
+   "enterpriseId": 102,
+   "name": "2Q-0802",
+   "propertyType": "2Q",
+   "privateArea": 57,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102031,
+   "enterpriseId": 102,
+   "name": "2Q-0803",
+   "propertyType": "2Q",
+   "privateArea": 58,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102032,
+   "enterpriseId": 102,
+   "name": "2Q-0804",
+   "propertyType": "2Q",
+   "privateArea": 58,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102033,
+   "enterpriseId": 102,
+   "name": "2Q-0901",
+   "propertyType": "2Q",
+   "privateArea": 56,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102034,
+   "enterpriseId": 102,
+   "name": "2Q-0902",
+   "propertyType": "2Q",
+   "privateArea": 58,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102035,
+   "enterpriseId": 102,
+   "name": "2Q-0903",
+   "propertyType": "2Q",
+   "privateArea": 61,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102036,
+   "enterpriseId": 102,
+   "name": "2Q-0904",
+   "propertyType": "2Q",
+   "privateArea": 60,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102037,
+   "enterpriseId": 102,
+   "name": "2Q-1001",
+   "propertyType": "2Q",
+   "privateArea": 60,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102038,
+   "enterpriseId": 102,
+   "name": "2Q-1002",
+   "propertyType": "2Q",
+   "privateArea": 56,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102039,
+   "enterpriseId": 102,
+   "name": "2Q-1003",
+   "propertyType": "2Q",
+   "privateArea": 57,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102040,
+   "enterpriseId": 102,
+   "name": "2Q-1004",
+   "propertyType": "2Q",
+   "privateArea": 61,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102041,
+   "enterpriseId": 102,
+   "name": "3Q-0101",
+   "propertyType": "3Q",
+   "privateArea": 71,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102042,
+   "enterpriseId": 102,
+   "name": "3Q-0102",
+   "propertyType": "3Q",
+   "privateArea": 75,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102043,
+   "enterpriseId": 102,
+   "name": "3Q-0103",
+   "propertyType": "3Q",
+   "privateArea": 73,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102044,
+   "enterpriseId": 102,
+   "name": "3Q-0104",
+   "propertyType": "3Q",
+   "privateArea": 73,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102045,
+   "enterpriseId": 102,
+   "name": "3Q-0201",
+   "propertyType": "3Q",
+   "privateArea": 72,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102046,
+   "enterpriseId": 102,
+   "name": "3Q-0202",
+   "propertyType": "3Q",
+   "privateArea": 77,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102047,
+   "enterpriseId": 102,
+   "name": "3Q-0203",
+   "propertyType": "3Q",
+   "privateArea": 71,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102048,
+   "enterpriseId": 102,
+   "name": "3Q-0204",
+   "propertyType": "3Q",
+   "privateArea": 72,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102049,
+   "enterpriseId": 102,
+   "name": "3Q-0301",
+   "propertyType": "3Q",
+   "privateArea": 76,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102050,
+   "enterpriseId": 102,
+   "name": "3Q-0302",
+   "propertyType": "3Q",
+   "privateArea": 74,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102051,
+   "enterpriseId": 102,
+   "name": "3Q-0303",
+   "propertyType": "3Q",
+   "privateArea": 74,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102052,
+   "enterpriseId": 102,
+   "name": "3Q-0304",
+   "propertyType": "3Q",
+   "privateArea": 77,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102053,
+   "enterpriseId": 102,
+   "name": "3Q-0401",
+   "propertyType": "3Q",
+   "privateArea": 73,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102054,
+   "enterpriseId": 102,
+   "name": "3Q-0402",
+   "propertyType": "3Q",
+   "privateArea": 75,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102055,
+   "enterpriseId": 102,
+   "name": "3Q-0403",
+   "propertyType": "3Q",
+   "privateArea": 77,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102056,
+   "enterpriseId": 102,
+   "name": "3Q-0404",
+   "propertyType": "3Q",
+   "privateArea": 72,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102057,
+   "enterpriseId": 102,
+   "name": "3Q-0501",
+   "propertyType": "3Q",
+   "privateArea": 73,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102058,
+   "enterpriseId": 102,
+   "name": "3Q-0502",
+   "propertyType": "3Q",
+   "privateArea": 71,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102059,
+   "enterpriseId": 102,
+   "name": "3Q-0503",
+   "propertyType": "3Q",
+   "privateArea": 76,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102060,
+   "enterpriseId": 102,
+   "name": "3Q-0504",
+   "propertyType": "3Q",
+   "privateArea": 71,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102061,
+   "enterpriseId": 102,
+   "name": "3Q-0601",
+   "propertyType": "3Q",
+   "privateArea": 73,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102062,
+   "enterpriseId": 102,
+   "name": "3Q-0602",
+   "propertyType": "3Q",
+   "privateArea": 71,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102063,
+   "enterpriseId": 102,
+   "name": "3Q-0603",
+   "propertyType": "3Q",
+   "privateArea": 74,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102064,
+   "enterpriseId": 102,
+   "name": "3Q-0604",
+   "propertyType": "3Q",
+   "privateArea": 72,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102065,
+   "enterpriseId": 102,
+   "name": "3Q-0701",
+   "propertyType": "3Q",
+   "privateArea": 71,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102066,
+   "enterpriseId": 102,
+   "name": "3Q-0702",
+   "propertyType": "3Q",
+   "privateArea": 76,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102067,
+   "enterpriseId": 102,
+   "name": "3Q-0703",
+   "propertyType": "3Q",
+   "privateArea": 71,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102068,
+   "enterpriseId": 102,
+   "name": "3Q-0704",
+   "propertyType": "3Q",
+   "privateArea": 76,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102069,
+   "enterpriseId": 102,
+   "name": "3Q-0801",
+   "propertyType": "3Q",
+   "privateArea": 77,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102070,
+   "enterpriseId": 102,
+   "name": "3Q-0802",
+   "propertyType": "3Q",
+   "privateArea": 71,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102071,
+   "enterpriseId": 102,
+   "name": "3Q-0803",
+   "propertyType": "3Q",
+   "privateArea": 77,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102072,
+   "enterpriseId": 102,
+   "name": "3Q-0804",
+   "propertyType": "3Q",
+   "privateArea": 77,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102073,
+   "enterpriseId": 102,
+   "name": "3Q-0901",
+   "propertyType": "3Q",
+   "privateArea": 75,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102074,
+   "enterpriseId": 102,
+   "name": "3Q-0902",
+   "propertyType": "3Q",
+   "privateArea": 72,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102075,
+   "enterpriseId": 102,
+   "name": "3Q-0903",
+   "propertyType": "3Q",
+   "privateArea": 74,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102076,
+   "enterpriseId": 102,
+   "name": "3Q-0904",
+   "propertyType": "3Q",
+   "privateArea": 77,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102077,
+   "enterpriseId": 102,
+   "name": "3Q-1001",
+   "propertyType": "3Q",
+   "privateArea": 72,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102078,
+   "enterpriseId": 102,
+   "name": "3Q-1002",
+   "propertyType": "3Q",
+   "privateArea": 75,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102079,
+   "enterpriseId": 102,
+   "name": "3Q-1003",
+   "propertyType": "3Q",
+   "privateArea": 73,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 102080,
+   "enterpriseId": 102,
+   "name": "3Q-1004",
+   "propertyType": "3Q",
+   "privateArea": 71,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28"
+  },
+  {
+   "id": 103001,
+   "enterpriseId": 103,
+   "name": "SALA-0101",
+   "propertyType": "SALA",
+   "privateArea": 38,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103002,
+   "enterpriseId": 103,
+   "name": "SALA-0102",
+   "propertyType": "SALA",
+   "privateArea": 36,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103003,
+   "enterpriseId": 103,
+   "name": "SALA-0103",
+   "propertyType": "SALA",
+   "privateArea": 41,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103004,
+   "enterpriseId": 103,
+   "name": "SALA-0104",
+   "propertyType": "SALA",
+   "privateArea": 36,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103005,
+   "enterpriseId": 103,
+   "name": "SALA-0201",
+   "propertyType": "SALA",
+   "privateArea": 38,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103006,
+   "enterpriseId": 103,
+   "name": "SALA-0202",
+   "propertyType": "SALA",
+   "privateArea": 36,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103007,
+   "enterpriseId": 103,
+   "name": "SALA-0203",
+   "propertyType": "SALA",
+   "privateArea": 40,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103008,
+   "enterpriseId": 103,
+   "name": "SALA-0204",
+   "propertyType": "SALA",
+   "privateArea": 41,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103009,
+   "enterpriseId": 103,
+   "name": "SALA-0301",
+   "propertyType": "SALA",
+   "privateArea": 38,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103010,
+   "enterpriseId": 103,
+   "name": "SALA-0302",
+   "propertyType": "SALA",
+   "privateArea": 41,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103011,
+   "enterpriseId": 103,
+   "name": "SALA-0303",
+   "propertyType": "SALA",
+   "privateArea": 36,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103012,
+   "enterpriseId": 103,
+   "name": "SALA-0304",
+   "propertyType": "SALA",
+   "privateArea": 37,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103013,
+   "enterpriseId": 103,
+   "name": "SALA-0401",
+   "propertyType": "SALA",
+   "privateArea": 41,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103014,
+   "enterpriseId": 103,
+   "name": "SALA-0402",
+   "propertyType": "SALA",
+   "privateArea": 41,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103015,
+   "enterpriseId": 103,
+   "name": "SALA-0403",
+   "propertyType": "SALA",
+   "privateArea": 35,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103016,
+   "enterpriseId": 103,
+   "name": "SALA-0404",
+   "propertyType": "SALA",
+   "privateArea": 37,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103017,
+   "enterpriseId": 103,
+   "name": "SALA-0501",
+   "propertyType": "SALA",
+   "privateArea": 36,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103018,
+   "enterpriseId": 103,
+   "name": "SALA-0502",
+   "propertyType": "SALA",
+   "privateArea": 35,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103019,
+   "enterpriseId": 103,
+   "name": "SALA-0503",
+   "propertyType": "SALA",
+   "privateArea": 41,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103020,
+   "enterpriseId": 103,
+   "name": "SALA-0504",
+   "propertyType": "SALA",
+   "privateArea": 39,
+   "commercialStock": "D",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103021,
+   "enterpriseId": 103,
+   "name": "SALA-0601",
+   "propertyType": "SALA",
+   "privateArea": 41,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103022,
+   "enterpriseId": 103,
+   "name": "SALA-0602",
+   "propertyType": "SALA",
+   "privateArea": 35,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103023,
+   "enterpriseId": 103,
+   "name": "SALA-0603",
+   "propertyType": "SALA",
+   "privateArea": 39,
+   "commercialStock": "D",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103024,
+   "enterpriseId": 103,
+   "name": "SALA-0604",
+   "propertyType": "SALA",
+   "privateArea": 37,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103025,
+   "enterpriseId": 103,
+   "name": "SALA-0701",
+   "propertyType": "SALA",
+   "privateArea": 36,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103026,
+   "enterpriseId": 103,
+   "name": "SALA-0702",
+   "propertyType": "SALA",
+   "privateArea": 37,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103027,
+   "enterpriseId": 103,
+   "name": "SALA-0703",
+   "propertyType": "SALA",
+   "privateArea": 38,
+   "commercialStock": "D",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103028,
+   "enterpriseId": 103,
+   "name": "SALA-0704",
+   "propertyType": "SALA",
+   "privateArea": 36,
+   "commercialStock": "D",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103029,
+   "enterpriseId": 103,
+   "name": "SALA-0801",
+   "propertyType": "SALA",
+   "privateArea": 40,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103030,
+   "enterpriseId": 103,
+   "name": "SALA-0802",
+   "propertyType": "SALA",
+   "privateArea": 37,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103031,
+   "enterpriseId": 103,
+   "name": "SALA-0803",
+   "propertyType": "SALA",
+   "privateArea": 37,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103032,
+   "enterpriseId": 103,
+   "name": "SALA-0804",
+   "propertyType": "SALA",
+   "privateArea": 36,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103033,
+   "enterpriseId": 103,
+   "name": "SALA-0901",
+   "propertyType": "SALA",
+   "privateArea": 41,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103034,
+   "enterpriseId": 103,
+   "name": "SALA-0902",
+   "propertyType": "SALA",
+   "privateArea": 40,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103035,
+   "enterpriseId": 103,
+   "name": "SALA-0903",
+   "propertyType": "SALA",
+   "privateArea": 37,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103036,
+   "enterpriseId": 103,
+   "name": "SALA-0904",
+   "propertyType": "SALA",
+   "privateArea": 39,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103037,
+   "enterpriseId": 103,
+   "name": "SALA-1001",
+   "propertyType": "SALA",
+   "privateArea": 41,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103038,
+   "enterpriseId": 103,
+   "name": "SALA-1002",
+   "propertyType": "SALA",
+   "privateArea": 40,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103039,
+   "enterpriseId": 103,
+   "name": "SALA-1003",
+   "propertyType": "SALA",
+   "privateArea": 35,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  },
+  {
+   "id": 103040,
+   "enterpriseId": 103,
+   "name": "SALA-1004",
+   "propertyType": "SALA",
+   "privateArea": 40,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31"
+  }
+ ]
+}

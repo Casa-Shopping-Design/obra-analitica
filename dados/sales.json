@@ -1,0 +1,7244 @@
+{
+ "data": [
+  {
+   "id": 1010001,
+   "enterpriseId": 101,
+   "number": "101-0001",
+   "contractDate": "2024-10-10",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 257661.2,
+   "totalSellingValue": 257661.2,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5001,
+     "main": true,
+     "name": "Julio Souza Pereira"
+    }
+   ],
+   "units": [
+    {
+     "id": 101035,
+     "main": true,
+     "name": "2Q-0903",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 25766.12,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 51532.24,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 25766.12,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 154596.72,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010002,
+   "enterpriseId": 101,
+   "number": "101-0002",
+   "contractDate": "2024-10-25",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 334127.46,
+   "totalSellingValue": 334127.46,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5002,
+     "main": true,
+     "name": "Tania Silva Martins"
+    }
+   ],
+   "units": [
+    {
+     "id": 101055,
+     "main": true,
+     "name": "2Q-1403",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 33412.75,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 66825.49,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 33412.75,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 200476.48,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010003,
+   "enterpriseId": 101,
+   "number": "101-0003",
+   "contractDate": "2024-10-11",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 369984.74,
+   "totalSellingValue": 369984.74,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5003,
+     "main": true,
+     "name": "Bruno Souza Costa"
+    }
+   ],
+   "units": [
+    {
+     "id": 101069,
+     "main": true,
+     "name": "3Q-0301",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 36998.47,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 73996.95,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 36998.47,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 221990.84,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010004,
+   "enterpriseId": 101,
+   "number": "101-0004",
+   "contractDate": "2024-10-20",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 341338.93,
+   "totalSellingValue": 341338.93,
+   "financialInstitutionNumber": null,
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5004,
+     "main": true,
+     "name": "Bruno Costa Martins"
+    }
+   ],
+   "units": [
+    {
+     "id": 101054,
+     "main": true,
+     "name": "2Q-1402",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 68267.79,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 273071.14,
+     "installmentsNumber": 36
+    }
+   ]
+  },
+  {
+   "id": 1010005,
+   "enterpriseId": 101,
+   "number": "101-0005",
+   "contractDate": "2024-10-12",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 415803.49,
+   "totalSellingValue": 415803.49,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5005,
+     "main": true,
+     "name": "Julio Silva Gomes"
+    }
+   ],
+   "units": [
+    {
+     "id": 101112,
+     "main": true,
+     "name": "3Q-1304",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 41580.35,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 83160.7,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 41580.35,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 249482.09,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010006,
+   "enterpriseId": 101,
+   "number": "101-0006",
+   "contractDate": "2024-11-12",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 321368.94,
+   "totalSellingValue": 321368.94,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5006,
+     "main": true,
+     "name": "Marta Oliveira Gomes"
+    }
+   ],
+   "units": [
+    {
+     "id": 101011,
+     "main": true,
+     "name": "2Q-0303",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 32136.89,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 64273.79,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 32136.89,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 192821.36,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010007,
+   "enterpriseId": 101,
+   "number": "101-0007",
+   "contractDate": "2024-11-22",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 332985.15,
+   "totalSellingValue": 332985.15,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5007,
+     "main": true,
+     "name": "Elisa Costa Martins"
+    }
+   ],
+   "units": [
+    {
+     "id": 101050,
+     "main": true,
+     "name": "2Q-1302",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 33298.52,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 66597.03,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 33298.52,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 199791.09,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010008,
+   "enterpriseId": 101,
+   "number": "101-0008",
+   "contractDate": "2024-11-01",
+   "situation": "3",
+   "cancellationDate": "2025-08-28",
+   "value": 295212.97,
+   "totalSellingValue": 295212.97,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5008,
+     "main": true,
+     "name": "Sergio Martins Gomes"
+    }
+   ],
+   "units": [
+    {
+     "id": 101040,
+     "main": true,
+     "name": "2Q-1004",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 29521.3,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 59042.59,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 29521.3,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 177127.78,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010009,
+   "enterpriseId": 101,
+   "number": "101-0009",
+   "contractDate": "2024-11-09",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 285275.63,
+   "totalSellingValue": 285275.63,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5009,
+     "main": true,
+     "name": "Heitor Silva Silva"
+    }
+   ],
+   "units": [
+    {
+     "id": 101024,
+     "main": true,
+     "name": "2Q-0604",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 28527.56,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 57055.13,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 28527.56,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 171165.38,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010010,
+   "enterpriseId": 101,
+   "number": "101-0010",
+   "contractDate": "2024-11-09",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 343076.87,
+   "totalSellingValue": 343076.87,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5010,
+     "main": true,
+     "name": "Nuno Pereira Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 101045,
+     "main": true,
+     "name": "2Q-1201",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 34307.69,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 68615.37,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 34307.69,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 205846.12,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010011,
+   "enterpriseId": 101,
+   "number": "101-0011",
+   "contractDate": "2024-11-05",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 254619.97,
+   "totalSellingValue": 254619.97,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5011,
+     "main": true,
+     "name": "Tania Souza Costa"
+    }
+   ],
+   "units": [
+    {
+     "id": 101023,
+     "main": true,
+     "name": "2Q-0603",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 25462.0,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 50923.99,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 25462.0,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 152771.98,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010012,
+   "enterpriseId": 101,
+   "number": "101-0012",
+   "contractDate": "2024-12-21",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 301607.16,
+   "totalSellingValue": 301607.16,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5012,
+     "main": true,
+     "name": "Renata Pereira Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 101034,
+     "main": true,
+     "name": "2Q-0902",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 30160.72,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 60321.43,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 30160.72,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 180964.3,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010013,
+   "enterpriseId": 101,
+   "number": "101-0013",
+   "contractDate": "2024-12-21",
+   "situation": "3",
+   "cancellationDate": "2025-08-29",
+   "value": 301334.64,
+   "totalSellingValue": 301334.64,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5013,
+     "main": true,
+     "name": "Karen Silva Silva"
+    }
+   ],
+   "units": [
+    {
+     "id": 101060,
+     "main": true,
+     "name": "2Q-1504",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 30133.46,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 60266.93,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 30133.46,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 180800.78,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010014,
+   "enterpriseId": 101,
+   "number": "101-0014",
+   "contractDate": "2024-12-21",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 344911.51,
+   "totalSellingValue": 344911.51,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5014,
+     "main": true,
+     "name": "Paulo Silva Oliveira"
+    }
+   ],
+   "units": [
+    {
+     "id": 101064,
+     "main": true,
+     "name": "3Q-0104",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 34491.15,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 68982.3,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 34491.15,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 206946.91,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010015,
+   "enterpriseId": 101,
+   "number": "101-0015",
+   "contractDate": "2024-12-22",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 383961.16,
+   "totalSellingValue": 383961.16,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5015,
+     "main": true,
+     "name": "Elisa Gomes Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 101100,
+     "main": true,
+     "name": "3Q-1004",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 38396.12,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 76792.23,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 38396.12,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 230376.7,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010016,
+   "enterpriseId": 101,
+   "number": "101-0016",
+   "contractDate": "2024-12-26",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 368958.29,
+   "totalSellingValue": 368958.29,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5016,
+     "main": true,
+     "name": "Iara Lima Oliveira"
+    }
+   ],
+   "units": [
+    {
+     "id": 101105,
+     "main": true,
+     "name": "3Q-1201",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 36895.83,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 73791.66,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 36895.83,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 221374.97,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010017,
+   "enterpriseId": 101,
+   "number": "101-0017",
+   "contractDate": "2025-01-12",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 339693.93,
+   "totalSellingValue": 339693.93,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5017,
+     "main": true,
+     "name": "Olivia Martins Ribeiro"
+    }
+   ],
+   "units": [
+    {
+     "id": 101117,
+     "main": true,
+     "name": "3Q-1501",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 33969.39,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 67938.79,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 33969.39,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 203816.36,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010018,
+   "enterpriseId": 101,
+   "number": "101-0018",
+   "contractDate": "2025-01-26",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 260783.36,
+   "totalSellingValue": 260783.36,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5018,
+     "main": true,
+     "name": "Julio Oliveira Costa"
+    }
+   ],
+   "units": [
+    {
+     "id": 101037,
+     "main": true,
+     "name": "2Q-1001",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 26078.34,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 52156.67,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 26078.34,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 156470.02,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010019,
+   "enterpriseId": 101,
+   "number": "101-0019",
+   "contractDate": "2025-01-21",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 390005.53,
+   "totalSellingValue": 390005.53,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5019,
+     "main": true,
+     "name": "Paulo Silva Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 101108,
+     "main": true,
+     "name": "3Q-1204",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 39000.55,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 78001.11,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 39000.55,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 234003.32,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010020,
+   "enterpriseId": 101,
+   "number": "101-0020",
+   "contractDate": "2025-01-27",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 384463.08,
+   "totalSellingValue": 384463.08,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5020,
+     "main": true,
+     "name": "Renata Gomes Silva"
+    }
+   ],
+   "units": [
+    {
+     "id": 101110,
+     "main": true,
+     "name": "3Q-1302",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 38446.31,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 76892.62,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 38446.31,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 230677.85,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010021,
+   "enterpriseId": 101,
+   "number": "101-0021",
+   "contractDate": "2025-01-21",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 334516.08,
+   "totalSellingValue": 334516.08,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5021,
+     "main": true,
+     "name": "Julio Lima Martins"
+    }
+   ],
+   "units": [
+    {
+     "id": 101042,
+     "main": true,
+     "name": "2Q-1102",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 33451.61,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 66903.22,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 33451.61,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 200709.65,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010022,
+   "enterpriseId": 101,
+   "number": "101-0022",
+   "contractDate": "2025-01-24",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 402255.62,
+   "totalSellingValue": 402255.62,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5022,
+     "main": true,
+     "name": "Diego Silva Martins"
+    }
+   ],
+   "units": [
+    {
+     "id": 101067,
+     "main": true,
+     "name": "3Q-0203",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 40225.56,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 80451.12,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 40225.56,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 241353.37,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010023,
+   "enterpriseId": 101,
+   "number": "101-0023",
+   "contractDate": "2025-01-07",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 329269.09,
+   "totalSellingValue": 329269.09,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5023,
+     "main": true,
+     "name": "Tania Pereira Rocha"
+    }
+   ],
+   "units": [
+    {
+     "id": 101062,
+     "main": true,
+     "name": "3Q-0102",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 32926.91,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 65853.82,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 32926.91,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 197561.45,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010024,
+   "enterpriseId": 101,
+   "number": "101-0024",
+   "contractDate": "2025-02-13",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 285277.39,
+   "totalSellingValue": 285277.39,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5024,
+     "main": true,
+     "name": "Renata Costa Martins"
+    }
+   ],
+   "units": [
+    {
+     "id": 101057,
+     "main": true,
+     "name": "2Q-1501",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 28527.74,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 57055.48,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 28527.74,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 171166.43,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010025,
+   "enterpriseId": 101,
+   "number": "101-0025",
+   "contractDate": "2025-02-04",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 321611.57,
+   "totalSellingValue": 321611.57,
+   "financialInstitutionNumber": null,
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5025,
+     "main": true,
+     "name": "Marta Lima Martins"
+    }
+   ],
+   "units": [
+    {
+     "id": 101016,
+     "main": true,
+     "name": "2Q-0404",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 64322.31,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 257289.26,
+     "installmentsNumber": 36
+    }
+   ]
+  },
+  {
+   "id": 1010026,
+   "enterpriseId": 101,
+   "number": "101-0026",
+   "contractDate": "2025-02-09",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 376928.81,
+   "totalSellingValue": 376928.81,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5026,
+     "main": true,
+     "name": "Tania Oliveira Costa"
+    }
+   ],
+   "units": [
+    {
+     "id": 101068,
+     "main": true,
+     "name": "3Q-0204",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 37692.88,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 75385.76,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 37692.88,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 226157.29,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010027,
+   "enterpriseId": 101,
+   "number": "101-0027",
+   "contractDate": "2025-02-10",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 350563.27,
+   "totalSellingValue": 350563.27,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5027,
+     "main": true,
+     "name": "Julio Lima Costa"
+    }
+   ],
+   "units": [
+    {
+     "id": 101095,
+     "main": true,
+     "name": "3Q-0903",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 35056.33,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 70112.65,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 35056.33,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 210337.96,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010028,
+   "enterpriseId": 101,
+   "number": "101-0028",
+   "contractDate": "2025-02-13",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 324399.46,
+   "totalSellingValue": 324399.46,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5028,
+     "main": true,
+     "name": "Ana Rocha Ribeiro"
+    }
+   ],
+   "units": [
+    {
+     "id": 101036,
+     "main": true,
+     "name": "2Q-0904",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 32439.95,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 64879.89,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 32439.95,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 194639.68,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010029,
+   "enterpriseId": 101,
+   "number": "101-0029",
+   "contractDate": "2025-03-12",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 293781.43,
+   "totalSellingValue": 293781.43,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5029,
+     "main": true,
+     "name": "Sergio Costa Martins"
+    }
+   ],
+   "units": [
+    {
+     "id": 101013,
+     "main": true,
+     "name": "2Q-0401",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 29378.14,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 58756.29,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 29378.14,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 176268.86,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010030,
+   "enterpriseId": 101,
+   "number": "101-0030",
+   "contractDate": "2025-03-01",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 291451.95,
+   "totalSellingValue": 291451.95,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5030,
+     "main": true,
+     "name": "Sergio Costa Costa"
+    }
+   ],
+   "units": [
+    {
+     "id": 101028,
+     "main": true,
+     "name": "2Q-0704",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 29145.2,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 58290.39,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 29145.2,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 174871.17,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010031,
+   "enterpriseId": 101,
+   "number": "101-0031",
+   "contractDate": "2025-03-01",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 332987.92,
+   "totalSellingValue": 332987.92,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5031,
+     "main": true,
+     "name": "Renata Silva Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 101030,
+     "main": true,
+     "name": "2Q-0802",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 33298.79,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 66597.58,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 33298.79,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 199792.75,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010032,
+   "enterpriseId": 101,
+   "number": "101-0032",
+   "contractDate": "2025-03-03",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 275392.33,
+   "totalSellingValue": 275392.33,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5032,
+     "main": true,
+     "name": "Gisele Martins Costa"
+    }
+   ],
+   "units": [
+    {
+     "id": 101001,
+     "main": true,
+     "name": "2Q-0101",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 27539.23,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 55078.47,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 27539.23,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 165235.4,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010033,
+   "enterpriseId": 101,
+   "number": "101-0033",
+   "contractDate": "2025-03-20",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 250469.52,
+   "totalSellingValue": 250469.52,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5033,
+     "main": true,
+     "name": "Elisa Souza Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 101012,
+     "main": true,
+     "name": "2Q-0304",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 25046.95,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 50093.9,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 25046.95,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 150281.71,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010034,
+   "enterpriseId": 101,
+   "number": "101-0034",
+   "contractDate": "2025-03-16",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 337479.72,
+   "totalSellingValue": 337479.72,
+   "financialInstitutionNumber": null,
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5034,
+     "main": true,
+     "name": "Carla Gomes Pereira"
+    }
+   ],
+   "units": [
+    {
+     "id": 101059,
+     "main": true,
+     "name": "2Q-1503",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 67495.94,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 269983.78,
+     "installmentsNumber": 36
+    }
+   ]
+  },
+  {
+   "id": 1010035,
+   "enterpriseId": 101,
+   "number": "101-0035",
+   "contractDate": "2025-03-20",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 357538.65,
+   "totalSellingValue": 357538.65,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5035,
+     "main": true,
+     "name": "Diego Lima Ribeiro"
+    }
+   ],
+   "units": [
+    {
+     "id": 101083,
+     "main": true,
+     "name": "3Q-0603",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 35753.87,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 71507.73,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 35753.87,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 214523.19,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010036,
+   "enterpriseId": 101,
+   "number": "101-0036",
+   "contractDate": "2025-03-16",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 314265.23,
+   "totalSellingValue": 314265.23,
+   "financialInstitutionNumber": null,
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5036,
+     "main": true,
+     "name": "Renata Oliveira Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 101043,
+     "main": true,
+     "name": "2Q-1103",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 62853.05,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 251412.18,
+     "installmentsNumber": 36
+    }
+   ]
+  },
+  {
+   "id": 1010037,
+   "enterpriseId": 101,
+   "number": "101-0037",
+   "contractDate": "2025-04-19",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 263345.81,
+   "totalSellingValue": 263345.81,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5037,
+     "main": true,
+     "name": "Carla Souza Ribeiro"
+    }
+   ],
+   "units": [
+    {
+     "id": 101053,
+     "main": true,
+     "name": "2Q-1401",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 26334.58,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 52669.16,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 26334.58,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 158007.49,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010038,
+   "enterpriseId": 101,
+   "number": "101-0038",
+   "contractDate": "2025-04-25",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 340399.88,
+   "totalSellingValue": 340399.88,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5038,
+     "main": true,
+     "name": "Heitor Costa Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 101070,
+     "main": true,
+     "name": "3Q-0302",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 34039.99,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 68079.98,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 34039.99,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 204239.93,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010039,
+   "enterpriseId": 101,
+   "number": "101-0039",
+   "contractDate": "2025-04-14",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 328479.02,
+   "totalSellingValue": 328479.02,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5039,
+     "main": true,
+     "name": "Karen Lima Ribeiro"
+    }
+   ],
+   "units": [
+    {
+     "id": 101116,
+     "main": true,
+     "name": "3Q-1404",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 32847.9,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 65695.8,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 32847.9,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 197087.41,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010040,
+   "enterpriseId": 101,
+   "number": "101-0040",
+   "contractDate": "2025-04-13",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 301771.39,
+   "totalSellingValue": 301771.39,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5040,
+     "main": true,
+     "name": "Gisele Ribeiro Oliveira"
+    }
+   ],
+   "units": [
+    {
+     "id": 101004,
+     "main": true,
+     "name": "2Q-0104",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 30177.14,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 60354.28,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 30177.14,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 181062.83,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010041,
+   "enterpriseId": 101,
+   "number": "101-0041",
+   "contractDate": "2025-04-28",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 281217.77,
+   "totalSellingValue": 281217.77,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5041,
+     "main": true,
+     "name": "Leandro Lima Gomes"
+    }
+   ],
+   "units": [
+    {
+     "id": 101046,
+     "main": true,
+     "name": "2Q-1202",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 28121.78,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 56243.55,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 28121.78,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 168730.66,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010042,
+   "enterpriseId": 101,
+   "number": "101-0042",
+   "contractDate": "2025-04-27",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 330499.39,
+   "totalSellingValue": 330499.39,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5042,
+     "main": true,
+     "name": "Marta Oliveira Costa"
+    }
+   ],
+   "units": [
+    {
+     "id": 101021,
+     "main": true,
+     "name": "2Q-0601",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 33049.94,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 66099.88,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 33049.94,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 198299.63,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010043,
+   "enterpriseId": 101,
+   "number": "101-0043",
+   "contractDate": "2025-04-15",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 341711.54,
+   "totalSellingValue": 341711.54,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5043,
+     "main": true,
+     "name": "Elisa Gomes Pereira"
+    }
+   ],
+   "units": [
+    {
+     "id": 101080,
+     "main": true,
+     "name": "3Q-0504",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 34171.15,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 68342.31,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 34171.15,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 205026.92,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010044,
+   "enterpriseId": 101,
+   "number": "101-0044",
+   "contractDate": "2025-04-11",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 316622.07,
+   "totalSellingValue": 316622.07,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5044,
+     "main": true,
+     "name": "Karen Pereira Ribeiro"
+    }
+   ],
+   "units": [
+    {
+     "id": 101072,
+     "main": true,
+     "name": "3Q-0304",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 31662.21,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 63324.41,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 31662.21,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 189973.24,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010045,
+   "enterpriseId": 101,
+   "number": "101-0045",
+   "contractDate": "2025-05-05",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 364202.67,
+   "totalSellingValue": 364202.67,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5045,
+     "main": true,
+     "name": "Iara Oliveira Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 101074,
+     "main": true,
+     "name": "3Q-0402",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 36420.27,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 72840.53,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 36420.27,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 218521.6,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010046,
+   "enterpriseId": 101,
+   "number": "101-0046",
+   "contractDate": "2025-05-05",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 414920.73,
+   "totalSellingValue": 414920.73,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5046,
+     "main": true,
+     "name": "Diego Pereira Pereira"
+    }
+   ],
+   "units": [
+    {
+     "id": 101118,
+     "main": true,
+     "name": "3Q-1502",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 41492.07,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 82984.15,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 41492.07,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 248952.44,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010047,
+   "enterpriseId": 101,
+   "number": "101-0047",
+   "contractDate": "2025-05-19",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 340178.63,
+   "totalSellingValue": 340178.63,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5047,
+     "main": true,
+     "name": "Marta Gomes Silva"
+    }
+   ],
+   "units": [
+    {
+     "id": 101091,
+     "main": true,
+     "name": "3Q-0803",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 34017.86,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 68035.73,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 34017.86,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 204107.18,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010048,
+   "enterpriseId": 101,
+   "number": "101-0048",
+   "contractDate": "2025-05-18",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 281174.17,
+   "totalSellingValue": 281174.17,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5048,
+     "main": true,
+     "name": "Nuno Lima Souza"
+    }
+   ],
+   "units": [
+    {
+     "id": 101015,
+     "main": true,
+     "name": "2Q-0403",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 28117.42,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 56234.83,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 28117.42,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 168704.5,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010049,
+   "enterpriseId": 101,
+   "number": "101-0049",
+   "contractDate": "2025-05-22",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 364778.96,
+   "totalSellingValue": 364778.96,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5049,
+     "main": true,
+     "name": "Paulo Martins Martins"
+    }
+   ],
+   "units": [
+    {
+     "id": 101093,
+     "main": true,
+     "name": "3Q-0901",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 36477.9,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 72955.79,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 36477.9,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 218867.38,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010050,
+   "enterpriseId": 101,
+   "number": "101-0050",
+   "contractDate": "2025-05-07",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 323467.1,
+   "totalSellingValue": 323467.1,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5050,
+     "main": true,
+     "name": "Karen Silva Gomes"
+    }
+   ],
+   "units": [
+    {
+     "id": 101076,
+     "main": true,
+     "name": "3Q-0404",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 32346.71,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 64693.42,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 32346.71,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 194080.26,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010051,
+   "enterpriseId": 101,
+   "number": "101-0051",
+   "contractDate": "2025-05-24",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 303700.63,
+   "totalSellingValue": 303700.63,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5051,
+     "main": true,
+     "name": "Iara Martins Pereira"
+    }
+   ],
+   "units": [
+    {
+     "id": 101038,
+     "main": true,
+     "name": "2Q-1002",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 30370.06,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 60740.13,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 30370.06,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 182220.38,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010052,
+   "enterpriseId": 101,
+   "number": "101-0052",
+   "contractDate": "2025-06-11",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 336052.38,
+   "totalSellingValue": 336052.38,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5052,
+     "main": true,
+     "name": "Vitor Gomes Ribeiro"
+    }
+   ],
+   "units": [
+    {
+     "id": 101120,
+     "main": true,
+     "name": "3Q-1504",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 33605.24,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 67210.48,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 33605.24,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 201631.43,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010053,
+   "enterpriseId": 101,
+   "number": "101-0053",
+   "contractDate": "2025-06-28",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 297005.76,
+   "totalSellingValue": 297005.76,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5053,
+     "main": true,
+     "name": "Karen Silva Silva"
+    }
+   ],
+   "units": [
+    {
+     "id": 101017,
+     "main": true,
+     "name": "2Q-0501",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 29700.58,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 59401.15,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 29700.58,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 178203.46,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010054,
+   "enterpriseId": 101,
+   "number": "101-0054",
+   "contractDate": "2025-06-25",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 349324.54,
+   "totalSellingValue": 349324.54,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5054,
+     "main": true,
+     "name": "Diego Pereira Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 101092,
+     "main": true,
+     "name": "3Q-0804",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 34932.45,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 69864.91,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 34932.45,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 209594.72,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010055,
+   "enterpriseId": 101,
+   "number": "101-0055",
+   "contractDate": "2025-06-01",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 357060.89,
+   "totalSellingValue": 357060.89,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5055,
+     "main": true,
+     "name": "Olivia Martins Pereira"
+    }
+   ],
+   "units": [
+    {
+     "id": 101109,
+     "main": true,
+     "name": "3Q-1301",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 35706.09,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 71412.18,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 35706.09,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 214236.53,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010056,
+   "enterpriseId": 101,
+   "number": "101-0056",
+   "contractDate": "2025-06-20",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 365134.35,
+   "totalSellingValue": 365134.35,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5056,
+     "main": true,
+     "name": "Carla Martins Oliveira"
+    }
+   ],
+   "units": [
+    {
+     "id": 101099,
+     "main": true,
+     "name": "3Q-1003",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 36513.43,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 73026.87,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 36513.43,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 219080.61,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010057,
+   "enterpriseId": 101,
+   "number": "101-0057",
+   "contractDate": "2025-06-18",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 293372.03,
+   "totalSellingValue": 293372.03,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5057,
+     "main": true,
+     "name": "Diego Costa Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 101056,
+     "main": true,
+     "name": "2Q-1404",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 29337.2,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 58674.41,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 29337.2,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 176023.22,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010058,
+   "enterpriseId": 101,
+   "number": "101-0058",
+   "contractDate": "2025-07-15",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 392989.64,
+   "totalSellingValue": 392989.64,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5058,
+     "main": true,
+     "name": "Fabio Pereira Souza"
+    }
+   ],
+   "units": [
+    {
+     "id": 101115,
+     "main": true,
+     "name": "3Q-1403",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 39298.96,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 78597.93,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 39298.96,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 235793.78,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010059,
+   "enterpriseId": 101,
+   "number": "101-0059",
+   "contractDate": "2025-07-19",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 315832.64,
+   "totalSellingValue": 315832.64,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5059,
+     "main": true,
+     "name": "Renata Rocha Martins"
+    }
+   ],
+   "units": [
+    {
+     "id": 101007,
+     "main": true,
+     "name": "2Q-0203",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 31583.26,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 63166.53,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 31583.26,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 189499.58,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010060,
+   "enterpriseId": 101,
+   "number": "101-0060",
+   "contractDate": "2025-07-05",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 318591.61,
+   "totalSellingValue": 318591.61,
+   "financialInstitutionNumber": null,
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5060,
+     "main": true,
+     "name": "Iara Gomes Silva"
+    }
+   ],
+   "units": [
+    {
+     "id": 101044,
+     "main": true,
+     "name": "2Q-1104",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 63718.32,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 254873.29,
+     "installmentsNumber": 36
+    }
+   ]
+  },
+  {
+   "id": 1010061,
+   "enterpriseId": 101,
+   "number": "101-0061",
+   "contractDate": "2025-07-06",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 338341.36,
+   "totalSellingValue": 338341.36,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5061,
+     "main": true,
+     "name": "Renata Oliveira Ribeiro"
+    }
+   ],
+   "units": [
+    {
+     "id": 101081,
+     "main": true,
+     "name": "3Q-0601",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 33834.14,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 67668.27,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 33834.14,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 203004.82,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010062,
+   "enterpriseId": 101,
+   "number": "101-0062",
+   "contractDate": "2025-07-22",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 305253.86,
+   "totalSellingValue": 305253.86,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5062,
+     "main": true,
+     "name": "Karen Lima Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 101049,
+     "main": true,
+     "name": "2Q-1301",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 30525.39,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 61050.77,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 30525.39,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 183152.32,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010063,
+   "enterpriseId": 101,
+   "number": "101-0063",
+   "contractDate": "2025-07-20",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 346330.81,
+   "totalSellingValue": 346330.81,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5063,
+     "main": true,
+     "name": "Paulo Lima Pereira"
+    }
+   ],
+   "units": [
+    {
+     "id": 101101,
+     "main": true,
+     "name": "3Q-1101",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 34633.08,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 69266.16,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 34633.08,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 207798.49,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010064,
+   "enterpriseId": 101,
+   "number": "101-0064",
+   "contractDate": "2025-08-21",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 319397.48,
+   "totalSellingValue": 319397.48,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5064,
+     "main": true,
+     "name": "Ana Ribeiro Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 101047,
+     "main": true,
+     "name": "2Q-1203",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 31939.75,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 63879.5,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 31939.75,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 191638.49,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010065,
+   "enterpriseId": 101,
+   "number": "101-0065",
+   "contractDate": "2025-08-09",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 335451.51,
+   "totalSellingValue": 335451.51,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5065,
+     "main": true,
+     "name": "Olivia Oliveira Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 101052,
+     "main": true,
+     "name": "2Q-1304",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 33545.15,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 67090.3,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 33545.15,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 201270.91,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010066,
+   "enterpriseId": 101,
+   "number": "101-0066",
+   "contractDate": "2025-08-09",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 337206.02,
+   "totalSellingValue": 337206.02,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5066,
+     "main": true,
+     "name": "Marta Pereira Oliveira"
+    }
+   ],
+   "units": [
+    {
+     "id": 101088,
+     "main": true,
+     "name": "3Q-0704",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 33720.6,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 67441.2,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 33720.6,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 202323.61,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010067,
+   "enterpriseId": 101,
+   "number": "101-0067",
+   "contractDate": "2025-08-19",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 380372.67,
+   "totalSellingValue": 380372.67,
+   "financialInstitutionNumber": null,
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5067,
+     "main": true,
+     "name": "Nuno Souza Martins"
+    }
+   ],
+   "units": [
+    {
+     "id": 101106,
+     "main": true,
+     "name": "3Q-1202",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 76074.53,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 304298.14,
+     "installmentsNumber": 36
+    }
+   ]
+  },
+  {
+   "id": 1010068,
+   "enterpriseId": 101,
+   "number": "101-0068",
+   "contractDate": "2025-08-22",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 301135.37,
+   "totalSellingValue": 301135.37,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5068,
+     "main": true,
+     "name": "Julio Ribeiro Rocha"
+    }
+   ],
+   "units": [
+    {
+     "id": 101041,
+     "main": true,
+     "name": "2Q-1101",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 30113.54,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 60227.07,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 30113.54,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 180681.22,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010069,
+   "enterpriseId": 101,
+   "number": "101-0069",
+   "contractDate": "2025-09-28",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 412601.77,
+   "totalSellingValue": 412601.77,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5069,
+     "main": true,
+     "name": "Renata Rocha Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 101098,
+     "main": true,
+     "name": "3Q-1002",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 41260.18,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 82520.35,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 41260.18,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 247561.06,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010070,
+   "enterpriseId": 101,
+   "number": "101-0070",
+   "contractDate": "2025-09-16",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 338857.24,
+   "totalSellingValue": 338857.24,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5070,
+     "main": true,
+     "name": "Karen Lima Costa"
+    }
+   ],
+   "units": [
+    {
+     "id": 101033,
+     "main": true,
+     "name": "2Q-0901",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 33885.72,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 67771.45,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 33885.72,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 203314.34,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010071,
+   "enterpriseId": 101,
+   "number": "101-0071",
+   "contractDate": "2025-09-03",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 375043.9,
+   "totalSellingValue": 375043.9,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5071,
+     "main": true,
+     "name": "Fabio Pereira Martins"
+    }
+   ],
+   "units": [
+    {
+     "id": 101079,
+     "main": true,
+     "name": "3Q-0503",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 37504.39,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 75008.78,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 37504.39,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 225026.34,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010072,
+   "enterpriseId": 101,
+   "number": "101-0072",
+   "contractDate": "2025-09-17",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 315598.96,
+   "totalSellingValue": 315598.96,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5072,
+     "main": true,
+     "name": "Diego Rocha Oliveira"
+    }
+   ],
+   "units": [
+    {
+     "id": 101018,
+     "main": true,
+     "name": "2Q-0502",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 31559.9,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 63119.79,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 31559.9,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 189359.38,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010073,
+   "enterpriseId": 101,
+   "number": "101-0073",
+   "contractDate": "2025-09-01",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 319993.49,
+   "totalSellingValue": 319993.49,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5073,
+     "main": true,
+     "name": "Gisele Gomes Martins"
+    }
+   ],
+   "units": [
+    {
+     "id": 101086,
+     "main": true,
+     "name": "3Q-0702",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 31999.35,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 63998.7,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 31999.35,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 191996.09,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010074,
+   "enterpriseId": 101,
+   "number": "101-0074",
+   "contractDate": "2025-10-17",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 317170.71,
+   "totalSellingValue": 317170.71,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5074,
+     "main": true,
+     "name": "Iara Ribeiro Costa"
+    }
+   ],
+   "units": [
+    {
+     "id": 101005,
+     "main": true,
+     "name": "2Q-0201",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 31717.07,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 63434.14,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 31717.07,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 190302.43,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010075,
+   "enterpriseId": 101,
+   "number": "101-0075",
+   "contractDate": "2025-10-18",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 300898.16,
+   "totalSellingValue": 300898.16,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5075,
+     "main": true,
+     "name": "Karen Lima Gomes"
+    }
+   ],
+   "units": [
+    {
+     "id": 101019,
+     "main": true,
+     "name": "2Q-0503",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 30089.82,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 60179.63,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 30089.82,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 180538.9,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010076,
+   "enterpriseId": 101,
+   "number": "101-0076",
+   "contractDate": "2025-10-18",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 385217.75,
+   "totalSellingValue": 385217.75,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5076,
+     "main": true,
+     "name": "Sergio Oliveira Costa"
+    }
+   ],
+   "units": [
+    {
+     "id": 101114,
+     "main": true,
+     "name": "3Q-1402",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 38521.78,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 77043.55,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 38521.78,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 231130.65,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010077,
+   "enterpriseId": 101,
+   "number": "101-0077",
+   "contractDate": "2025-10-20",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 395340.29,
+   "totalSellingValue": 395340.29,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5077,
+     "main": true,
+     "name": "Elisa Costa Costa"
+    }
+   ],
+   "units": [
+    {
+     "id": 101063,
+     "main": true,
+     "name": "3Q-0103",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 39534.03,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 79068.06,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 39534.03,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 237204.17,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010078,
+   "enterpriseId": 101,
+   "number": "101-0078",
+   "contractDate": "2025-10-26",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 349111.95,
+   "totalSellingValue": 349111.95,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5078,
+     "main": true,
+     "name": "Tania Silva Silva"
+    }
+   ],
+   "units": [
+    {
+     "id": 101094,
+     "main": true,
+     "name": "3Q-0902",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 34911.19,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 69822.39,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 34911.19,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 209467.17,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010079,
+   "enterpriseId": 101,
+   "number": "101-0079",
+   "contractDate": "2025-10-09",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 329892.81,
+   "totalSellingValue": 329892.81,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5079,
+     "main": true,
+     "name": "Fabio Costa Pereira"
+    }
+   ],
+   "units": [
+    {
+     "id": 101085,
+     "main": true,
+     "name": "3Q-0701",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 32989.28,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 65978.56,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 32989.28,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 197935.69,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010080,
+   "enterpriseId": 101,
+   "number": "101-0080",
+   "contractDate": "2025-11-05",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 379972.95,
+   "totalSellingValue": 379972.95,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5080,
+     "main": true,
+     "name": "Fabio Silva Costa"
+    }
+   ],
+   "units": [
+    {
+     "id": 101097,
+     "main": true,
+     "name": "3Q-1001",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 37997.3,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 75994.59,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 37997.3,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 227983.77,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010081,
+   "enterpriseId": 101,
+   "number": "101-0081",
+   "contractDate": "2025-11-22",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 379464.61,
+   "totalSellingValue": 379464.61,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5081,
+     "main": true,
+     "name": "Vitor Ribeiro Martins"
+    }
+   ],
+   "units": [
+    {
+     "id": 101089,
+     "main": true,
+     "name": "3Q-0801",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 37946.46,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 75892.92,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 37946.46,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 227678.77,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010082,
+   "enterpriseId": 101,
+   "number": "101-0082",
+   "contractDate": "2025-11-01",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 297981.83,
+   "totalSellingValue": 297981.83,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5082,
+     "main": true,
+     "name": "Renata Lima Martins"
+    }
+   ],
+   "units": [
+    {
+     "id": 101027,
+     "main": true,
+     "name": "2Q-0703",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 29798.18,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 59596.37,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 29798.18,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 178789.1,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010083,
+   "enterpriseId": 101,
+   "number": "101-0083",
+   "contractDate": "2025-11-03",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 329305.82,
+   "totalSellingValue": 329305.82,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5083,
+     "main": true,
+     "name": "Nuno Costa Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 101104,
+     "main": true,
+     "name": "3Q-1104",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 32930.58,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 65861.16,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 32930.58,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 197583.49,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1010084,
+   "enterpriseId": 101,
+   "number": "101-0084",
+   "contractDate": "2025-11-05",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 265641.11,
+   "totalSellingValue": 265641.11,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5084,
+     "main": true,
+     "name": "Bruno Ribeiro Silva"
+    }
+   ],
+   "units": [
+    {
+     "id": 101039,
+     "main": true,
+     "name": "2Q-1003",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 26564.11,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 53128.22,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 26564.11,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 159384.67,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1020001,
+   "enterpriseId": 102,
+   "number": "102-0001",
+   "contractDate": "2024-11-11",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 223841.76,
+   "totalSellingValue": 223841.76,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5001,
+     "main": true,
+     "name": "Renata Oliveira Pereira"
+    }
+   ],
+   "units": [
+    {
+     "id": 102038,
+     "main": true,
+     "name": "2Q-1002",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 22384.18,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 44768.35,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 22384.18,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 134305.06,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1020002,
+   "enterpriseId": 102,
+   "number": "102-0002",
+   "contractDate": "2024-11-27",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 284562.18,
+   "totalSellingValue": 284562.18,
+   "financialInstitutionNumber": null,
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5002,
+     "main": true,
+     "name": "Sergio Oliveira Rocha"
+    }
+   ],
+   "units": [
+    {
+     "id": 102079,
+     "main": true,
+     "name": "3Q-1003",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 56912.44,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 227649.74,
+     "installmentsNumber": 36
+    }
+   ]
+  },
+  {
+   "id": 1020003,
+   "enterpriseId": 102,
+   "number": "102-0003",
+   "contractDate": "2024-11-28",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 223270.35,
+   "totalSellingValue": 223270.35,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5003,
+     "main": true,
+     "name": "Julio Oliveira Rocha"
+    }
+   ],
+   "units": [
+    {
+     "id": 102024,
+     "main": true,
+     "name": "2Q-0604",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 22327.04,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 44654.07,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 22327.04,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 133962.21,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1020004,
+   "enterpriseId": 102,
+   "number": "102-0004",
+   "contractDate": "2024-11-10",
+   "situation": "3",
+   "cancellationDate": "2025-07-12",
+   "value": 293202.33,
+   "totalSellingValue": 293202.33,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5004,
+     "main": true,
+     "name": "Carla Souza Rocha"
+    }
+   ],
+   "units": [
+    {
+     "id": 102037,
+     "main": true,
+     "name": "2Q-1001",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 29320.23,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 58640.47,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 29320.23,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 175921.4,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1020005,
+   "enterpriseId": 102,
+   "number": "102-0005",
+   "contractDate": "2024-11-01",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 248413.68,
+   "totalSellingValue": 248413.68,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5005,
+     "main": true,
+     "name": "Carla Pereira Ribeiro"
+    }
+   ],
+   "units": [
+    {
+     "id": 102039,
+     "main": true,
+     "name": "2Q-1003",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 24841.37,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 49682.74,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 24841.37,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 149048.21,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1020006,
+   "enterpriseId": 102,
+   "number": "102-0006",
+   "contractDate": "2024-11-18",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 252274.57,
+   "totalSellingValue": 252274.57,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5006,
+     "main": true,
+     "name": "Tania Costa Silva"
+    }
+   ],
+   "units": [
+    {
+     "id": 102021,
+     "main": true,
+     "name": "2Q-0601",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 25227.46,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 50454.91,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 25227.46,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 151364.74,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1020007,
+   "enterpriseId": 102,
+   "number": "102-0007",
+   "contractDate": "2024-11-28",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 218416.5,
+   "totalSellingValue": 218416.5,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5007,
+     "main": true,
+     "name": "Ana Pereira Rocha"
+    }
+   ],
+   "units": [
+    {
+     "id": 102016,
+     "main": true,
+     "name": "2Q-0404",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 21841.65,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 43683.3,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 21841.65,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 131049.9,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1020008,
+   "enterpriseId": 102,
+   "number": "102-0008",
+   "contractDate": "2024-12-17",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 258147.72,
+   "totalSellingValue": 258147.72,
+   "financialInstitutionNumber": null,
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5008,
+     "main": true,
+     "name": "Heitor Lima Silva"
+    }
+   ],
+   "units": [
+    {
+     "id": 102036,
+     "main": true,
+     "name": "2Q-0904",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 51629.54,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 206518.18,
+     "installmentsNumber": 36
+    }
+   ]
+  },
+  {
+   "id": 1020009,
+   "enterpriseId": 102,
+   "number": "102-0009",
+   "contractDate": "2024-12-03",
+   "situation": "3",
+   "cancellationDate": "2025-04-22",
+   "value": 225610.37,
+   "totalSellingValue": 225610.37,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5009,
+     "main": true,
+     "name": "Tania Gomes Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 102032,
+     "main": true,
+     "name": "2Q-0804",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 22561.04,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 45122.07,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 22561.04,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 135366.22,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1020010,
+   "enterpriseId": 102,
+   "number": "102-0010",
+   "contractDate": "2024-12-05",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 335122.55,
+   "totalSellingValue": 335122.55,
+   "financialInstitutionNumber": null,
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5010,
+     "main": true,
+     "name": "Heitor Pereira Gomes"
+    }
+   ],
+   "units": [
+    {
+     "id": 102074,
+     "main": true,
+     "name": "3Q-0902",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 67024.51,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 268098.04,
+     "installmentsNumber": 36
+    }
+   ]
+  },
+  {
+   "id": 1020011,
+   "enterpriseId": 102,
+   "number": "102-0011",
+   "contractDate": "2024-12-17",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 295424.78,
+   "totalSellingValue": 295424.78,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5011,
+     "main": true,
+     "name": "Ana Oliveira Pereira"
+    }
+   ],
+   "units": [
+    {
+     "id": 102030,
+     "main": true,
+     "name": "2Q-0802",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 29542.48,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 59084.96,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 29542.48,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 177254.87,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1020012,
+   "enterpriseId": 102,
+   "number": "102-0012",
+   "contractDate": "2024-12-02",
+   "situation": "3",
+   "cancellationDate": "2025-11-03",
+   "value": 302003.31,
+   "totalSellingValue": 302003.31,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5012,
+     "main": true,
+     "name": "Marta Pereira Souza"
+    }
+   ],
+   "units": [
+    {
+     "id": 102041,
+     "main": true,
+     "name": "3Q-0101",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 30200.33,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 60400.66,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 30200.33,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 181201.99,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1020013,
+   "enterpriseId": 102,
+   "number": "102-0013",
+   "contractDate": "2025-01-05",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 312292.3,
+   "totalSellingValue": 312292.3,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5013,
+     "main": true,
+     "name": "Paulo Ribeiro Silva"
+    }
+   ],
+   "units": [
+    {
+     "id": 102061,
+     "main": true,
+     "name": "3Q-0601",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 31229.23,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 62458.46,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 31229.23,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 187375.38,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1020014,
+   "enterpriseId": 102,
+   "number": "102-0014",
+   "contractDate": "2025-01-11",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 307481.26,
+   "totalSellingValue": 307481.26,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5014,
+     "main": true,
+     "name": "Marta Lima Gomes"
+    }
+   ],
+   "units": [
+    {
+     "id": 102068,
+     "main": true,
+     "name": "3Q-0704",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 30748.13,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 61496.25,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 30748.13,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 184488.76,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1020015,
+   "enterpriseId": 102,
+   "number": "102-0015",
+   "contractDate": "2025-01-05",
+   "situation": "3",
+   "cancellationDate": "2025-07-09",
+   "value": 272651.42,
+   "totalSellingValue": 272651.42,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5015,
+     "main": true,
+     "name": "Bruno Silva Souza"
+    }
+   ],
+   "units": [
+    {
+     "id": 102020,
+     "main": true,
+     "name": "2Q-0504",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 27265.14,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 54530.28,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 27265.14,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 163590.85,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1020016,
+   "enterpriseId": 102,
+   "number": "102-0016",
+   "contractDate": "2025-01-04",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 252360.1,
+   "totalSellingValue": 252360.1,
+   "financialInstitutionNumber": null,
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5016,
+     "main": true,
+     "name": "Olivia Lima Oliveira"
+    }
+   ],
+   "units": [
+    {
+     "id": 102014,
+     "main": true,
+     "name": "2Q-0402",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 50472.02,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 201888.08,
+     "installmentsNumber": 36
+    }
+   ]
+  },
+  {
+   "id": 1020017,
+   "enterpriseId": 102,
+   "number": "102-0017",
+   "contractDate": "2025-01-02",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 220046.42,
+   "totalSellingValue": 220046.42,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5017,
+     "main": true,
+     "name": "Ana Silva Souza"
+    }
+   ],
+   "units": [
+    {
+     "id": 102002,
+     "main": true,
+     "name": "2Q-0102",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 22004.64,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 44009.28,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 22004.64,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 132027.85,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1020018,
+   "enterpriseId": 102,
+   "number": "102-0018",
+   "contractDate": "2025-01-12",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 296794.86,
+   "totalSellingValue": 296794.86,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5018,
+     "main": true,
+     "name": "Paulo Rocha Souza"
+    }
+   ],
+   "units": [
+    {
+     "id": 102067,
+     "main": true,
+     "name": "3Q-0703",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 29679.49,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 59358.97,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 29679.49,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 178076.92,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1020019,
+   "enterpriseId": 102,
+   "number": "102-0019",
+   "contractDate": "2025-02-04",
+   "situation": "3",
+   "cancellationDate": "2025-07-30",
+   "value": 277490.09,
+   "totalSellingValue": 277490.09,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5019,
+     "main": true,
+     "name": "Paulo Souza Ribeiro"
+    }
+   ],
+   "units": [
+    {
+     "id": 102051,
+     "main": true,
+     "name": "3Q-0303",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 27749.01,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 55498.02,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 27749.01,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 166494.05,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1020020,
+   "enterpriseId": 102,
+   "number": "102-0020",
+   "contractDate": "2025-02-06",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 345511.44,
+   "totalSellingValue": 345511.44,
+   "financialInstitutionNumber": null,
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5020,
+     "main": true,
+     "name": "Karen Rocha Rocha"
+    }
+   ],
+   "units": [
+    {
+     "id": 102073,
+     "main": true,
+     "name": "3Q-0901",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 69102.29,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 276409.15,
+     "installmentsNumber": 36
+    }
+   ]
+  },
+  {
+   "id": 1020021,
+   "enterpriseId": 102,
+   "number": "102-0021",
+   "contractDate": "2025-02-10",
+   "situation": "3",
+   "cancellationDate": "2025-11-07",
+   "value": 361400.54,
+   "totalSellingValue": 361400.54,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5021,
+     "main": true,
+     "name": "Bruno Pereira Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 102053,
+     "main": true,
+     "name": "3Q-0401",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 36140.05,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 72280.11,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 36140.05,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 216840.32,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1020022,
+   "enterpriseId": 102,
+   "number": "102-0022",
+   "contractDate": "2025-02-05",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 360106.03,
+   "totalSellingValue": 360106.03,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5022,
+     "main": true,
+     "name": "Heitor Souza Oliveira"
+    }
+   ],
+   "units": [
+    {
+     "id": 102071,
+     "main": true,
+     "name": "3Q-0803",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 36010.6,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 72021.21,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 36010.6,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 216063.62,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1020023,
+   "enterpriseId": 102,
+   "number": "102-0023",
+   "contractDate": "2025-02-03",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 315564.38,
+   "totalSellingValue": 315564.38,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5023,
+     "main": true,
+     "name": "Ana Silva Costa"
+    }
+   ],
+   "units": [
+    {
+     "id": 102058,
+     "main": true,
+     "name": "3Q-0502",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 31556.44,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 63112.88,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 31556.44,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 189338.63,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1020024,
+   "enterpriseId": 102,
+   "number": "102-0024",
+   "contractDate": "2025-03-09",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 345788.76,
+   "totalSellingValue": 345788.76,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5024,
+     "main": true,
+     "name": "Bruno Martins Souza"
+    }
+   ],
+   "units": [
+    {
+     "id": 102046,
+     "main": true,
+     "name": "3Q-0202",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 34578.88,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 69157.75,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 34578.88,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 207473.26,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1020025,
+   "enterpriseId": 102,
+   "number": "102-0025",
+   "contractDate": "2025-03-17",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 282018.81,
+   "totalSellingValue": 282018.81,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5025,
+     "main": true,
+     "name": "Karen Oliveira Gomes"
+    }
+   ],
+   "units": [
+    {
+     "id": 102062,
+     "main": true,
+     "name": "3Q-0602",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 28201.88,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 56403.76,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 28201.88,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 169211.29,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1020026,
+   "enterpriseId": 102,
+   "number": "102-0026",
+   "contractDate": "2025-03-02",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 258501.17,
+   "totalSellingValue": 258501.17,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5026,
+     "main": true,
+     "name": "Marta Souza Oliveira"
+    }
+   ],
+   "units": [
+    {
+     "id": 102022,
+     "main": true,
+     "name": "2Q-0602",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 25850.12,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 51700.23,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 25850.12,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 155100.7,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1020027,
+   "enterpriseId": 102,
+   "number": "102-0027",
+   "contractDate": "2025-03-06",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 248301.6,
+   "totalSellingValue": 248301.6,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5027,
+     "main": true,
+     "name": "Vitor Gomes Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 102029,
+     "main": true,
+     "name": "2Q-0801",
+     "propertyType": "2Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 24830.16,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 49660.32,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 24830.16,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 148980.96,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1020028,
+   "enterpriseId": 102,
+   "number": "102-0028",
+   "contractDate": "2025-03-23",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 273349.01,
+   "totalSellingValue": 273349.01,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5028,
+     "main": true,
+     "name": "Paulo Rocha Rocha"
+    }
+   ],
+   "units": [
+    {
+     "id": 102048,
+     "main": true,
+     "name": "3Q-0204",
+     "propertyType": "3Q"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 27334.9,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 54669.8,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 27334.9,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 164009.41,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030001,
+   "enterpriseId": 103,
+   "number": "103-0001",
+   "contractDate": "2024-10-25",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 226506.9,
+   "totalSellingValue": 226506.9,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5001,
+     "main": true,
+     "name": "Nuno Pereira Martins"
+    }
+   ],
+   "units": [
+    {
+     "id": 103007,
+     "main": true,
+     "name": "SALA-0203",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 22650.69,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 45301.38,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 22650.69,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 135904.14,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030002,
+   "enterpriseId": 103,
+   "number": "103-0002",
+   "contractDate": "2024-10-21",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 183377.48,
+   "totalSellingValue": 183377.48,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5002,
+     "main": true,
+     "name": "Elisa Martins Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 103006,
+     "main": true,
+     "name": "SALA-0202",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 18337.75,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 36675.5,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 18337.75,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 110026.49,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030003,
+   "enterpriseId": 103,
+   "number": "103-0003",
+   "contractDate": "2024-10-23",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 213238.87,
+   "totalSellingValue": 213238.87,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5003,
+     "main": true,
+     "name": "Fabio Rocha Rocha"
+    }
+   ],
+   "units": [
+    {
+     "id": 103013,
+     "main": true,
+     "name": "SALA-0401",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 21323.89,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 42647.77,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 21323.89,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 127943.32,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030004,
+   "enterpriseId": 103,
+   "number": "103-0004",
+   "contractDate": "2024-11-17",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 215583.47,
+   "totalSellingValue": 215583.47,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5004,
+     "main": true,
+     "name": "Paulo Silva Costa"
+    }
+   ],
+   "units": [
+    {
+     "id": 103032,
+     "main": true,
+     "name": "SALA-0804",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 21558.35,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 43116.69,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 21558.35,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 129350.08,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030005,
+   "enterpriseId": 103,
+   "number": "103-0005",
+   "contractDate": "2024-11-26",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 241838.76,
+   "totalSellingValue": 241838.76,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5005,
+     "main": true,
+     "name": "Elisa Pereira Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 103019,
+     "main": true,
+     "name": "SALA-0503",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 24183.88,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 48367.75,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 24183.88,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 145103.26,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030006,
+   "enterpriseId": 103,
+   "number": "103-0006",
+   "contractDate": "2024-11-21",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 228715.64,
+   "totalSellingValue": 228715.64,
+   "financialInstitutionNumber": null,
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5006,
+     "main": true,
+     "name": "Leandro Ribeiro Gomes"
+    }
+   ],
+   "units": [
+    {
+     "id": 103005,
+     "main": true,
+     "name": "SALA-0201",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 45743.13,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 182972.51,
+     "installmentsNumber": 36
+    }
+   ]
+  },
+  {
+   "id": 1030007,
+   "enterpriseId": 103,
+   "number": "103-0007",
+   "contractDate": "2024-11-02",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 236803.46,
+   "totalSellingValue": 236803.46,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5007,
+     "main": true,
+     "name": "Marta Pereira Costa"
+    }
+   ],
+   "units": [
+    {
+     "id": 103021,
+     "main": true,
+     "name": "SALA-0601",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 23680.35,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 47360.69,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 23680.35,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 142082.08,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030008,
+   "enterpriseId": 103,
+   "number": "103-0008",
+   "contractDate": "2024-12-16",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 197862.73,
+   "totalSellingValue": 197862.73,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5008,
+     "main": true,
+     "name": "Leandro Souza Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 103002,
+     "main": true,
+     "name": "SALA-0102",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 19786.27,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 39572.55,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 19786.27,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 118717.64,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030009,
+   "enterpriseId": 103,
+   "number": "103-0009",
+   "contractDate": "2024-12-03",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 185145.51,
+   "totalSellingValue": 185145.51,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5009,
+     "main": true,
+     "name": "Iara Ribeiro Costa"
+    }
+   ],
+   "units": [
+    {
+     "id": 103034,
+     "main": true,
+     "name": "SALA-0902",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 18514.55,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 37029.1,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 18514.55,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 111087.31,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030010,
+   "enterpriseId": 103,
+   "number": "103-0010",
+   "contractDate": "2024-12-16",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 195843.06,
+   "totalSellingValue": 195843.06,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5010,
+     "main": true,
+     "name": "Tania Oliveira Costa"
+    }
+   ],
+   "units": [
+    {
+     "id": 103029,
+     "main": true,
+     "name": "SALA-0801",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 19584.31,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 39168.61,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 19584.31,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 117505.84,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030011,
+   "enterpriseId": 103,
+   "number": "103-0011",
+   "contractDate": "2024-12-05",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 233411.76,
+   "totalSellingValue": 233411.76,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5011,
+     "main": true,
+     "name": "Leandro Souza Martins"
+    }
+   ],
+   "units": [
+    {
+     "id": 103001,
+     "main": true,
+     "name": "SALA-0101",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 23341.18,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 46682.35,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 23341.18,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 140047.06,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030012,
+   "enterpriseId": 103,
+   "number": "103-0012",
+   "contractDate": "2024-12-25",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 209997.95,
+   "totalSellingValue": 209997.95,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5012,
+     "main": true,
+     "name": "Julio Ribeiro Costa"
+    }
+   ],
+   "units": [
+    {
+     "id": 103004,
+     "main": true,
+     "name": "SALA-0104",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 20999.8,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 41999.59,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 20999.8,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 125998.77,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030013,
+   "enterpriseId": 103,
+   "number": "103-0013",
+   "contractDate": "2025-01-17",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 223320.89,
+   "totalSellingValue": 223320.89,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5013,
+     "main": true,
+     "name": "Gisele Lima Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 103016,
+     "main": true,
+     "name": "SALA-0404",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 22332.09,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 44664.18,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 22332.09,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 133992.53,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030014,
+   "enterpriseId": 103,
+   "number": "103-0014",
+   "contractDate": "2025-01-08",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 235964.22,
+   "totalSellingValue": 235964.22,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5014,
+     "main": true,
+     "name": "Leandro Lima Rocha"
+    }
+   ],
+   "units": [
+    {
+     "id": 103037,
+     "main": true,
+     "name": "SALA-1001",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 23596.42,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 47192.84,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 23596.42,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 141578.53,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030015,
+   "enterpriseId": 103,
+   "number": "103-0015",
+   "contractDate": "2025-01-02",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 241558.53,
+   "totalSellingValue": 241558.53,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5015,
+     "main": true,
+     "name": "Tania Ribeiro Ribeiro"
+    }
+   ],
+   "units": [
+    {
+     "id": 103003,
+     "main": true,
+     "name": "SALA-0103",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 24155.85,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 48311.71,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 24155.85,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 144935.12,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030016,
+   "enterpriseId": 103,
+   "number": "103-0016",
+   "contractDate": "2025-02-15",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 237099.71,
+   "totalSellingValue": 237099.71,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5016,
+     "main": true,
+     "name": "Marta Lima Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 103010,
+     "main": true,
+     "name": "SALA-0302",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 23709.97,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 47419.94,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 23709.97,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 142259.83,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030017,
+   "enterpriseId": 103,
+   "number": "103-0017",
+   "contractDate": "2025-02-10",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 199293.84,
+   "totalSellingValue": 199293.84,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5017,
+     "main": true,
+     "name": "Leandro Gomes Ribeiro"
+    }
+   ],
+   "units": [
+    {
+     "id": 103031,
+     "main": true,
+     "name": "SALA-0803",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 19929.38,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 39858.77,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 19929.38,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 119576.3,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030018,
+   "enterpriseId": 103,
+   "number": "103-0018",
+   "contractDate": "2025-02-05",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 190860.03,
+   "totalSellingValue": 190860.03,
+   "financialInstitutionNumber": null,
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5018,
+     "main": true,
+     "name": "Olivia Martins Ribeiro"
+    }
+   ],
+   "units": [
+    {
+     "id": 103015,
+     "main": true,
+     "name": "SALA-0403",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 38172.01,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 152688.02,
+     "installmentsNumber": 36
+    }
+   ]
+  },
+  {
+   "id": 1030019,
+   "enterpriseId": 103,
+   "number": "103-0019",
+   "contractDate": "2025-02-28",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 218371.3,
+   "totalSellingValue": 218371.3,
+   "financialInstitutionNumber": null,
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5019,
+     "main": true,
+     "name": "Elisa Lima Silva"
+    }
+   ],
+   "units": [
+    {
+     "id": 103014,
+     "main": true,
+     "name": "SALA-0402",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 43674.26,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 174697.04,
+     "installmentsNumber": 36
+    }
+   ]
+  },
+  {
+   "id": 1030020,
+   "enterpriseId": 103,
+   "number": "103-0020",
+   "contractDate": "2025-02-05",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 237010.94,
+   "totalSellingValue": 237010.94,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5020,
+     "main": true,
+     "name": "Gisele Lima Souza"
+    }
+   ],
+   "units": [
+    {
+     "id": 103011,
+     "main": true,
+     "name": "SALA-0303",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 23701.09,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 47402.19,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 23701.09,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 142206.56,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030021,
+   "enterpriseId": 103,
+   "number": "103-0021",
+   "contractDate": "2025-03-16",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 244711.63,
+   "totalSellingValue": 244711.63,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5021,
+     "main": true,
+     "name": "Leandro Gomes Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 103036,
+     "main": true,
+     "name": "SALA-0904",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 24471.16,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 48942.33,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 24471.16,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 146826.98,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030022,
+   "enterpriseId": 103,
+   "number": "103-0022",
+   "contractDate": "2025-03-27",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 202057.51,
+   "totalSellingValue": 202057.51,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5022,
+     "main": true,
+     "name": "Carla Martins Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 103033,
+     "main": true,
+     "name": "SALA-0901",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 20205.75,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 40411.5,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 20205.75,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 121234.51,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030023,
+   "enterpriseId": 103,
+   "number": "103-0023",
+   "contractDate": "2025-03-07",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 233640.8,
+   "totalSellingValue": 233640.8,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5023,
+     "main": true,
+     "name": "Vitor Martins Souza"
+    }
+   ],
+   "units": [
+    {
+     "id": 103026,
+     "main": true,
+     "name": "SALA-0702",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 23364.08,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 46728.16,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 23364.08,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 140184.48,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030024,
+   "enterpriseId": 103,
+   "number": "103-0024",
+   "contractDate": "2025-03-24",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 232489.0,
+   "totalSellingValue": 232489.0,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5024,
+     "main": true,
+     "name": "Carla Costa Ribeiro"
+    }
+   ],
+   "units": [
+    {
+     "id": 103009,
+     "main": true,
+     "name": "SALA-0301",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 23248.9,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 46497.8,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 23248.9,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 139493.4,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030025,
+   "enterpriseId": 103,
+   "number": "103-0025",
+   "contractDate": "2025-04-19",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 199643.85,
+   "totalSellingValue": 199643.85,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5025,
+     "main": true,
+     "name": "Heitor Souza Souza"
+    }
+   ],
+   "units": [
+    {
+     "id": 103017,
+     "main": true,
+     "name": "SALA-0501",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 19964.39,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 39928.77,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 19964.39,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 119786.31,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030026,
+   "enterpriseId": 103,
+   "number": "103-0026",
+   "contractDate": "2025-04-07",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 203446.02,
+   "totalSellingValue": 203446.02,
+   "financialInstitutionNumber": null,
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5026,
+     "main": true,
+     "name": "Olivia Souza Ribeiro"
+    }
+   ],
+   "units": [
+    {
+     "id": 103025,
+     "main": true,
+     "name": "SALA-0701",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 40689.2,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 162756.82,
+     "installmentsNumber": 36
+    }
+   ]
+  },
+  {
+   "id": 1030027,
+   "enterpriseId": 103,
+   "number": "103-0027",
+   "contractDate": "2025-04-18",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 187086.65,
+   "totalSellingValue": 187086.65,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5027,
+     "main": true,
+     "name": "Marta Souza Silva"
+    }
+   ],
+   "units": [
+    {
+     "id": 103035,
+     "main": true,
+     "name": "SALA-0903",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 18708.67,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 37417.33,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 18708.67,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 112251.99,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030028,
+   "enterpriseId": 103,
+   "number": "103-0028",
+   "contractDate": "2025-04-02",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 195306.06,
+   "totalSellingValue": 195306.06,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5028,
+     "main": true,
+     "name": "Gisele Oliveira Pereira"
+    }
+   ],
+   "units": [
+    {
+     "id": 103018,
+     "main": true,
+     "name": "SALA-0502",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 19530.61,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 39061.21,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 19530.61,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 117183.64,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030029,
+   "enterpriseId": 103,
+   "number": "103-0029",
+   "contractDate": "2025-04-11",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 231760.18,
+   "totalSellingValue": 231760.18,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5029,
+     "main": true,
+     "name": "Olivia Costa Silva"
+    }
+   ],
+   "units": [
+    {
+     "id": 103039,
+     "main": true,
+     "name": "SALA-1003",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 23176.02,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 46352.04,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 23176.02,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 139056.11,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030030,
+   "enterpriseId": 103,
+   "number": "103-0030",
+   "contractDate": "2025-05-01",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 243048.94,
+   "totalSellingValue": 243048.94,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5030,
+     "main": true,
+     "name": "Karen Ribeiro Silva"
+    }
+   ],
+   "units": [
+    {
+     "id": 103012,
+     "main": true,
+     "name": "SALA-0304",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 24304.89,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 48609.79,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 24304.89,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 145829.36,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030031,
+   "enterpriseId": 103,
+   "number": "103-0031",
+   "contractDate": "2025-05-17",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 204505.67,
+   "totalSellingValue": 204505.67,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5031,
+     "main": true,
+     "name": "Julio Silva Ribeiro"
+    }
+   ],
+   "units": [
+    {
+     "id": 103038,
+     "main": true,
+     "name": "SALA-1002",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 20450.57,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 40901.13,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 20450.57,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 122703.4,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030032,
+   "enterpriseId": 103,
+   "number": "103-0032",
+   "contractDate": "2025-05-09",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 218204.94,
+   "totalSellingValue": 218204.94,
+   "financialInstitutionNumber": null,
+   "financialInstitutionDate": null,
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5032,
+     "main": true,
+     "name": "Sergio Ribeiro Costa"
+    }
+   ],
+   "units": [
+    {
+     "id": 103040,
+     "main": true,
+     "name": "SALA-1004",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 43640.99,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 174563.95,
+     "installmentsNumber": 36
+    }
+   ]
+  },
+  {
+   "id": 1030033,
+   "enterpriseId": 103,
+   "number": "103-0033",
+   "contractDate": "2025-06-05",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 223541.94,
+   "totalSellingValue": 223541.94,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5033,
+     "main": true,
+     "name": "Olivia Costa Oliveira"
+    }
+   ],
+   "units": [
+    {
+     "id": 103022,
+     "main": true,
+     "name": "SALA-0602",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 22354.19,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 44708.39,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 22354.19,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 134125.16,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030034,
+   "enterpriseId": 103,
+   "number": "103-0034",
+   "contractDate": "2025-06-19",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 203005.01,
+   "totalSellingValue": 203005.01,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5034,
+     "main": true,
+     "name": "Elisa Souza Rocha"
+    }
+   ],
+   "units": [
+    {
+     "id": 103030,
+     "main": true,
+     "name": "SALA-0802",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 20300.5,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 40601.0,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 20300.5,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 121803.01,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030035,
+   "enterpriseId": 103,
+   "number": "103-0035",
+   "contractDate": "2025-06-13",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 242929.68,
+   "totalSellingValue": 242929.68,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5035,
+     "main": true,
+     "name": "Iara Silva Pereira"
+    }
+   ],
+   "units": [
+    {
+     "id": 103024,
+     "main": true,
+     "name": "SALA-0604",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 24292.97,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 48585.94,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 24292.97,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 145757.81,
+     "installmentsNumber": 1
+    }
+   ]
+  },
+  {
+   "id": 1030036,
+   "enterpriseId": 103,
+   "number": "103-0036",
+   "contractDate": "2025-06-12",
+   "situation": "1",
+   "cancellationDate": null,
+   "value": 202316.49,
+   "totalSellingValue": 202316.49,
+   "financialInstitutionNumber": "104",
+   "financialInstitutionDate": "2026-05-31",
+   "associativeCredit": "N",
+   "customers": [
+    {
+     "id": 5036,
+     "main": true,
+     "name": "Renata Martins Lima"
+    }
+   ],
+   "units": [
+    {
+     "id": 103008,
+     "main": true,
+     "name": "SALA-0204",
+     "propertyType": "SALA"
+    }
+   ],
+   "paymentConditions": [
+    {
+     "conditionType": "AT",
+     "totalValue": 20231.65,
+     "installmentsNumber": 1
+    },
+    {
+     "conditionType": "PM",
+     "totalValue": 40463.3,
+     "installmentsNumber": 24
+    },
+    {
+     "conditionType": "BA",
+     "totalValue": 20231.65,
+     "installmentsNumber": 2
+    },
+    {
+     "conditionType": "FI",
+     "totalValue": 121389.89,
+     "installmentsNumber": 1
+    }
+   ]
+  }
+ ]
+}

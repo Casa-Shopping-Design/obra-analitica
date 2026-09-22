@@ -1,0 +1,25 @@
+{
+ "data": [
+  {
+   "id": 101,
+   "name": "Residencial Aurora",
+   "commercialName": "Residencial Aurora",
+   "companyId": 1,
+   "type": "1"
+  },
+  {
+   "id": 102,
+   "name": "Parque das Aguas",
+   "commercialName": "Parque das Aguas",
+   "companyId": 1,
+   "type": "1"
+  },
+  {
+   "id": 103,
+   "name": "Torre Comercial Sul",
+   "commercialName": "Torre Comercial Sul",
+   "companyId": 1,
+   "type": "1"
+  }
+ ]
+}

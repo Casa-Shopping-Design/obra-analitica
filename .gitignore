@@ -1,0 +1,10 @@
+.venv/
+.env
+.env*.local
+.vercel/
+node_modules/
+.next/
+dados/income.json
+dados/outcome.json
+__pycache__/
+dados/brutos/
