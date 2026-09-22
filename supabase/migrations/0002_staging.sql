@@ -8,7 +8,7 @@ create table staging.unidade (
   nome text,
   tipologia text,
   area_privativa numeric,
-  situacao text,          -- D disponivel, R reservada, V vendida
+  situacao text,          -- D disponivel, C reservada, P proposta, V vendida, R reserva tecnica (lista completa em marts.mapa_unidades)
   data_entrega date,
   primary key (tenant_id, id_origem)
 );
@@ -43,7 +43,8 @@ create table staging.parcela_receber (
   inadimplente boolean,
   data_recebimento date,
   valor_recebido numeric,
-  primary key (tenant_id, id_origem)
+  -- installmentId repete entre titulos (1, 2, 3...), a chave precisa do titulo junto
+  primary key (tenant_id, contrato_id_origem, id_origem)
 );
 create index on staging.parcela_receber (tenant_id, centro_custo_id, vencimento);
 

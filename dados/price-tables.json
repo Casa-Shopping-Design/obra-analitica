@@ -1,0 +1,1126 @@
+{
+ "data": [
+  {
+   "id": 1010,
+   "version": 24,
+   "companyId": 1,
+   "enterpriseId": 101,
+   "tableName": "Tabela Residencial Aurora",
+   "tableVersionName": "09/2026",
+   "startOfTerm": "2026-09-01",
+   "endOfTerm": null,
+   "paymentConditions": [
+    {
+     "order": 1,
+     "paymentConditionType": "AT",
+     "installmentsNumber": 1,
+     "unitValuePercentage": 10,
+     "indexer": {
+      "id": 7
+     },
+     "baseDate": "2024-10-01"
+    },
+    {
+     "order": 2,
+     "paymentConditionType": "PM",
+     "installmentsNumber": 24,
+     "unitValuePercentage": 20,
+     "indexer": {
+      "id": 7
+     },
+     "baseDate": "2024-10-01"
+    },
+    {
+     "order": 3,
+     "paymentConditionType": "BA",
+     "installmentsNumber": 2,
+     "unitValuePercentage": 10,
+     "indexer": {
+      "id": 7
+     },
+     "baseDate": "2024-10-01"
+    },
+    {
+     "order": 4,
+     "paymentConditionType": "FI",
+     "installmentsNumber": 1,
+     "unitValuePercentage": 60,
+     "indexer": {
+      "id": 7
+     },
+     "baseDate": "2024-10-01"
+    }
+   ],
+   "units": [
+    {
+     "id": 101001,
+     "indexedQuantity": 275.3923
+    },
+    {
+     "id": 101002,
+     "indexedQuantity": 304.0175
+    },
+    {
+     "id": 101003,
+     "indexedQuantity": 324.7121
+    },
+    {
+     "id": 101004,
+     "indexedQuantity": 301.7714
+    },
+    {
+     "id": 101005,
+     "indexedQuantity": 317.1707
+    },
+    {
+     "id": 101006,
+     "indexedQuantity": 322.3473
+    },
+    {
+     "id": 101007,
+     "indexedQuantity": 315.8326
+    },
+    {
+     "id": 101008,
+     "indexedQuantity": 316.2674
+    },
+    {
+     "id": 101009,
+     "indexedQuantity": 270.5828
+    },
+    {
+     "id": 101010,
+     "indexedQuantity": 256.5652
+    },
+    {
+     "id": 101011,
+     "indexedQuantity": 321.3689
+    },
+    {
+     "id": 101012,
+     "indexedQuantity": 250.4695
+    },
+    {
+     "id": 101013,
+     "indexedQuantity": 293.7814
+    },
+    {
+     "id": 101014,
+     "indexedQuantity": 269.0262
+    },
+    {
+     "id": 101015,
+     "indexedQuantity": 281.1742
+    },
+    {
+     "id": 101016,
+     "indexedQuantity": 321.6116
+    },
+    {
+     "id": 101017,
+     "indexedQuantity": 297.0058
+    },
+    {
+     "id": 101018,
+     "indexedQuantity": 315.599
+    },
+    {
+     "id": 101019,
+     "indexedQuantity": 300.8982
+    },
+    {
+     "id": 101020,
+     "indexedQuantity": 276.9518
+    },
+    {
+     "id": 101021,
+     "indexedQuantity": 330.4994
+    },
+    {
+     "id": 101022,
+     "indexedQuantity": 316.24
+    },
+    {
+     "id": 101023,
+     "indexedQuantity": 254.62
+    },
+    {
+     "id": 101024,
+     "indexedQuantity": 285.2756
+    },
+    {
+     "id": 101025,
+     "indexedQuantity": 291.1634
+    },
+    {
+     "id": 101026,
+     "indexedQuantity": 333.0867
+    },
+    {
+     "id": 101027,
+     "indexedQuantity": 297.9818
+    },
+    {
+     "id": 101028,
+     "indexedQuantity": 291.452
+    },
+    {
+     "id": 101029,
+     "indexedQuantity": 321.7392
+    },
+    {
+     "id": 101030,
+     "indexedQuantity": 332.9879
+    },
+    {
+     "id": 101031,
+     "indexedQuantity": 336.6979
+    },
+    {
+     "id": 101032,
+     "indexedQuantity": 330.2086
+    },
+    {
+     "id": 101033,
+     "indexedQuantity": 338.8572
+    },
+    {
+     "id": 101034,
+     "indexedQuantity": 301.6072
+    },
+    {
+     "id": 101035,
+     "indexedQuantity": 257.6612
+    },
+    {
+     "id": 101036,
+     "indexedQuantity": 324.3995
+    },
+    {
+     "id": 101037,
+     "indexedQuantity": 260.7834
+    },
+    {
+     "id": 101038,
+     "indexedQuantity": 303.7006
+    },
+    {
+     "id": 101039,
+     "indexedQuantity": 265.6411
+    },
+    {
+     "id": 101040,
+     "indexedQuantity": 295.213
+    },
+    {
+     "id": 101041,
+     "indexedQuantity": 301.1354
+    },
+    {
+     "id": 101042,
+     "indexedQuantity": 334.5161
+    },
+    {
+     "id": 101043,
+     "indexedQuantity": 314.2652
+    },
+    {
+     "id": 101044,
+     "indexedQuantity": 318.5916
+    },
+    {
+     "id": 101045,
+     "indexedQuantity": 343.0769
+    },
+    {
+     "id": 101046,
+     "indexedQuantity": 281.2178
+    },
+    {
+     "id": 101047,
+     "indexedQuantity": 319.3975
+    },
+    {
+     "id": 101048,
+     "indexedQuantity": 308.31
+    },
+    {
+     "id": 101049,
+     "indexedQuantity": 305.2539
+    },
+    {
+     "id": 101050,
+     "indexedQuantity": 332.9852
+    },
+    {
+     "id": 101051,
+     "indexedQuantity": 298.954
+    },
+    {
+     "id": 101052,
+     "indexedQuantity": 335.4515
+    },
+    {
+     "id": 101053,
+     "indexedQuantity": 263.3458
+    },
+    {
+     "id": 101054,
+     "indexedQuantity": 341.3389
+    },
+    {
+     "id": 101055,
+     "indexedQuantity": 334.1275
+    },
+    {
+     "id": 101056,
+     "indexedQuantity": 293.372
+    },
+    {
+     "id": 101057,
+     "indexedQuantity": 285.2774
+    },
+    {
+     "id": 101058,
+     "indexedQuantity": 304.325
+    },
+    {
+     "id": 101059,
+     "indexedQuantity": 337.4797
+    },
+    {
+     "id": 101060,
+     "indexedQuantity": 301.3346
+    },
+    {
+     "id": 101061,
+     "indexedQuantity": 394.334
+    },
+    {
+     "id": 101062,
+     "indexedQuantity": 329.2691
+    },
+    {
+     "id": 101063,
+     "indexedQuantity": 395.3403
+    },
+    {
+     "id": 101064,
+     "indexedQuantity": 344.9115
+    },
+    {
+     "id": 101065,
+     "indexedQuantity": 382.9733
+    },
+    {
+     "id": 101066,
+     "indexedQuantity": 327.2747
+    },
+    {
+     "id": 101067,
+     "indexedQuantity": 402.2556
+    },
+    {
+     "id": 101068,
+     "indexedQuantity": 376.9288
+    },
+    {
+     "id": 101069,
+     "indexedQuantity": 369.9847
+    },
+    {
+     "id": 101070,
+     "indexedQuantity": 340.3999
+    },
+    {
+     "id": 101071,
+     "indexedQuantity": 380.5048
+    },
+    {
+     "id": 101072,
+     "indexedQuantity": 316.6221
+    },
+    {
+     "id": 101073,
+     "indexedQuantity": 312.0925
+    },
+    {
+     "id": 101074,
+     "indexedQuantity": 364.2027
+    },
+    {
+     "id": 101075,
+     "indexedQuantity": 311.1214
+    },
+    {
+     "id": 101076,
+     "indexedQuantity": 323.4671
+    },
+    {
+     "id": 101077,
+     "indexedQuantity": 369.9671
+    },
+    {
+     "id": 101078,
+     "indexedQuantity": 361.9746
+    },
+    {
+     "id": 101079,
+     "indexedQuantity": 375.0439
+    },
+    {
+     "id": 101080,
+     "indexedQuantity": 341.7115
+    },
+    {
+     "id": 101081,
+     "indexedQuantity": 338.3414
+    },
+    {
+     "id": 101082,
+     "indexedQuantity": 366.387
+    },
+    {
+     "id": 101083,
+     "indexedQuantity": 357.5387
+    },
+    {
+     "id": 101084,
+     "indexedQuantity": 405.4415
+    },
+    {
+     "id": 101085,
+     "indexedQuantity": 329.8928
+    },
+    {
+     "id": 101086,
+     "indexedQuantity": 319.9935
+    },
+    {
+     "id": 101087,
+     "indexedQuantity": 400.3848
+    },
+    {
+     "id": 101088,
+     "indexedQuantity": 337.206
+    },
+    {
+     "id": 101089,
+     "indexedQuantity": 379.4646
+    },
+    {
+     "id": 101090,
+     "indexedQuantity": 391.9133
+    },
+    {
+     "id": 101091,
+     "indexedQuantity": 340.1786
+    },
+    {
+     "id": 101092,
+     "indexedQuantity": 349.3245
+    },
+    {
+     "id": 101093,
+     "indexedQuantity": 364.779
+    },
+    {
+     "id": 101094,
+     "indexedQuantity": 349.112
+    },
+    {
+     "id": 101095,
+     "indexedQuantity": 350.5633
+    },
+    {
+     "id": 101096,
+     "indexedQuantity": 313.7986
+    },
+    {
+     "id": 101097,
+     "indexedQuantity": 379.973
+    },
+    {
+     "id": 101098,
+     "indexedQuantity": 412.6018
+    },
+    {
+     "id": 101099,
+     "indexedQuantity": 365.1343
+    },
+    {
+     "id": 101100,
+     "indexedQuantity": 383.9612
+    },
+    {
+     "id": 101101,
+     "indexedQuantity": 346.3308
+    },
+    {
+     "id": 101102,
+     "indexedQuantity": 365.1336
+    },
+    {
+     "id": 101103,
+     "indexedQuantity": 373.2508
+    },
+    {
+     "id": 101104,
+     "indexedQuantity": 329.3058
+    },
+    {
+     "id": 101105,
+     "indexedQuantity": 368.9583
+    },
+    {
+     "id": 101106,
+     "indexedQuantity": 380.3727
+    },
+    {
+     "id": 101107,
+     "indexedQuantity": 377.6081
+    },
+    {
+     "id": 101108,
+     "indexedQuantity": 390.0055
+    },
+    {
+     "id": 101109,
+     "indexedQuantity": 357.0609
+    },
+    {
+     "id": 101110,
+     "indexedQuantity": 384.4631
+    },
+    {
+     "id": 101111,
+     "indexedQuantity": 317.9668
+    },
+    {
+     "id": 101112,
+     "indexedQuantity": 415.8035
+    },
+    {
+     "id": 101113,
+     "indexedQuantity": 364.2579
+    },
+    {
+     "id": 101114,
+     "indexedQuantity": 385.2178
+    },
+    {
+     "id": 101115,
+     "indexedQuantity": 392.9896
+    },
+    {
+     "id": 101116,
+     "indexedQuantity": 328.479
+    },
+    {
+     "id": 101117,
+     "indexedQuantity": 339.6939
+    },
+    {
+     "id": 101118,
+     "indexedQuantity": 414.9207
+    },
+    {
+     "id": 101119,
+     "indexedQuantity": 333.2015
+    },
+    {
+     "id": 101120,
+     "indexedQuantity": 336.0524
+    }
+   ]
+  },
+  {
+   "id": 1020,
+   "version": 24,
+   "companyId": 1,
+   "enterpriseId": 102,
+   "tableName": "Tabela Parque das Aguas",
+   "tableVersionName": "09/2026",
+   "startOfTerm": "2026-09-01",
+   "endOfTerm": null,
+   "paymentConditions": [
+    {
+     "order": 1,
+     "paymentConditionType": "AT",
+     "installmentsNumber": 1,
+     "unitValuePercentage": 10,
+     "indexer": {
+      "id": 7
+     },
+     "baseDate": "2024-10-01"
+    },
+    {
+     "order": 2,
+     "paymentConditionType": "PM",
+     "installmentsNumber": 24,
+     "unitValuePercentage": 20,
+     "indexer": {
+      "id": 7
+     },
+     "baseDate": "2024-10-01"
+    },
+    {
+     "order": 3,
+     "paymentConditionType": "BA",
+     "installmentsNumber": 2,
+     "unitValuePercentage": 10,
+     "indexer": {
+      "id": 7
+     },
+     "baseDate": "2024-10-01"
+    },
+    {
+     "order": 4,
+     "paymentConditionType": "FI",
+     "installmentsNumber": 1,
+     "unitValuePercentage": 60,
+     "indexer": {
+      "id": 7
+     },
+     "baseDate": "2024-10-01"
+    }
+   ],
+   "units": [
+    {
+     "id": 102001,
+     "indexedQuantity": 273.1457
+    },
+    {
+     "id": 102002,
+     "indexedQuantity": 230.1271
+    },
+    {
+     "id": 102003,
+     "indexedQuantity": 256.3736
+    },
+    {
+     "id": 102004,
+     "indexedQuantity": 234.3406
+    },
+    {
+     "id": 102005,
+     "indexedQuantity": 226.2825
+    },
+    {
+     "id": 102006,
+     "indexedQuantity": 229.7263
+    },
+    {
+     "id": 102007,
+     "indexedQuantity": 286.514
+    },
+    {
+     "id": 102008,
+     "indexedQuantity": 230.2031
+    },
+    {
+     "id": 102009,
+     "indexedQuantity": 258.8022
+    },
+    {
+     "id": 102010,
+     "indexedQuantity": 253.8971
+    },
+    {
+     "id": 102011,
+     "indexedQuantity": 230.7427
+    },
+    {
+     "id": 102012,
+     "indexedQuantity": 222.7347
+    },
+    {
+     "id": 102013,
+     "indexedQuantity": 268.918
+    },
+    {
+     "id": 102014,
+     "indexedQuantity": 276.6631
+    },
+    {
+     "id": 102015,
+     "indexedQuantity": 282.3435
+    },
+    {
+     "id": 102016,
+     "indexedQuantity": 221.483
+    },
+    {
+     "id": 102017,
+     "indexedQuantity": 241.7098
+    },
+    {
+     "id": 102018,
+     "indexedQuantity": 245.9927
+    },
+    {
+     "id": 102019,
+     "indexedQuantity": 281.798
+    },
+    {
+     "id": 102020,
+     "indexedQuantity": 222.4579
+    },
+    {
+     "id": 102021,
+     "indexedQuantity": 245.5133
+    },
+    {
+     "id": 102022,
+     "indexedQuantity": 219.4263
+    },
+    {
+     "id": 102023,
+     "indexedQuantity": 272.087
+    },
+    {
+     "id": 102024,
+     "indexedQuantity": 228.5619
+    },
+    {
+     "id": 102025,
+     "indexedQuantity": 287.0296
+    },
+    {
+     "id": 102026,
+     "indexedQuantity": 281.8234
+    },
+    {
+     "id": 102027,
+     "indexedQuantity": 279.2378
+    },
+    {
+     "id": 102028,
+     "indexedQuantity": 248.3461
+    },
+    {
+     "id": 102029,
+     "indexedQuantity": 289.3309
+    },
+    {
+     "id": 102030,
+     "indexedQuantity": 295.4013
+    },
+    {
+     "id": 102031,
+     "indexedQuantity": 261.1863
+    },
+    {
+     "id": 102032,
+     "indexedQuantity": 288.8636
+    },
+    {
+     "id": 102033,
+     "indexedQuantity": 267.7149
+    },
+    {
+     "id": 102034,
+     "indexedQuantity": 233.9177
+    },
+    {
+     "id": 102035,
+     "indexedQuantity": 225.9391
+    },
+    {
+     "id": 102036,
+     "indexedQuantity": 248.1894
+    },
+    {
+     "id": 102037,
+     "indexedQuantity": 286.6454
+    },
+    {
+     "id": 102038,
+     "indexedQuantity": 248.6076
+    },
+    {
+     "id": 102039,
+     "indexedQuantity": 244.7746
+    },
+    {
+     "id": 102040,
+     "indexedQuantity": 246.2316
+    },
+    {
+     "id": 102041,
+     "indexedQuantity": 355.3277
+    },
+    {
+     "id": 102042,
+     "indexedQuantity": 312.2643
+    },
+    {
+     "id": 102043,
+     "indexedQuantity": 266.2012
+    },
+    {
+     "id": 102044,
+     "indexedQuantity": 323.1817
+    },
+    {
+     "id": 102045,
+     "indexedQuantity": 272.0084
+    },
+    {
+     "id": 102046,
+     "indexedQuantity": 301.6922
+    },
+    {
+     "id": 102047,
+     "indexedQuantity": 299.8094
+    },
+    {
+     "id": 102048,
+     "indexedQuantity": 307.745
+    },
+    {
+     "id": 102049,
+     "indexedQuantity": 332.7323
+    },
+    {
+     "id": 102050,
+     "indexedQuantity": 346.4273
+    },
+    {
+     "id": 102051,
+     "indexedQuantity": 317.1343
+    },
+    {
+     "id": 102052,
+     "indexedQuantity": 271.1957
+    },
+    {
+     "id": 102053,
+     "indexedQuantity": 283.7819
+    },
+    {
+     "id": 102054,
+     "indexedQuantity": 335.5324
+    },
+    {
+     "id": 102055,
+     "indexedQuantity": 325.6574
+    },
+    {
+     "id": 102056,
+     "indexedQuantity": 316.7965
+    },
+    {
+     "id": 102057,
+     "indexedQuantity": 285.0051
+    },
+    {
+     "id": 102058,
+     "indexedQuantity": 316.4473
+    },
+    {
+     "id": 102059,
+     "indexedQuantity": 288.5893
+    },
+    {
+     "id": 102060,
+     "indexedQuantity": 362.8888
+    },
+    {
+     "id": 102061,
+     "indexedQuantity": 346.9817
+    },
+    {
+     "id": 102062,
+     "indexedQuantity": 344.3871
+    },
+    {
+     "id": 102063,
+     "indexedQuantity": 310.2696
+    },
+    {
+     "id": 102064,
+     "indexedQuantity": 281.935
+    },
+    {
+     "id": 102065,
+     "indexedQuantity": 313.057
+    },
+    {
+     "id": 102066,
+     "indexedQuantity": 293.1907
+    },
+    {
+     "id": 102067,
+     "indexedQuantity": 300.6443
+    },
+    {
+     "id": 102068,
+     "indexedQuantity": 293.666
+    },
+    {
+     "id": 102069,
+     "indexedQuantity": 299.1302
+    },
+    {
+     "id": 102070,
+     "indexedQuantity": 301.5039
+    },
+    {
+     "id": 102071,
+     "indexedQuantity": 279.5869
+    },
+    {
+     "id": 102072,
+     "indexedQuantity": 302.6005
+    },
+    {
+     "id": 102073,
+     "indexedQuantity": 343.2738
+    },
+    {
+     "id": 102074,
+     "indexedQuantity": 332.7949
+    },
+    {
+     "id": 102075,
+     "indexedQuantity": 343.88
+    },
+    {
+     "id": 102076,
+     "indexedQuantity": 288.9643
+    },
+    {
+     "id": 102077,
+     "indexedQuantity": 282.4304
+    },
+    {
+     "id": 102078,
+     "indexedQuantity": 347.3944
+    },
+    {
+     "id": 102079,
+     "indexedQuantity": 342.8311
+    },
+    {
+     "id": 102080,
+     "indexedQuantity": 335.1916
+    }
+   ]
+  },
+  {
+   "id": 1030,
+   "version": 24,
+   "companyId": 1,
+   "enterpriseId": 103,
+   "tableName": "Tabela Torre Comercial Sul",
+   "tableVersionName": "09/2026",
+   "startOfTerm": "2026-09-01",
+   "endOfTerm": null,
+   "paymentConditions": [
+    {
+     "order": 1,
+     "paymentConditionType": "AT",
+     "installmentsNumber": 1,
+     "unitValuePercentage": 10,
+     "indexer": {
+      "id": 7
+     },
+     "baseDate": "2024-10-01"
+    },
+    {
+     "order": 2,
+     "paymentConditionType": "PM",
+     "installmentsNumber": 24,
+     "unitValuePercentage": 20,
+     "indexer": {
+      "id": 7
+     },
+     "baseDate": "2024-10-01"
+    },
+    {
+     "order": 3,
+     "paymentConditionType": "BA",
+     "installmentsNumber": 2,
+     "unitValuePercentage": 10,
+     "indexer": {
+      "id": 7
+     },
+     "baseDate": "2024-10-01"
+    },
+    {
+     "order": 4,
+     "paymentConditionType": "FI",
+     "installmentsNumber": 1,
+     "unitValuePercentage": 60,
+     "indexer": {
+      "id": 7
+     },
+     "baseDate": "2024-10-01"
+    }
+   ],
+   "units": [
+    {
+     "id": 103001,
+     "indexedQuantity": 186.7045
+    },
+    {
+     "id": 103002,
+     "indexedQuantity": 219.4514
+    },
+    {
+     "id": 103003,
+     "indexedQuantity": 201.0728
+    },
+    {
+     "id": 103004,
+     "indexedQuantity": 237.3612
+    },
+    {
+     "id": 103005,
+     "indexedQuantity": 196.0916
+    },
+    {
+     "id": 103006,
+     "indexedQuantity": 235.6906
+    },
+    {
+     "id": 103007,
+     "indexedQuantity": 198.0193
+    },
+    {
+     "id": 103008,
+     "indexedQuantity": 199.1393
+    },
+    {
+     "id": 103009,
+     "indexedQuantity": 209.4117
+    },
+    {
+     "id": 103010,
+     "indexedQuantity": 195.0751
+    },
+    {
+     "id": 103011,
+     "indexedQuantity": 191.4084
+    },
+    {
+     "id": 103012,
+     "indexedQuantity": 199.4176
+    },
+    {
+     "id": 103013,
+     "indexedQuantity": 186.5012
+    },
+    {
+     "id": 103014,
+     "indexedQuantity": 232.1251
+    },
+    {
+     "id": 103015,
+     "indexedQuantity": 224.3878
+    },
+    {
+     "id": 103016,
+     "indexedQuantity": 218.8641
+    },
+    {
+     "id": 103017,
+     "indexedQuantity": 193.3289
+    },
+    {
+     "id": 103018,
+     "indexedQuantity": 188.0303
+    },
+    {
+     "id": 103019,
+     "indexedQuantity": 212.5762
+    },
+    {
+     "id": 103020,
+     "indexedQuantity": 234.6418
+    },
+    {
+     "id": 103021,
+     "indexedQuantity": 200.5857
+    },
+    {
+     "id": 103022,
+     "indexedQuantity": 232.7228
+    },
+    {
+     "id": 103023,
+     "indexedQuantity": 193.7052
+    },
+    {
+     "id": 103024,
+     "indexedQuantity": 222.17
+    },
+    {
+     "id": 103025,
+     "indexedQuantity": 230.1735
+    },
+    {
+     "id": 103026,
+     "indexedQuantity": 187.2731
+    },
+    {
+     "id": 103027,
+     "indexedQuantity": 213.4421
+    },
+    {
+     "id": 103028,
+     "indexedQuantity": 208.5644
+    },
+    {
+     "id": 103029,
+     "indexedQuantity": 216.7537
+    },
+    {
+     "id": 103030,
+     "indexedQuantity": 190.6753
+    },
+    {
+     "id": 103031,
+     "indexedQuantity": 246.4269
+    },
+    {
+     "id": 103032,
+     "indexedQuantity": 236.9162
+    },
+    {
+     "id": 103033,
+     "indexedQuantity": 201.8412
+    },
+    {
+     "id": 103034,
+     "indexedQuantity": 231.5645
+    },
+    {
+     "id": 103035,
+     "indexedQuantity": 232.8522
+    },
+    {
+     "id": 103036,
+     "indexedQuantity": 227.2525
+    },
+    {
+     "id": 103037,
+     "indexedQuantity": 229.3415
+    },
+    {
+     "id": 103038,
+     "indexedQuantity": 233.9893
+    },
+    {
+     "id": 103039,
+     "indexedQuantity": 248.4439
+    },
+    {
+     "id": 103040,
+     "indexedQuantity": 196.228
+    }
+   ]
+  }
+ ]
+}

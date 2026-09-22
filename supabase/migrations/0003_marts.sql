@@ -51,8 +51,10 @@ group by 1, 2, 3;
 create or replace view marts.estoque_atual with (security_invoker = true) as
 select tenant_id, centro_custo_id, tipologia,
        count(*) filter (where situacao = 'D') as disponiveis,
-       count(*) filter (where situacao = 'R') as reservadas,
-       count(*) filter (where situacao = 'V') as vendidas,
+       count(*) filter (where situacao = 'C') as reservadas,
+       count(*) filter (where situacao = 'P') as propostas,
+       count(*) filter (where situacao in ('V', 'O', 'G')) as vendidas,
+       count(*) filter (where situacao not in ('D', 'C', 'P', 'V', 'O', 'G')) as indisponiveis,
        count(*) as total
 from staging.unidade
 group by 1, 2, 3;

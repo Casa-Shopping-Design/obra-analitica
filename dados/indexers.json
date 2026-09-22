@@ -1,0 +1,220 @@
+{
+ "data": [
+  {
+   "id": 7,
+   "name": "INCC",
+   "lastValue": {
+    "date": "2024-10-01",
+    "value": 1000.0,
+    "percentage": 0.0
+   }
+  },
+  {
+   "id": 7,
+   "name": "INCC",
+   "lastValue": {
+    "date": "2024-11-01",
+    "value": 1005.7,
+    "percentage": 0.57
+   }
+  },
+  {
+   "id": 7,
+   "name": "INCC",
+   "lastValue": {
+    "date": "2024-12-01",
+    "value": 1009.5217,
+    "percentage": 0.38
+   }
+  },
+  {
+   "id": 7,
+   "name": "INCC",
+   "lastValue": {
+    "date": "2025-01-01",
+    "value": 1013.055,
+    "percentage": 0.35
+   }
+  },
+  {
+   "id": 7,
+   "name": "INCC",
+   "lastValue": {
+    "date": "2025-02-01",
+    "value": 1018.9307,
+    "percentage": 0.58
+   }
+  },
+  {
+   "id": 7,
+   "name": "INCC",
+   "lastValue": {
+    "date": "2025-03-01",
+    "value": 1021.9875,
+    "percentage": 0.3
+   }
+  },
+  {
+   "id": 7,
+   "name": "INCC",
+   "lastValue": {
+    "date": "2025-04-01",
+    "value": 1026.4842,
+    "percentage": 0.44
+   }
+  },
+  {
+   "id": 7,
+   "name": "INCC",
+   "lastValue": {
+    "date": "2025-05-01",
+    "value": 1031.3087,
+    "percentage": 0.47
+   }
+  },
+  {
+   "id": 7,
+   "name": "INCC",
+   "lastValue": {
+    "date": "2025-06-01",
+    "value": 1036.3621,
+    "percentage": 0.49
+   }
+  },
+  {
+   "id": 7,
+   "name": "INCC",
+   "lastValue": {
+    "date": "2025-07-01",
+    "value": 1039.5748,
+    "percentage": 0.31
+   }
+  },
+  {
+   "id": 7,
+   "name": "INCC",
+   "lastValue": {
+    "date": "2025-08-01",
+    "value": 1044.7727,
+    "percentage": 0.5
+   }
+  },
+  {
+   "id": 7,
+   "name": "INCC",
+   "lastValue": {
+    "date": "2025-09-01",
+    "value": 1049.4742,
+    "percentage": 0.45
+   }
+  },
+  {
+   "id": 7,
+   "name": "INCC",
+   "lastValue": {
+    "date": "2025-10-01",
+    "value": 1055.6661,
+    "percentage": 0.59
+   }
+  },
+  {
+   "id": 7,
+   "name": "INCC",
+   "lastValue": {
+    "date": "2025-11-01",
+    "value": 1058.4108,
+    "percentage": 0.26
+   }
+  },
+  {
+   "id": 7,
+   "name": "INCC",
+   "lastValue": {
+    "date": "2025-12-01",
+    "value": 1065.0788,
+    "percentage": 0.63
+   }
+  },
+  {
+   "id": 7,
+   "name": "INCC",
+   "lastValue": {
+    "date": "2026-01-01",
+    "value": 1068.4871,
+    "percentage": 0.32
+   }
+  },
+  {
+   "id": 7,
+   "name": "INCC",
+   "lastValue": {
+    "date": "2026-02-01",
+    "value": 1074.6843,
+    "percentage": 0.58
+   }
+  },
+  {
+   "id": 7,
+   "name": "INCC",
+   "lastValue": {
+    "date": "2026-03-01",
+    "value": 1079.5204,
+    "percentage": 0.45
+   }
+  },
+  {
+   "id": 7,
+   "name": "INCC",
+   "lastValue": {
+    "date": "2026-04-01",
+    "value": 1085.7816,
+    "percentage": 0.58
+   }
+  },
+  {
+   "id": 7,
+   "name": "INCC",
+   "lastValue": {
+    "date": "2026-05-01",
+    "value": 1089.2561,
+    "percentage": 0.32
+   }
+  },
+  {
+   "id": 7,
+   "name": "INCC",
+   "lastValue": {
+    "date": "2026-06-01",
+    "value": 1093.3953,
+    "percentage": 0.38
+   }
+  },
+  {
+   "id": 7,
+   "name": "INCC",
+   "lastValue": {
+    "date": "2026-07-01",
+    "value": 1096.4568,
+    "percentage": 0.28
+   }
+  },
+  {
+   "id": 7,
+   "name": "INCC",
+   "lastValue": {
+    "date": "2026-08-01",
+    "value": 1102.597,
+    "percentage": 0.56
+   }
+  },
+  {
+   "id": 7,
+   "name": "INCC",
+   "lastValue": {
+    "date": "2026-09-01",
+    "value": 1107.6689,
+    "percentage": 0.46
+   }
+  }
+ ]
+}

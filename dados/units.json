@@ -7,7 +7,11 @@
    "propertyType": "2Q",
    "privateArea": 55,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 305043.49,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101002,
@@ -16,7 +20,11 @@
    "propertyType": "2Q",
    "privateArea": 59,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 336750.73,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101003,
@@ -25,7 +33,11 @@
    "propertyType": "2Q",
    "privateArea": 55,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 359673.49,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101004,
@@ -34,7 +46,11 @@
    "propertyType": "2Q",
    "privateArea": 59,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 334262.79,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101005,
@@ -43,7 +59,11 @@
    "propertyType": "2Q",
    "privateArea": 58,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 351320.12,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101006,
@@ -52,7 +72,11 @@
    "propertyType": "2Q",
    "privateArea": 59,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 357054.08,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101007,
@@ -61,7 +85,11 @@
    "propertyType": "2Q",
    "privateArea": 61,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 349837.95,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101008,
@@ -70,7 +98,11 @@
    "propertyType": "2Q",
    "privateArea": 61,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 350319.56,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101009,
@@ -79,7 +111,11 @@
    "propertyType": "2Q",
    "privateArea": 58,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 299716.15,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101010,
@@ -88,7 +124,11 @@
    "propertyType": "2Q",
    "privateArea": 59,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 284189.29,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101011,
@@ -97,7 +137,11 @@
    "propertyType": "2Q",
    "privateArea": 57,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 355970.34,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101012,
@@ -106,7 +150,11 @@
    "propertyType": "2Q",
    "privateArea": 58,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 277437.28,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101013,
@@ -115,7 +163,11 @@
    "propertyType": "2Q",
    "privateArea": 60,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 325412.52,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101014,
@@ -123,8 +175,12 @@
    "name": "2Q-0402",
    "propertyType": "2Q",
    "privateArea": 57,
-   "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "commercialStock": "P",
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 297991.96,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101015,
@@ -133,7 +189,11 @@
    "propertyType": "2Q",
    "privateArea": 57,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 311447.92,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101016,
@@ -142,7 +202,11 @@
    "propertyType": "2Q",
    "privateArea": 57,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 356239.17,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101017,
@@ -151,7 +215,11 @@
    "propertyType": "2Q",
    "privateArea": 60,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 328984.09,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101018,
@@ -160,7 +228,11 @@
    "propertyType": "2Q",
    "privateArea": 55,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 349579.2,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101019,
@@ -169,7 +241,11 @@
    "propertyType": "2Q",
    "privateArea": 55,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 333295.58,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101020,
@@ -178,7 +254,11 @@
    "propertyType": "2Q",
    "privateArea": 57,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 306770.9,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101021,
@@ -187,7 +267,11 @@
    "propertyType": "2Q",
    "privateArea": 56,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 366083.91,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101022,
@@ -196,7 +280,11 @@
    "propertyType": "2Q",
    "privateArea": 60,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 350289.21,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101023,
@@ -205,7 +293,11 @@
    "propertyType": "2Q",
    "privateArea": 57,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 282034.66,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101024,
@@ -214,7 +306,11 @@
    "propertyType": "2Q",
    "privateArea": 60,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 315990.91,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101025,
@@ -222,8 +318,12 @@
    "name": "2Q-0701",
    "propertyType": "2Q",
    "privateArea": 58,
-   "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "commercialStock": "C",
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 322512.64,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101026,
@@ -232,7 +332,11 @@
    "propertyType": "2Q",
    "privateArea": 58,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 368949.78,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101027,
@@ -241,7 +345,11 @@
    "propertyType": "2Q",
    "privateArea": 59,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 330065.17,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101028,
@@ -250,7 +358,11 @@
    "propertyType": "2Q",
    "privateArea": 55,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 322832.32,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101029,
@@ -259,7 +371,11 @@
    "propertyType": "2Q",
    "privateArea": 61,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 356380.51,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101030,
@@ -268,7 +384,11 @@
    "propertyType": "2Q",
    "privateArea": 59,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 368840.34,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101031,
@@ -277,7 +397,11 @@
    "propertyType": "2Q",
    "privateArea": 58,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 372949.79,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101032,
@@ -286,7 +410,11 @@
    "propertyType": "2Q",
    "privateArea": 57,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 365761.8,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101033,
@@ -295,7 +423,11 @@
    "propertyType": "2Q",
    "privateArea": 59,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 375341.58,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101034,
@@ -304,7 +436,11 @@
    "propertyType": "2Q",
    "privateArea": 58,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 334080.92,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101035,
@@ -313,7 +449,11 @@
    "propertyType": "2Q",
    "privateArea": 61,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 285403.3,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101036,
@@ -322,7 +462,11 @@
    "propertyType": "2Q",
    "privateArea": 56,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 359327.24,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101037,
@@ -331,7 +475,11 @@
    "propertyType": "2Q",
    "privateArea": 61,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 288861.66,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101038,
@@ -340,7 +488,11 @@
    "propertyType": "2Q",
    "privateArea": 60,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 336399.71,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101039,
@@ -349,7 +501,11 @@
    "propertyType": "2Q",
    "privateArea": 60,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 294242.39,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101040,
@@ -357,8 +513,12 @@
    "name": "2Q-1004",
    "propertyType": "2Q",
    "privateArea": 59,
-   "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 326998.26,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101041,
@@ -367,7 +527,11 @@
    "propertyType": "2Q",
    "privateArea": 56,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 333558.32,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101042,
@@ -376,7 +540,11 @@
    "propertyType": "2Q",
    "privateArea": 56,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 370533.08,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101043,
@@ -385,7 +553,11 @@
    "propertyType": "2Q",
    "privateArea": 55,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 348101.79,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101044,
@@ -394,7 +566,11 @@
    "propertyType": "2Q",
    "privateArea": 58,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 352894.01,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101045,
@@ -403,7 +579,11 @@
    "propertyType": "2Q",
    "privateArea": 60,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 380015.61,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101046,
@@ -412,7 +592,11 @@
    "propertyType": "2Q",
    "privateArea": 59,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 311496.21,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101047,
@@ -421,7 +605,11 @@
    "propertyType": "2Q",
    "privateArea": 58,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 353786.68,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101048,
@@ -430,7 +618,11 @@
    "propertyType": "2Q",
    "privateArea": 57,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 341505.4,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101049,
@@ -439,7 +631,11 @@
    "propertyType": "2Q",
    "privateArea": 60,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 338120.25,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101050,
@@ -448,7 +644,11 @@
    "propertyType": "2Q",
    "privateArea": 58,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 368837.35,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101051,
@@ -457,7 +657,11 @@
    "propertyType": "2Q",
    "privateArea": 58,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 331142.05,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101052,
@@ -466,7 +670,11 @@
    "propertyType": "2Q",
    "privateArea": 57,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 371569.19,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101053,
@@ -475,7 +683,11 @@
    "propertyType": "2Q",
    "privateArea": 55,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 291699.95,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101054,
@@ -484,7 +696,11 @@
    "propertyType": "2Q",
    "privateArea": 60,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 378090.48,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101055,
@@ -493,7 +709,11 @@
    "propertyType": "2Q",
    "privateArea": 58,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 370102.64,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101056,
@@ -502,7 +722,11 @@
    "propertyType": "2Q",
    "privateArea": 58,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 324959.04,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101057,
@@ -511,7 +735,11 @@
    "propertyType": "2Q",
    "privateArea": 56,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 315992.9,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101058,
@@ -519,8 +747,12 @@
    "name": "2Q-1502",
    "propertyType": "2Q",
    "privateArea": 58,
-   "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "commercialStock": "R",
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 337091.34,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101059,
@@ -529,7 +761,11 @@
    "propertyType": "2Q",
    "privateArea": 61,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 373815.77,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101060,
@@ -537,8 +773,12 @@
    "name": "2Q-1504",
    "propertyType": "2Q",
    "privateArea": 61,
-   "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "commercialStock": "V",
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 333778.96,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101061,
@@ -547,7 +787,11 @@
    "propertyType": "3Q",
    "privateArea": 76,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 436791.51,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101062,
@@ -556,7 +800,11 @@
    "propertyType": "3Q",
    "privateArea": 77,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 364721.14,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101063,
@@ -565,7 +813,11 @@
    "propertyType": "3Q",
    "privateArea": 74,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 437906.16,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101064,
@@ -574,7 +826,11 @@
    "propertyType": "3Q",
    "privateArea": 71,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 382047.74,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101065,
@@ -583,7 +839,11 @@
    "propertyType": "3Q",
    "privateArea": 76,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 424207.61,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101066,
@@ -592,7 +852,11 @@
    "propertyType": "3Q",
    "privateArea": 75,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 362512.01,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101067,
@@ -600,8 +864,12 @@
    "name": "3Q-0203",
    "propertyType": "3Q",
    "privateArea": 72,
-   "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 445566.02,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101068,
@@ -609,8 +877,12 @@
    "name": "3Q-0204",
    "propertyType": "3Q",
    "privateArea": 77,
-   "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "commercialStock": "D",
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 417512.31,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101069,
@@ -619,7 +891,11 @@
    "propertyType": "3Q",
    "privateArea": 71,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 409820.55,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101070,
@@ -628,7 +904,11 @@
    "propertyType": "3Q",
    "privateArea": 74,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 377050.38,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101071,
@@ -637,7 +917,11 @@
    "propertyType": "3Q",
    "privateArea": 72,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 421473.33,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101072,
@@ -646,7 +930,11 @@
    "propertyType": "3Q",
    "privateArea": 74,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 350712.45,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101073,
@@ -655,7 +943,11 @@
    "propertyType": "3Q",
    "privateArea": 71,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 345695.16,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101074,
@@ -664,7 +956,11 @@
    "propertyType": "3Q",
    "privateArea": 74,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 403416.0,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101075,
@@ -673,7 +969,11 @@
    "propertyType": "3Q",
    "privateArea": 77,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 344619.5,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101076,
@@ -682,7 +982,11 @@
    "propertyType": "3Q",
    "privateArea": 77,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 358294.45,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101077,
@@ -690,8 +994,12 @@
    "name": "3Q-0501",
    "propertyType": "3Q",
    "privateArea": 71,
-   "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "commercialStock": "P",
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 409801.05,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101078,
@@ -700,7 +1008,11 @@
    "propertyType": "3Q",
    "privateArea": 77,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 400948.01,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101079,
@@ -709,7 +1021,11 @@
    "propertyType": "3Q",
    "privateArea": 73,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 415424.46,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101080,
@@ -718,7 +1034,11 @@
    "propertyType": "3Q",
    "privateArea": 76,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 378503.2,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101081,
@@ -727,7 +1047,11 @@
    "propertyType": "3Q",
    "privateArea": 71,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 374770.25,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101082,
@@ -736,7 +1060,11 @@
    "propertyType": "3Q",
    "privateArea": 75,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 405835.49,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101083,
@@ -745,7 +1073,11 @@
    "propertyType": "3Q",
    "privateArea": 77,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 396034.5,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101084,
@@ -754,7 +1086,11 @@
    "propertyType": "3Q",
    "privateArea": 76,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 449094.94,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101085,
@@ -763,7 +1099,11 @@
    "propertyType": "3Q",
    "privateArea": 75,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 365411.99,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101086,
@@ -772,7 +1112,11 @@
    "propertyType": "3Q",
    "privateArea": 75,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 354446.85,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101087,
@@ -781,7 +1125,11 @@
    "propertyType": "3Q",
    "privateArea": 75,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 443493.79,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101088,
@@ -790,7 +1138,11 @@
    "propertyType": "3Q",
    "privateArea": 75,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 373512.6,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101089,
@@ -799,7 +1151,11 @@
    "propertyType": "3Q",
    "privateArea": 74,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 420321.14,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101090,
@@ -808,7 +1164,11 @@
    "propertyType": "3Q",
    "privateArea": 72,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 434110.17,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101091,
@@ -817,7 +1177,11 @@
    "propertyType": "3Q",
    "privateArea": 75,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 376805.26,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101092,
@@ -826,7 +1190,11 @@
    "propertyType": "3Q",
    "privateArea": 74,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 386935.88,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101093,
@@ -835,7 +1203,11 @@
    "propertyType": "3Q",
    "privateArea": 72,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 404054.35,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101094,
@@ -844,7 +1216,11 @@
    "propertyType": "3Q",
    "privateArea": 72,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 386700.51,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101095,
@@ -853,7 +1229,11 @@
    "propertyType": "3Q",
    "privateArea": 71,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 388308.06,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101096,
@@ -862,7 +1242,11 @@
    "propertyType": "3Q",
    "privateArea": 71,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 347584.95,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101097,
@@ -871,7 +1255,11 @@
    "propertyType": "3Q",
    "privateArea": 73,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 420884.27,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101098,
@@ -880,7 +1268,11 @@
    "propertyType": "3Q",
    "privateArea": 77,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 457026.18,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101099,
@@ -889,7 +1281,11 @@
    "propertyType": "3Q",
    "privateArea": 71,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 404447.91,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101100,
@@ -898,7 +1294,11 @@
    "propertyType": "3Q",
    "privateArea": 73,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 425301.88,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101101,
@@ -907,7 +1307,11 @@
    "propertyType": "3Q",
    "privateArea": 74,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 383619.86,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101102,
@@ -916,7 +1320,11 @@
    "propertyType": "3Q",
    "privateArea": 71,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 404447.13,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101103,
@@ -924,8 +1332,12 @@
    "name": "3Q-1103",
    "propertyType": "3Q",
    "privateArea": 74,
-   "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "commercialStock": "C",
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 413438.3,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101104,
@@ -934,7 +1346,11 @@
    "propertyType": "3Q",
    "privateArea": 77,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 364761.79,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101105,
@@ -943,7 +1359,11 @@
    "propertyType": "3Q",
    "privateArea": 75,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 408683.63,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101106,
@@ -952,7 +1372,11 @@
    "propertyType": "3Q",
    "privateArea": 74,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 421327.01,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101107,
@@ -961,7 +1385,11 @@
    "propertyType": "3Q",
    "privateArea": 74,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 418264.75,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101108,
@@ -970,7 +1398,11 @@
    "propertyType": "3Q",
    "privateArea": 76,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 431996.96,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101109,
@@ -979,7 +1411,11 @@
    "propertyType": "3Q",
    "privateArea": 75,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 395505.25,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101110,
@@ -988,7 +1424,11 @@
    "propertyType": "3Q",
    "privateArea": 72,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 425857.82,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101111,
@@ -997,7 +1437,11 @@
    "propertyType": "3Q",
    "privateArea": 72,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 352201.94,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101112,
@@ -1006,7 +1450,11 @@
    "propertyType": "3Q",
    "privateArea": 75,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 460572.61,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101113,
@@ -1015,7 +1463,11 @@
    "propertyType": "3Q",
    "privateArea": 71,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 403477.15,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101114,
@@ -1024,7 +1476,11 @@
    "propertyType": "3Q",
    "privateArea": 77,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 426693.78,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101115,
@@ -1033,7 +1489,11 @@
    "propertyType": "3Q",
    "privateArea": 74,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 435302.36,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101116,
@@ -1042,7 +1502,11 @@
    "propertyType": "3Q",
    "privateArea": 71,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 363845.97,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101117,
@@ -1051,7 +1515,11 @@
    "propertyType": "3Q",
    "privateArea": 75,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 376268.37,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101118,
@@ -1060,7 +1528,11 @@
    "propertyType": "3Q",
    "privateArea": 75,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 459594.76,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101119,
@@ -1069,7 +1541,11 @@
    "propertyType": "3Q",
    "privateArea": 72,
    "commercialStock": "D",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 369076.94,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 101120,
@@ -1078,43 +1554,63 @@
    "propertyType": "3Q",
    "privateArea": 77,
    "commercialStock": "V",
-   "deliveryDate": "2027-06-30"
+   "deliveryDate": "2027-06-30",
+   "indexerId": 7,
+   "tablePricesID": 1010,
+   "saleValuePrice": 372234.79,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102001,
    "enterpriseId": 102,
    "name": "2Q-0101",
    "propertyType": "2Q",
-   "privateArea": 56,
-   "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 61,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 302555.0,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102002,
    "enterpriseId": 102,
    "name": "2Q-0102",
    "propertyType": "2Q",
-   "privateArea": 59,
+   "privateArea": 57,
    "commercialStock": "V",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 254904.63,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102003,
    "enterpriseId": 102,
    "name": "2Q-0103",
    "propertyType": "2Q",
-   "privateArea": 58,
+   "privateArea": 55,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 283977.06,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102004,
    "enterpriseId": 102,
    "name": "2Q-0104",
    "propertyType": "2Q",
-   "privateArea": 55,
+   "privateArea": 58,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 259571.79,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102005,
@@ -1123,70 +1619,102 @@
    "propertyType": "2Q",
    "privateArea": 59,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 250646.09,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102006,
    "enterpriseId": 102,
    "name": "2Q-0202",
    "propertyType": "2Q",
-   "privateArea": 59,
+   "privateArea": 61,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 254460.68,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102007,
    "enterpriseId": 102,
    "name": "2Q-0203",
    "propertyType": "2Q",
-   "privateArea": 58,
-   "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 55,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 317362.65,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102008,
    "enterpriseId": 102,
    "name": "2Q-0204",
    "propertyType": "2Q",
-   "privateArea": 55,
-   "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 61,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 254988.81,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102009,
    "enterpriseId": 102,
    "name": "2Q-0301",
    "propertyType": "2Q",
-   "privateArea": 58,
+   "privateArea": 57,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 286667.15,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102010,
    "enterpriseId": 102,
    "name": "2Q-0302",
    "propertyType": "2Q",
-   "privateArea": 55,
+   "privateArea": 61,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 281233.92,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102011,
    "enterpriseId": 102,
    "name": "2Q-0303",
    "propertyType": "2Q",
-   "privateArea": 57,
+   "privateArea": 61,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 255586.51,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102012,
    "enterpriseId": 102,
    "name": "2Q-0304",
    "propertyType": "2Q",
-   "privateArea": 55,
+   "privateArea": 59,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 246716.3,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102013,
@@ -1195,7 +1723,11 @@
    "propertyType": "2Q",
    "privateArea": 57,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 297872.11,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102014,
@@ -1203,89 +1735,129 @@
    "name": "2Q-0402",
    "propertyType": "2Q",
    "privateArea": 57,
-   "commercialStock": "V",
-   "deliveryDate": "2027-02-28"
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 306451.11,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102015,
    "enterpriseId": 102,
    "name": "2Q-0403",
    "propertyType": "2Q",
-   "privateArea": 58,
+   "privateArea": 57,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 312743.11,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102016,
    "enterpriseId": 102,
    "name": "2Q-0404",
    "propertyType": "2Q",
-   "privateArea": 55,
-   "commercialStock": "V",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 57,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 245329.83,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102017,
    "enterpriseId": 102,
    "name": "2Q-0501",
    "propertyType": "2Q",
-   "privateArea": 55,
-   "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 61,
+   "commercialStock": "P",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 267734.43,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102018,
    "enterpriseId": 102,
    "name": "2Q-0502",
    "propertyType": "2Q",
-   "privateArea": 60,
+   "privateArea": 59,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 272478.46,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102019,
    "enterpriseId": 102,
    "name": "2Q-0503",
    "propertyType": "2Q",
-   "privateArea": 61,
-   "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 56,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 312138.88,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102020,
    "enterpriseId": 102,
    "name": "2Q-0504",
    "propertyType": "2Q",
-   "privateArea": 61,
-   "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 58,
+   "commercialStock": "R",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 246409.7,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102021,
    "enterpriseId": 102,
    "name": "2Q-0601",
    "propertyType": "2Q",
-   "privateArea": 57,
-   "commercialStock": "V",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 56,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 271947.45,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102022,
    "enterpriseId": 102,
    "name": "2Q-0602",
    "propertyType": "2Q",
-   "privateArea": 59,
-   "commercialStock": "V",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 56,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 243051.69,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102023,
    "enterpriseId": 102,
    "name": "2Q-0603",
    "propertyType": "2Q",
-   "privateArea": 59,
+   "privateArea": 60,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 301382.31,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102024,
@@ -1293,35 +1865,51 @@
    "name": "2Q-0604",
    "propertyType": "2Q",
    "privateArea": 60,
-   "commercialStock": "V",
-   "deliveryDate": "2027-02-28"
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 253170.91,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102025,
    "enterpriseId": 102,
    "name": "2Q-0701",
    "propertyType": "2Q",
-   "privateArea": 59,
+   "privateArea": 57,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 317933.76,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102026,
    "enterpriseId": 102,
    "name": "2Q-0702",
    "propertyType": "2Q",
-   "privateArea": 56,
+   "privateArea": 55,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 312167.02,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102027,
    "enterpriseId": 102,
    "name": "2Q-0703",
    "propertyType": "2Q",
-   "privateArea": 56,
-   "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 60,
+   "commercialStock": "C",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 309303.03,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102028,
@@ -1329,8 +1917,12 @@
    "name": "2Q-0704",
    "propertyType": "2Q",
    "privateArea": 60,
-   "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 275085.25,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102029,
@@ -1338,53 +1930,77 @@
    "name": "2Q-0801",
    "propertyType": "2Q",
    "privateArea": 58,
-   "commercialStock": "V",
-   "deliveryDate": "2027-02-28"
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 320482.84,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102030,
    "enterpriseId": 102,
    "name": "2Q-0802",
    "propertyType": "2Q",
-   "privateArea": 57,
-   "commercialStock": "V",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 59,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 327206.83,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102031,
    "enterpriseId": 102,
    "name": "2Q-0803",
    "propertyType": "2Q",
-   "privateArea": 58,
+   "privateArea": 57,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 289307.94,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102032,
    "enterpriseId": 102,
    "name": "2Q-0804",
    "propertyType": "2Q",
-   "privateArea": 58,
-   "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 57,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 319965.23,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102033,
    "enterpriseId": 102,
    "name": "2Q-0901",
    "propertyType": "2Q",
-   "privateArea": 56,
+   "privateArea": 60,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 296539.47,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102034,
    "enterpriseId": 102,
    "name": "2Q-0902",
    "propertyType": "2Q",
-   "privateArea": 58,
+   "privateArea": 55,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 259103.36,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102035,
@@ -1393,7 +2009,11 @@
    "propertyType": "2Q",
    "privateArea": 61,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 250265.71,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102036,
@@ -1401,44 +2021,64 @@
    "name": "2Q-0904",
    "propertyType": "2Q",
    "privateArea": 60,
-   "commercialStock": "V",
-   "deliveryDate": "2027-02-28"
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 274911.68,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102037,
    "enterpriseId": 102,
    "name": "2Q-1001",
    "propertyType": "2Q",
-   "privateArea": 60,
-   "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 59,
+   "commercialStock": "P",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 317508.19,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102038,
    "enterpriseId": 102,
    "name": "2Q-1002",
    "propertyType": "2Q",
-   "privateArea": 56,
-   "commercialStock": "V",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 58,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 275374.91,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102039,
    "enterpriseId": 102,
    "name": "2Q-1003",
    "propertyType": "2Q",
-   "privateArea": 57,
-   "commercialStock": "V",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 59,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 271129.21,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102040,
    "enterpriseId": 102,
    "name": "2Q-1004",
    "propertyType": "2Q",
-   "privateArea": 61,
+   "privateArea": 55,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 272743.09,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102041,
@@ -1446,44 +2086,64 @@
    "name": "3Q-0101",
    "propertyType": "3Q",
    "privateArea": 71,
-   "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 393585.44,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102042,
    "enterpriseId": 102,
    "name": "3Q-0102",
    "propertyType": "3Q",
-   "privateArea": 75,
-   "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 76,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 345885.45,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102043,
    "enterpriseId": 102,
    "name": "3Q-0103",
    "propertyType": "3Q",
-   "privateArea": 73,
-   "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 71,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 294862.79,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102044,
    "enterpriseId": 102,
    "name": "3Q-0104",
    "propertyType": "3Q",
-   "privateArea": 73,
-   "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 77,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 357978.32,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102045,
    "enterpriseId": 102,
    "name": "3Q-0201",
    "propertyType": "3Q",
-   "privateArea": 72,
+   "privateArea": 74,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 301295.25,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102046,
@@ -1491,269 +2151,389 @@
    "name": "3Q-0202",
    "propertyType": "3Q",
    "privateArea": 77,
-   "commercialStock": "V",
-   "deliveryDate": "2027-02-28"
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 334175.07,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102047,
    "enterpriseId": 102,
    "name": "3Q-0203",
    "propertyType": "3Q",
-   "privateArea": 71,
-   "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 77,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 332089.55,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102048,
    "enterpriseId": 102,
    "name": "3Q-0204",
    "propertyType": "3Q",
-   "privateArea": 72,
+   "privateArea": 73,
    "commercialStock": "V",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 340879.57,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102049,
    "enterpriseId": 102,
    "name": "3Q-0301",
    "propertyType": "3Q",
-   "privateArea": 76,
-   "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 72,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 368557.22,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102050,
    "enterpriseId": 102,
    "name": "3Q-0302",
    "propertyType": "3Q",
-   "privateArea": 74,
-   "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 72,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 383726.75,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102051,
    "enterpriseId": 102,
    "name": "3Q-0303",
    "propertyType": "3Q",
-   "privateArea": 74,
+   "privateArea": 75,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 351279.8,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102052,
    "enterpriseId": 102,
    "name": "3Q-0304",
    "propertyType": "3Q",
-   "privateArea": 77,
+   "privateArea": 72,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 300395.04,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102053,
    "enterpriseId": 102,
    "name": "3Q-0401",
    "propertyType": "3Q",
-   "privateArea": 73,
-   "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 77,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 314336.39,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102054,
    "enterpriseId": 102,
    "name": "3Q-0402",
    "propertyType": "3Q",
-   "privateArea": 75,
+   "privateArea": 74,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 371658.8,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102055,
    "enterpriseId": 102,
    "name": "3Q-0403",
    "propertyType": "3Q",
-   "privateArea": 77,
+   "privateArea": 73,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 360720.57,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102056,
    "enterpriseId": 102,
    "name": "3Q-0404",
    "propertyType": "3Q",
-   "privateArea": 72,
+   "privateArea": 71,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 350905.63,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102057,
    "enterpriseId": 102,
    "name": "3Q-0501",
    "propertyType": "3Q",
-   "privateArea": 73,
-   "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 75,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 315691.29,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102058,
    "enterpriseId": 102,
    "name": "3Q-0502",
    "propertyType": "3Q",
-   "privateArea": 71,
-   "commercialStock": "V",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 72,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 350518.83,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102059,
    "enterpriseId": 102,
    "name": "3Q-0503",
    "propertyType": "3Q",
-   "privateArea": 76,
+   "privateArea": 73,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 319661.39,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102060,
    "enterpriseId": 102,
    "name": "3Q-0504",
    "propertyType": "3Q",
-   "privateArea": 71,
+   "privateArea": 77,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 401960.64,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102061,
    "enterpriseId": 102,
    "name": "3Q-0601",
    "propertyType": "3Q",
-   "privateArea": 73,
-   "commercialStock": "V",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 77,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 384340.84,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102062,
    "enterpriseId": 102,
    "name": "3Q-0602",
    "propertyType": "3Q",
-   "privateArea": 71,
-   "commercialStock": "V",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 76,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 381466.88,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102063,
    "enterpriseId": 102,
    "name": "3Q-0603",
    "propertyType": "3Q",
-   "privateArea": 74,
+   "privateArea": 76,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 343675.99,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102064,
    "enterpriseId": 102,
    "name": "3Q-0604",
    "propertyType": "3Q",
-   "privateArea": 72,
+   "privateArea": 75,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 312290.63,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102065,
    "enterpriseId": 102,
    "name": "3Q-0701",
    "propertyType": "3Q",
-   "privateArea": 71,
-   "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 77,
+   "commercialStock": "C",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 346763.5,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102066,
    "enterpriseId": 102,
    "name": "3Q-0702",
    "propertyType": "3Q",
-   "privateArea": 76,
-   "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 73,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 324758.22,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102067,
    "enterpriseId": 102,
    "name": "3Q-0703",
    "propertyType": "3Q",
-   "privateArea": 71,
+   "privateArea": 73,
    "commercialStock": "V",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 333014.34,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102068,
    "enterpriseId": 102,
    "name": "3Q-0704",
    "propertyType": "3Q",
-   "privateArea": 76,
+   "privateArea": 77,
    "commercialStock": "V",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 325284.7,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102069,
    "enterpriseId": 102,
    "name": "3Q-0801",
    "propertyType": "3Q",
-   "privateArea": 77,
+   "privateArea": 73,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 331337.22,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102070,
    "enterpriseId": 102,
    "name": "3Q-0802",
    "propertyType": "3Q",
-   "privateArea": 71,
+   "privateArea": 73,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 333966.49,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102071,
    "enterpriseId": 102,
    "name": "3Q-0803",
    "propertyType": "3Q",
-   "privateArea": 77,
-   "commercialStock": "V",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 73,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 309689.71,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102072,
    "enterpriseId": 102,
    "name": "3Q-0804",
    "propertyType": "3Q",
-   "privateArea": 77,
-   "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 75,
+   "commercialStock": "V",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 335181.16,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102073,
    "enterpriseId": 102,
    "name": "3Q-0901",
    "propertyType": "3Q",
-   "privateArea": 75,
-   "commercialStock": "V",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 77,
+   "commercialStock": "C",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 380233.71,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102074,
    "enterpriseId": 102,
    "name": "3Q-0902",
    "propertyType": "3Q",
-   "privateArea": 72,
+   "privateArea": 73,
    "commercialStock": "V",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 368626.56,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102075,
    "enterpriseId": 102,
    "name": "3Q-0903",
    "propertyType": "3Q",
-   "privateArea": 74,
+   "privateArea": 72,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 380905.18,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102076,
@@ -1762,34 +2542,50 @@
    "propertyType": "3Q",
    "privateArea": 77,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 320076.77,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102077,
    "enterpriseId": 102,
    "name": "3Q-1001",
    "propertyType": "3Q",
-   "privateArea": 72,
+   "privateArea": 75,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 312839.37,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102078,
    "enterpriseId": 102,
    "name": "3Q-1002",
    "propertyType": "3Q",
-   "privateArea": 75,
+   "privateArea": 71,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 384797.97,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102079,
    "enterpriseId": 102,
    "name": "3Q-1003",
    "propertyType": "3Q",
-   "privateArea": 73,
-   "commercialStock": "V",
-   "deliveryDate": "2027-02-28"
+   "privateArea": 72,
+   "commercialStock": "D",
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 379743.35,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 102080,
@@ -1798,52 +2594,76 @@
    "propertyType": "3Q",
    "privateArea": 71,
    "commercialStock": "D",
-   "deliveryDate": "2027-02-28"
+   "deliveryDate": "2027-02-28",
+   "indexerId": 7,
+   "tablePricesID": 1020,
+   "saleValuePrice": 371281.31,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103001,
    "enterpriseId": 103,
    "name": "SALA-0101",
    "propertyType": "SALA",
-   "privateArea": 38,
+   "privateArea": 36,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 206806.77,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103002,
    "enterpriseId": 103,
    "name": "SALA-0102",
    "propertyType": "SALA",
-   "privateArea": 36,
+   "privateArea": 39,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 243079.49,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103003,
    "enterpriseId": 103,
    "name": "SALA-0103",
    "propertyType": "SALA",
-   "privateArea": 41,
-   "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "privateArea": 39,
+   "commercialStock": "D",
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 222722.09,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103004,
    "enterpriseId": 103,
    "name": "SALA-0104",
    "propertyType": "SALA",
-   "privateArea": 36,
+   "privateArea": 39,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 262917.62,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103005,
    "enterpriseId": 103,
    "name": "SALA-0201",
    "propertyType": "SALA",
-   "privateArea": 38,
+   "privateArea": 36,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 217204.57,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103006,
@@ -1852,106 +2672,154 @@
    "propertyType": "SALA",
    "privateArea": 36,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 261067.15,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103007,
    "enterpriseId": 103,
    "name": "SALA-0203",
    "propertyType": "SALA",
-   "privateArea": 40,
+   "privateArea": 35,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 219339.82,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103008,
    "enterpriseId": 103,
    "name": "SALA-0204",
    "propertyType": "SALA",
-   "privateArea": 41,
+   "privateArea": 37,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 220580.41,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103009,
    "enterpriseId": 103,
    "name": "SALA-0301",
    "propertyType": "SALA",
-   "privateArea": 38,
+   "privateArea": 39,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 231958.83,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103010,
    "enterpriseId": 103,
    "name": "SALA-0302",
    "propertyType": "SALA",
-   "privateArea": 41,
+   "privateArea": 40,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 216078.62,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103011,
    "enterpriseId": 103,
    "name": "SALA-0303",
    "propertyType": "SALA",
-   "privateArea": 36,
+   "privateArea": 39,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 212017.13,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103012,
    "enterpriseId": 103,
    "name": "SALA-0304",
    "propertyType": "SALA",
-   "privateArea": 37,
+   "privateArea": 40,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 220888.67,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103013,
    "enterpriseId": 103,
    "name": "SALA-0401",
    "propertyType": "SALA",
-   "privateArea": 41,
+   "privateArea": 36,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 206581.58,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103014,
    "enterpriseId": 103,
    "name": "SALA-0402",
    "propertyType": "SALA",
-   "privateArea": 41,
+   "privateArea": 35,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 257117.75,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103015,
    "enterpriseId": 103,
    "name": "SALA-0403",
    "propertyType": "SALA",
-   "privateArea": 35,
+   "privateArea": 38,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 248547.39,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103016,
    "enterpriseId": 103,
    "name": "SALA-0404",
    "propertyType": "SALA",
-   "privateArea": 37,
+   "privateArea": 38,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 242428.96,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103017,
    "enterpriseId": 103,
    "name": "SALA-0501",
    "propertyType": "SALA",
-   "privateArea": 36,
+   "privateArea": 38,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 214144.41,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103018,
@@ -1960,25 +2828,37 @@
    "propertyType": "SALA",
    "privateArea": 35,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 208275.32,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103019,
    "enterpriseId": 103,
    "name": "SALA-0503",
    "propertyType": "SALA",
-   "privateArea": 41,
+   "privateArea": 38,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 235464.05,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103020,
    "enterpriseId": 103,
    "name": "SALA-0504",
    "propertyType": "SALA",
-   "privateArea": 39,
-   "commercialStock": "D",
-   "deliveryDate": "2026-05-31"
+   "privateArea": 40,
+   "commercialStock": "C",
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 259905.42,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103021,
@@ -1987,115 +2867,167 @@
    "propertyType": "SALA",
    "privateArea": 41,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 222182.54,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103022,
    "enterpriseId": 103,
    "name": "SALA-0602",
    "propertyType": "SALA",
-   "privateArea": 35,
+   "privateArea": 38,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 257779.81,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103023,
    "enterpriseId": 103,
    "name": "SALA-0603",
    "propertyType": "SALA",
-   "privateArea": 39,
+   "privateArea": 35,
    "commercialStock": "D",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 214561.23,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103024,
    "enterpriseId": 103,
    "name": "SALA-0604",
    "propertyType": "SALA",
-   "privateArea": 37,
+   "privateArea": 36,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 246090.8,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103025,
    "enterpriseId": 103,
    "name": "SALA-0701",
    "propertyType": "SALA",
-   "privateArea": 36,
+   "privateArea": 37,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 254956.03,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103026,
    "enterpriseId": 103,
    "name": "SALA-0702",
    "propertyType": "SALA",
-   "privateArea": 37,
+   "privateArea": 39,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 207436.59,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103027,
    "enterpriseId": 103,
    "name": "SALA-0703",
    "propertyType": "SALA",
-   "privateArea": 38,
-   "commercialStock": "D",
-   "deliveryDate": "2026-05-31"
+   "privateArea": 35,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 236423.18,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103028,
    "enterpriseId": 103,
    "name": "SALA-0704",
    "propertyType": "SALA",
-   "privateArea": 36,
-   "commercialStock": "D",
-   "deliveryDate": "2026-05-31"
+   "privateArea": 41,
+   "commercialStock": "V",
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 231020.3,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103029,
    "enterpriseId": 103,
    "name": "SALA-0801",
    "propertyType": "SALA",
-   "privateArea": 40,
+   "privateArea": 35,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 240091.33,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103030,
    "enterpriseId": 103,
    "name": "SALA-0802",
    "propertyType": "SALA",
-   "privateArea": 37,
+   "privateArea": 41,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 211205.1,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103031,
    "enterpriseId": 103,
    "name": "SALA-0803",
    "propertyType": "SALA",
-   "privateArea": 37,
+   "privateArea": 41,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 272959.41,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103032,
    "enterpriseId": 103,
    "name": "SALA-0804",
    "propertyType": "SALA",
-   "privateArea": 36,
+   "privateArea": 37,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 262424.71,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103033,
    "enterpriseId": 103,
    "name": "SALA-0901",
    "propertyType": "SALA",
-   "privateArea": 41,
+   "privateArea": 37,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 223573.22,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103034,
@@ -2104,25 +3036,37 @@
    "propertyType": "SALA",
    "privateArea": 40,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 256496.79,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103035,
    "enterpriseId": 103,
    "name": "SALA-0903",
    "propertyType": "SALA",
-   "privateArea": 37,
+   "privateArea": 35,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 257923.14,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103036,
    "enterpriseId": 103,
    "name": "SALA-0904",
    "propertyType": "SALA",
-   "privateArea": 39,
+   "privateArea": 35,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 251720.53,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103037,
@@ -2130,26 +3074,38 @@
    "name": "SALA-1001",
    "propertyType": "SALA",
    "privateArea": 41,
-   "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "commercialStock": "D",
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 254034.45,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103038,
    "enterpriseId": 103,
    "name": "SALA-1002",
    "propertyType": "SALA",
-   "privateArea": 40,
+   "privateArea": 36,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 259182.67,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103039,
    "enterpriseId": 103,
    "name": "SALA-1003",
    "propertyType": "SALA",
-   "privateArea": 35,
+   "privateArea": 41,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 275193.58,
+   "saleValueDate": "2026-09-01"
   },
   {
    "id": 103040,
@@ -2158,7 +3114,11 @@
    "propertyType": "SALA",
    "privateArea": 40,
    "commercialStock": "V",
-   "deliveryDate": "2026-05-31"
+   "deliveryDate": "2026-05-31",
+   "indexerId": 7,
+   "tablePricesID": 1030,
+   "saleValuePrice": 217355.65,
+   "saleValueDate": "2026-09-01"
   }
  ]
 }

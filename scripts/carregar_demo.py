@@ -22,6 +22,8 @@ ARQUIVOS = {
     "income": "income.json",
     "outcome": "outcome.json",
     "building-cost-estimation-items": "building-cost-estimation-items.json",
+    "indexers": "indexers.json",
+    "price-tables": "price-tables.json",
 }
 
 
@@ -35,6 +37,7 @@ def main():
         with conexao.cursor() as cur:
             for endpoint, arquivo in ARQUIVOS.items():
                 registros = json.loads((PASTA_DADOS / arquivo).read_text(encoding="utf-8"))["data"]
+                # na demo o arquivo substitui tudo; no MVP indexers so acumula, porque a API manda so o ultimo valor
                 cur.execute("delete from raw.registro where tenant_id = %s and endpoint = %s", (tenant, endpoint))
                 cur.executemany(
                     "insert into raw.registro (tenant_id, endpoint, payload, hash_registro) values (%s, %s, %s, %s) "
@@ -43,6 +46,7 @@ def main():
                 )
                 print(f"{endpoint}: {len(registros)} registros")
             cur.execute("select staging.recarregar(%s)", (tenant,))
+            cur.execute("select staging.recarregar_precos(%s)", (tenant,))
         conexao.commit()
     print("staging recarregado")
 

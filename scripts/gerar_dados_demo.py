@@ -123,9 +123,14 @@ def gerar_vendas(obra, unidades):
             contratos.append(montar_contrato(obra, unidade, data_venda, contador, investidor))
             contador += 1
 
-    # parte do estoque fica reservada, como acontece com proposta em analise
-    for unidade in disponiveis[: max(1, len(disponiveis) // 15)]:
-        unidade["commercialStock"] = "R"
+    # parte do estoque sai de venda: C reservada, P proposta em analise, R reserva tecnica
+    reservadas = max(1, len(disponiveis) // 15)
+    for unidade in disponiveis[:reservadas]:
+        unidade["commercialStock"] = "C"
+    if len(disponiveis) >= 20:
+        for unidade in disponiveis[reservadas:reservadas + 2]:
+            unidade["commercialStock"] = "P"
+        disponiveis[reservadas + 2]["commercialStock"] = "R"
     aplicar_distratos(obra, contratos)
     return contratos
 
@@ -284,6 +289,55 @@ def gerar_desembolso(obra, itens):
     return titulos
 
 
+INDEXADOR = {"id": 7, "name": "INCC"}
+
+
+def gerar_indice():
+    """Serie mensal ficticia no formato de /indexers.
+
+    A API so devolve o ultimo valor, entao em producao cada carga noturna guarda
+    um registro e a serie se forma com o tempo. Aqui ela ja vem inteira.
+    """
+    sorteio = random.Random(77)  # separado para nao alterar os outros dados sorteados
+    valor = 1000.0
+    serie = []
+    for mes in meses_entre(INICIO_HISTORICO, HOJE):
+        variacao = round(sorteio.uniform(0.25, 0.65), 2) if serie else 0.0
+        valor = round(valor * (1 + variacao / 100), 4)
+        serie.append({**INDEXADOR, "lastValue": {"date": mes.isoformat(), "value": valor, "percentage": variacao}})
+    return serie
+
+
+def gerar_tabela_preco(obra, unidades, indice):
+    """Tabela vigente no formato de /price-tables, com preco em quantidade indexada.
+
+    O valor em reais de cada unidade e quantidade x indice do mes, por isso muda
+    todo mes ate a venda. Depois da venda vale o valor do contrato.
+    """
+    indice_base = indice[0]["lastValue"]
+    indice_atual = indice[-1]["lastValue"]
+    tabela_id = obra["id"] * 10
+    itens = []
+    for u in unidades:
+        quantidade = round(u["valorTabela"] / indice_base["value"], 4)
+        itens.append({"id": u["id"], "indexedQuantity": quantidade})
+        u["indexerId"] = INDEXADOR["id"]
+        u["tablePricesID"] = tabela_id
+        u["saleValuePrice"] = round(quantidade * indice_atual["value"], 2)
+        u["saleValueDate"] = indice_atual["date"]
+    condicoes = [
+        {"order": ordem, "paymentConditionType": tipo, "installmentsNumber": parcelas, "unitValuePercentage": pct,
+         "indexer": {"id": INDEXADOR["id"]}, "baseDate": indice_base["date"]}
+        for ordem, (tipo, pct, parcelas) in enumerate([("AT", 10, 1), ("PM", 20, 24), ("BA", 10, 2), ("FI", 60, 1)], 1)
+    ]
+    return {
+        "id": tabela_id, "version": len(indice), "companyId": EMPRESA["id"], "enterpriseId": obra["id"],
+        "tableName": f"Tabela {obra['name']}", "tableVersionName": HOJE.strftime("%m/%Y"),
+        "startOfTerm": date(HOJE.year, HOJE.month, 1).isoformat(), "endOfTerm": None,
+        "paymentConditions": condicoes, "units": itens,
+    }
+
+
 def salvar(nome, conteudo):
     caminho = PASTA_SAIDA / nome
     caminho.write_text(json.dumps({"data": conteudo}, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -297,7 +351,9 @@ def main():
     salvar("enterprises.json", [{"id": o["id"], "name": o["name"], "commercialName": o["name"],
                                  "companyId": EMPRESA["id"], "type": "1"} for o in OBRAS])
 
+    indice = gerar_indice()
     todas_unidades, todas_vendas, todas_parcelas, todo_orcamento, todo_desembolso = [], [], [], [], []
+    tabelas = []
     for obra in OBRAS:
         unidades = gerar_unidades(obra)
         vendas = gerar_vendas(obra, unidades)
@@ -309,6 +365,7 @@ def main():
         parcelas = gerar_parcelas(obra, vendas, {u["id"]: u for u in unidades})
         orcamento = gerar_orcamento(obra)
         desembolso = gerar_desembolso(obra, orcamento)
+        tabelas.append(gerar_tabela_preco(obra, unidades, indice))
         for u in unidades:
             u.pop("valorTabela", None)
         todas_unidades += unidades
@@ -323,6 +380,8 @@ def main():
     salvar("income.json", todas_parcelas)
     salvar("outcome.json", todo_desembolso)
     salvar("building-cost-estimation-items.json", todo_orcamento)
+    salvar("indexers.json", indice)
+    salvar("price-tables.json", tabelas)
 
 
 if __name__ == "__main__":
