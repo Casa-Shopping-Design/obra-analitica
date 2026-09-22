@@ -15,7 +15,7 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 ## Decisões tomadas
 
 - Nomenclatura neutra: nada no sistema leva o nome do ERP (tabelas, colunas, schemas, arquivos, variáveis, env). Chave externa é `id_origem`, conta no ERP é `conta_origem`, URL da API vem de `ORIGEM_URL_BASE`. Nome de campo do payload bruto fica como a API devolve, só dentro de `raw` e das funções de staging.
-- Stack: Supabase (Postgres, Auth, RLS, pgvector) e Next.js na Vercel. Worker de carga em contêiner só no MVP; na demo é script manual.
+- Stack: Supabase (Postgres, Auth, RLS, pgvector) e Next.js na Vercel. Carga noturna proposta no GitHub Actions (cota gratuita), no lugar do contêiner; falta João confirmar. E-mails de convite e senha pelo Resend (plano gratuito).
 - ELT: Bulk Data e REST do ERP de origem gravados brutos em `raw`, transformados por SQL em `staging` e `marts`. Carga diária de madrugada. Painel e IA nunca chamam o ERP ao vivo.
 - Multi-tenant por linha (pool com RLS), política única por tabela com `tenant_id` e `centro_custo_id in obras_permitidas()`. Nunca duas políticas permissivas separadas (elas se combinam com OR).
 - Identidade via claims do JWT (`tenant_id`, `perfil`), não `current_setting`.
@@ -23,7 +23,12 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 - LGPD: CPF, renda, score e dados bancários não são carregados no MVP. Mascaramento no banco, não no front.
 - Assistente: sem embeddings de tabela. Catálogo semântico de views no prompt, validador de SQL, execução com JWT do usuário, resposta só com números retornados.
 - Demo: três obras fictícias (Residencial Aurora, Parque das Águas, Torre Comercial Sul), dados sintéticos no formato do ERP de origem, dois logins (diretor e gerente da Aurora). Prazo 16/10/2026.
-- MVP: 16 semanas a 20 h por semana. O prazo de 6 semanas de outro documento foi descartado.
+- MVP: 16 semanas a 20 h por semana, a partir de 19/10/2026, em duas entregas. Entrega 1 até 18/12/2026: carga real, visão geral, fluxo de caixa, obras e login. Entrega 2 até 05/02/2027 (19/02 com recesso de duas semanas): estoque com preços, assistente e uso acompanhado. Braga ouviu "3 meses"; a entrega 1 cobre isso.
+- Login: só por convite, perfis diretor, financeiro e gerente de obra, segundo fator por app autenticador para diretor e financeiro.
+- Preço das unidades: tabela guarda quantidade indexada (INCC); valor = quantidade x índice do mês; vendida vale o contrato. View `marts.mapa_unidades`.
+- Situação da unidade no ERP: D disponível, C reservada, P proposta, V/O/G vendida, R reserva técnica e demais fora de venda.
+- Visual: paleta tijolo (menu vinho, fundo rosado), nada de creme ou azul de IA. Verde entra, grafite sai, vermelho vivo só em alerta.
+- Premissas do repositório em `CLAUDE.md` (nomes em português, humanizer, PAA, ISO 25010, segurança Supabase/Vercel). Claude não faz commit.
 
 ## ERP de origem: o que foi verificado
 
@@ -39,17 +44,31 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 - Cliente disse que R$ 10 mil por mês está fora da realidade.
 - Proposta atual: sociedade em torno do produto. Participação de 30% a 40% para o lado técnico, mensalidade mínima de R$ 3.000 mais infra repassada sem margem (US$ 90 a 165 por mês no piloto), metas comerciais para Braga e vesting para os dois.
 - Com Lucas: sugestão de dividir a participação (por exemplo 27% João, 8% sociedade) e a mensalidade ir para João como remuneração das horas. Ainda não conversado.
-- Hora de referência de João: R$ 80 a 90.
+- A parceria é com a empresa de João Cosme, não com ele como pessoa física (razão social ainda não definida no documento).
+- Hora de desenvolvimento de João: R$ 180. Remuneração que ele cobra: R$ 1.700 por mês; o restante das horas é aporte (R$ 13.900 por mês).
+- Planilha `negocio/investimento_mvp_obra_analitica.xlsx` (fora do git), conferida centavo a centavo: custo mensal com uma construtora R$ 2.118,58 (infra R$ 418,58 + remuneração R$ 1.700); investimento até o fim do MVP R$ 70.271,10 (aporte em horas R$ 61.600, remuneração R$ 6.800, infra R$ 1.871,10). Dólar efetivo R$ 5,50 (PTAX 5,11 + spread 4% estimado + IOF 3,5%).
+- Fase mobile fora do total: já existe um Mac (Xcode só roda em macOS); Apple US$ 99 por ano, Google Play US$ 25 uma vez; Apple exige D-U-N-S para conta de empresa.
 
 ## Em aberto
 
-- Reunião com Braga (semana de 28/09) e reação dele ao modelo.
+- Conversa com Braga no sábado 26/09 sobre porcentagens; antes disso enviar o documento e a planilha (compartilhar o documento, que é privado).
+- Conferir o spread do cartão na fatura e ajustar na aba Premissas.
 - Conversa com Lucas sobre a divisão.
 - Construtora piloto com o ERP em nuvem e usuário de API.
 - As 20 perguntas do assistente (vêm do Braga e do piloto).
 - Conflito de interesse com o CVCRM: ler o contrato de trabalho antes de assinar sociedade.
 - CNPJ: a sociedade com Lucas ainda não tem; definir quem assina.
 
+- Rodar `scripts/sondar_origem.py` no terminal do Mac (a rede das sessões do Claude bloqueia a API do ERP) e depois `sanitizar_amostras.py`.
+- Trocar o validador de SQL por parser (hoje é regex e deixa passar tabela depois de vírgula).
+- Gerador: custo realizado está à frente da execução física nas três obras; decidir se ajusta.
+
+## Links
+
+- Telas da demo (canvas): https://claude.ai/artifact/SBVWLWvyW4FLDfg5kFZXqz (visão geral, obra, mapa de disponibilidade, assistente, login, paletas)
+- Documento para o Braga: https://claude.ai/code/artifact/db85bf45-161e-434c-a663-a25b04b7b3bd
+- Repositório: https://github.com/joaocss/obra-analitica
+
 ## Próxima sessão
 
-Começar pela semana 1 do plano da demo: rodar `gerar_dados_demo.py`, conferir totais, criar o projeto Supabase e aplicar as migrations.
+Migrations 0001 a 0004 já foram testadas num Postgres local com os dados da demo (RLS ok). Começar criando o projeto Supabase, aplicar as migrations e o seed, rodar `carregar_demo.py` e iniciar o Next.js com as telas do canvas.

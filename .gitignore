@@ -8,3 +8,4 @@ dados/income.json
 dados/outcome.json
 __pycache__/
 dados/brutos/
+negocio/
