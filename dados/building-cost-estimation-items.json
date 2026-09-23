@@ -955,8 +955,8 @@
    "description": "Areas comuns - item 4",
    "unitOfMeasure": "vb",
    "quantity": 1,
-   "unitPrice": 1732038.490000001,
-   "totalPrice": 1732038.490000001,
+   "unitPrice": 1732038.49,
+   "totalPrice": 1732038.49,
    "percentComplete": 0,
    "measuredQuantity": 0.0
   },
@@ -1435,8 +1435,8 @@
    "description": "Areas comuns - item 4",
    "unitOfMeasure": "vb",
    "quantity": 1,
-   "unitPrice": 425408.7500000016,
-   "totalPrice": 425408.7500000016,
+   "unitPrice": 425408.75,
+   "totalPrice": 425408.75,
    "percentComplete": 41,
    "measuredQuantity": 0.41
   }

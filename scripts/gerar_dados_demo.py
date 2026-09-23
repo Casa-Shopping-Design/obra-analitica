@@ -235,13 +235,15 @@ def gerar_orcamento(obra):
     grupos = ["Fundacoes", "Estrutura", "Alvenaria", "Instalacoes", "Revestimentos", "Esquadrias",
               "Cobertura", "Pintura", "Acabamentos", "Areas comuns"]
     itens = []
-    restante = obra["orcamento"]
+    # em centavos inteiros, para a soma dos itens fechar exatamente no orcamento da obra
+    restante_centavos = obra["orcamento"] * 100
     for g, grupo in enumerate(grupos):
         n_itens = 4
         for i in range(n_itens):
             ultimo = g == len(grupos) - 1 and i == n_itens - 1
-            valor = restante if ultimo else round(obra["orcamento"] / 40 * random.uniform(0.6, 1.4), 2)
-            restante -= valor
+            valor_centavos = restante_centavos if ultimo else round(obra["orcamento"] * 100 / 40 * random.uniform(0.6, 1.4))
+            restante_centavos -= valor_centavos
+            valor = valor_centavos / 100
             posicao = (g * n_itens + i) / (len(grupos) * n_itens)
             pct = 100 if posicao < obra["pct_obra"] - 0.1 else (0 if posicao > obra["pct_obra"] + 0.1 else random.randint(20, 80))
             itens.append({

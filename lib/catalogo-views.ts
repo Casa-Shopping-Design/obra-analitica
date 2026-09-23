@@ -10,15 +10,6 @@ export type ViewCatalogo = {
 
 export const catalogoViews: ViewCatalogo[] = [
   {
-    nome: "marts.consolidado_centro_custo",
-    descricao: "Totais por obra: receita contratada, recebida, saldo a receber, custo orcado, realizado e saldo a pagar.",
-    colunas: ["centro_custo_id", "obra", "receita_contratada", "receita_recebida", "saldo_a_receber", "custo_orcado", "custo_realizado", "saldo_a_pagar"],
-    exemplos: [
-      { pergunta: "Qual o saldo a receber total da Aurora?", sql: "select obra, saldo_a_receber from marts.consolidado_centro_custo where obra ilike '%aurora%'" },
-      { pergunta: "Qual o custo realizado da Parque das Aguas em relacao ao orcado?", sql: "select obra, custo_realizado, custo_orcado, round(custo_realizado / nullif(custo_orcado,0), 4) as pct from marts.consolidado_centro_custo where obra ilike '%parque%'" },
-    ],
-  },
-  {
     nome: "marts.fluxo_caixa_mensal",
     descricao: "Entradas e saidas de cada obra por mes. Realizado cai no mes em que o dinheiro entrou ou saiu; previsto e vencido caem no mes do vencimento. Entrada direta e o que o comprador paga a construtora; repasse e o que o banco paga pelo financiamento. saldo_acumulado soma realizado, previsto e saidas vencidas; entrada vencida fica fora.",
     colunas: ["centro_custo_id", "competencia", "entrada_direta_realizada", "repasse_realizado", "entrada_direta_prevista", "repasse_previsto", "entrada_direta_vencida", "repasse_vencido", "saida_realizada", "saida_prevista", "saida_vencida", "saldo_mes", "saldo_acumulado"],
@@ -42,7 +33,6 @@ export const catalogoViews: ViewCatalogo[] = [
     descricao: "Vendas, distratos e VGV vendido por obra e mes.",
     colunas: ["centro_custo_id", "competencia", "vendas", "distratos", "vgv_vendido"],
     exemplos: [
-      { pergunta: "Qual foi a VSO media da Aurora nos ultimos 6 meses?", sql: "select avg(v.vendas) from marts.vso_mensal v join app.centro_custo c on c.id = v.centro_custo_id where c.nome ilike '%aurora%' and v.competencia >= current_date - interval '6 months'" },
       { pergunta: "Quantos distratos houve em 2026?", sql: "select sum(distratos) from marts.vso_mensal where competencia >= '2026-01-01'" },
     ],
   },
@@ -64,11 +54,11 @@ export const catalogoViews: ViewCatalogo[] = [
     ],
   },
   {
-    nome: "marts.break_even_obra",
-    descricao: "Ponto de equilibrio por obra: custo total, VGV vendido, percentual atingido, unidades faltantes e meses pelo ritmo atual.",
-    colunas: ["centro_custo_id", "obra", "custo_total", "vgv_vendido", "ticket_medio", "vso_media_6m", "pct_atingido", "unidades_faltantes", "meses_para_break_even"],
+    nome: "marts.cobertura_orcamento_obra",
+    descricao: "Cobertura do orcamento pelo VGV contratado, por obra. Compara o valor dos contratos ativos com o custo orcado; nao e caixa nem ponto de equilibrio, porque ignora quando o dinheiro entra e sai. pct_cobertura e fracao (1,0 = VGV igual ao orcamento). unidades_para_cobrir e quantas vendas ao ticket medio faltam para o VGV alcancar o orcamento.",
+    colunas: ["centro_custo_id", "obra", "custo_orcado", "vgv_contratado", "pct_cobertura", "ticket_medio", "unidades_para_cobrir"],
     exemplos: [
-      { pergunta: "Quantas unidades faltam para a Parque das Aguas atingir o ponto de equilibrio?", sql: "select obra, unidades_faltantes, meses_para_break_even from marts.break_even_obra where obra ilike '%parque%'" },
+      { pergunta: "Quantas vendas faltam para o VGV da Parque das Aguas cobrir o orcamento?", sql: "select obra, custo_orcado, vgv_contratado, pct_cobertura, unidades_para_cobrir from marts.cobertura_orcamento_obra where obra ilike '%parque%'" },
     ],
   },
 ];
