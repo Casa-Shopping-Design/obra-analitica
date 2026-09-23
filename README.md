@@ -12,20 +12,42 @@ scripts/          gerador de dados e carregador para o Supabase
 supabase/         migrations (esquema, RLS, marts) e seed de usuários
 lib/              catálogo de views e validador de SQL do assistente
 docs/             referências aos documentos de escopo, apresentação e plano
-app/              (a criar) Next.js 15 com App Router
+painel/           (a criar no PT-01) Next.js com App Router
 ```
 
 ## Como começar
+
+Ambiente Python e dados sintéticos:
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install psycopg[binary] python-dotenv
 python scripts/gerar_dados_demo.py          # escreve dados/*.json
-cp .env.example .env                        # preencher DATABASE_URL do Supabase
-# aplicar supabase/migrations/*.sql e supabase/seed.sql no SQL editor, na ordem
-python scripts/carregar_demo.py             # grava em raw e roda staging/marts
-npx create-next-app@latest app --ts --tailwind --app --src-dir=false
+cp .env.example .env                        # preencher DATABASE_URL (pooler em modo sessão) e TENANT_DEMO_ID
 ```
+
+Banco no Supabase, com a CLI logada:
+
+```bash
+supabase link --project-ref <ref do projeto>
+supabase db push                            # aplica supabase/migrations na ordem
+supabase db push --include-seed             # grava o tenant e os três centros de custo
+python scripts/carregar_demo.py             # grava em raw e recarrega o staging
+```
+
+No Dashboard do projeto:
+
+1. Authentication, Users, Add user: criar `diretor@demo.com` e `gerente.aurora@demo.com` com "Auto Confirm User" marcado.
+2. Authentication, Sign In / Providers, Email: desligar "Allow new users to sign up".
+3. Configurações da Data API: acrescentar `app` e `marts` aos schemas expostos. `raw` e `staging` ficam de fora.
+
+Vínculo dos usuários ao tenant (os UUIDs estão em Authentication, Users, e não vão para arquivo versionado):
+
+```bash
+python scripts/vincular_usuarios_demo.py --diretor <uuid do diretor> --gerente <uuid da gerente>
+```
+
+O diretor vê as três obras; a gerente vê só o Residencial Aurora.
 
 ## Documentos
 
