@@ -28,6 +28,7 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 - Preço das unidades: tabela guarda quantidade indexada (INCC); valor = quantidade x índice do mês; vendida vale o contrato. View `marts.mapa_unidades`.
 - Situação da unidade no ERP: D disponível, C reservada, P proposta, V/O/G vendida, R reserva técnica e demais fora de venda.
 - Visual: paleta tijolo (menu vinho, fundo rosado), nada de creme ou azul de IA. Verde entra, grafite sai, vermelho vivo só em alerta.
+- Entradas e saídas por obra (migration 0005): `marts.posicao_financeira_obra` separa direto do comprador e repasse do banco (recebido, a receber, vencido), estoque a preço de hoje, pago, a pagar, orçamento sem título, estouro, caixa atual, exposição máxima (dinheiro próprio no pior mês) e resultado. `marts.fluxo_caixa_mensal` foi recriada com realizado pela data do pagamento e saldo acumulado; o cenário desloca só o repasse pendente. Saldo projetado conservador: a receber vencido fica fora, a pagar vencido entra.
 - Premissas do repositório em `CLAUDE.md` (nomes em português, humanizer, PAA, ISO 25010, segurança Supabase/Vercel). Claude não faz commit.
 
 ## ERP de origem: o que foi verificado
@@ -62,6 +63,10 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 - Rodar `scripts/sondar_origem.py` no terminal do Mac (a rede das sessões do Claude bloqueia a API do ERP) e depois `sanitizar_amostras.py`.
 - Trocar o validador de SQL por parser (hoje é regex e deixa passar tabela depois de vírgula).
 - Gerador: custo realizado está à frente da execução física nas três obras; decidir se ajusta.
+- Exposição máxima só enxerga títulos já lançados; no ERP real o custo futuro sem título fica só no total (`custo_a_incorrer`). Decidir como distribuir por mês.
+- Staging lê só `buildingsCosts[0]` do título a pagar: rateio entre obras vai inteiro para a primeira e título sem obra (despesa da empresa, devolução de distrato) some. Conferir com as amostras reais.
+- Tirar `marts.consolidado_centro_custo` do catálogo do assistente (sobrepõe a posição financeira e ainda soma saldo de distrato).
+- Gerador: orçamento sai com resíduo de ponto flutuante (17500000.000000001); arredondar.
 
 ## Links
 
@@ -71,4 +76,4 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 
 ## Próxima sessão
 
-Migrations 0001 a 0004 já foram testadas num Postgres local com os dados da demo (RLS ok). Começar criando o projeto Supabase, aplicar as migrations e o seed, rodar `carregar_demo.py` e iniciar o Next.js com as telas do canvas.
+Migrations 0001 a 0005 já foram testadas num Postgres local com os dados da demo (RLS ok). Começar criando o projeto Supabase, aplicar as migrations e o seed, rodar `carregar_demo.py` e iniciar o Next.js com as telas do canvas.
