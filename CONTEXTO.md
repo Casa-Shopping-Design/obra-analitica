@@ -46,8 +46,9 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 - Proposta atual: sociedade em torno do produto. Participação de 30% a 40% para o lado técnico, mensalidade mínima de R$ 3.000 mais infra repassada sem margem (US$ 90 a 165 por mês no piloto), metas comerciais para Braga e vesting para os dois.
 - Com Lucas: sugestão de dividir a participação (por exemplo 27% João, 8% sociedade) e a mensalidade ir para João como remuneração das horas. Ainda não conversado.
 - A parceria é com a empresa de João Cosme, não com ele como pessoa física (razão social ainda não definida no documento).
-- Hora de desenvolvimento de João: R$ 180. Remuneração que ele cobra: R$ 1.700 por mês; o restante das horas é aporte (R$ 13.900 por mês).
-- Planilha `negocio/investimento_mvp_obra_analitica.xlsx` (fora do git), conferida centavo a centavo: custo mensal com uma construtora R$ 2.118,58 (infra R$ 418,58 + remuneração R$ 1.700); investimento até o fim do MVP R$ 70.271,10 (aporte em horas R$ 61.600, remuneração R$ 6.800, infra R$ 1.871,10). Dólar efetivo R$ 5,50 (PTAX 5,11 + spread 4% estimado + IOF 3,5%).
+- Hora de desenvolvimento de João: R$ 130 (era R$ 180 até 22/09/2026). Remuneração que ele cobra: R$ 1.800 por mês (era R$ 1.700); o restante das horas é aporte (R$ 9.466,67 por mês). A planilha ainda está com os valores antigos; para bater, alterar as duas células da aba Premissas.
+- Relatório orçamentário atualizado com os valores novos, quatro meses (out/2026 a jan/2027) e cronograma de custos que só entram com cliente em produção: `docs/plano_implementacao.md`, seção 7.
+- Planilha `negocio/investimento_mvp_obra_analitica.xlsx` (fora do git), conferida centavo a centavo com os valores antigos: custo mensal com uma construtora R$ 2.118,58 (infra R$ 418,58 + remuneração R$ 1.700); investimento até o fim do MVP R$ 70.271,10 (aporte em horas R$ 61.600, remuneração R$ 6.800, infra R$ 1.871,10). Dólar efetivo R$ 5,50 (PTAX 5,11 + spread 4% estimado + IOF 3,5%).
 - Fase mobile fora do total: já existe um Mac (Xcode só roda em macOS); Apple US$ 99 por ano, Google Play US$ 25 uma vez; Apple exige D-U-N-S para conta de empresa.
 
 ## Em aberto
@@ -74,6 +75,10 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 - Documento para o Braga: https://claude.ai/code/artifact/db85bf45-161e-434c-a663-a25b04b7b3bd
 - Repositório: https://github.com/joaocss/obra-analitica
 
+## Plano de implementação
+
+`docs/plano_implementacao.md` (22/09/2026) é o plano em pacotes de trabalho PT-00 a PT-11 para execução por vários agentes, com números de migration reservados (0006 a 0010), premissas de segurança, observabilidade, engenharia, PAA, usabilidade e ISO 25010, cronograma até 19/02/2027, orçamento e conceitos a estudar. Foi escrito para um modelo executor menos capaz: qualquer agente lê `CLAUDE.md`, este arquivo e o plano antes de mexer em código.
+
 ## Próxima sessão
 
-Migrations 0001 a 0005 já foram testadas num Postgres local com os dados da demo (RLS ok). Começar criando o projeto Supabase, aplicar as migrations e o seed, rodar `carregar_demo.py` e iniciar o Next.js com as telas do canvas.
+Projeto Supabase `obraanalitic` (ref `ndgwcunpnxhkzapmmvsq`, sa-east-1, Postgres 17) criado em 22/09/2026; CLI logado e linkado; migrations 0001 a 0005 e o seed aplicados; `supabase/config.toml` criado com `app` e `marts` expostos (só local); `.env` com a string do pooler e a senha ainda como `SENHA_DO_BANCO`; `.venv` com psycopg. Falta o PT-00 do plano: senha no `.env`, dois usuários no Dashboard, cadastro livre desligado, schemas `app` e `marts` expostos no Dashboard, `carregar_demo.py` e o script de vínculo dos usuários. Depois, PT-01 (painel em `painel/`) e PT-04 (migration 0006) em paralelo.

@@ -9,3 +9,4 @@ dados/outcome.json
 __pycache__/
 dados/brutos/
 negocio/
+.DS_Store
