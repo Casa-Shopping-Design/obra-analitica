@@ -1,0 +1,39 @@
+import "server-only";
+import { criarClienteServidor } from "@/lib/supabase/servidor";
+
+// Colunas de marts.posicao_financeira_obra (migration 0005). Tipo escrito à mão até a geração automática.
+export type PosicaoObra = {
+  tenant_id: string;
+  centro_custo_id: string;
+  obra: string;
+  recebido_direto: number;
+  recebido_repasse: number;
+  a_receber_direto: number;
+  a_receber_repasse: number;
+  vencido_direto: number;
+  repasse_atrasado: number;
+  estoque_a_vender: number;
+  pago: number;
+  a_pagar: number;
+  custo_orcado: number;
+  custo_a_incorrer: number;
+  estouro_orcamento: number;
+  caixa_atual: number;
+  exposicao_maxima: number;
+  resultado_contratado: number;
+  resultado_projetado: number;
+};
+
+export class ErroConsulta extends Error {}
+
+// Uma linha por obra liberada ao usuário; o RLS filtra, a consulta não repete o filtro.
+export async function listarPosicaoObras(): Promise<PosicaoObra[]> {
+  const supabase = await criarClienteServidor();
+  const { data, error } = await supabase
+    .schema("marts")
+    .from("posicao_financeira_obra")
+    .select("*")
+    .order("obra");
+  if (error) throw new ErroConsulta(error.code);
+  return data as PosicaoObra[];
+}

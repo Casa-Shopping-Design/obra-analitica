@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+/* Paleta "tijolo" do canvas de telas da demo. Verde é dinheiro que entra, grafite é o que sai,
+   vermelho vivo só em alerta. */
+@theme {
+  --color-fundo: #efe4e1;
+  --color-superficie: #ffffff;
+  --color-texto: #221a19;
+  --color-suave: #6a5552;
+  --color-borda: #dccbc6;
+  --color-trilho: #e7d8d4;
+  --color-menu: #4a1714;
+  --color-menu-texto: #f4e9e6;
+  --color-menu-suave: #d9bdb7;
+  --color-menu-ativo: #6b2620;
+  --color-entrada: #2f5d46;
+  --color-repasse: #9cbf8c;
+  --color-saida: #4a4543;
+  --color-atencao: #8a5a0b;
+  --color-alerta: #b3261e;
+
+  --font-sans: var(--fonte-texto), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--fonte-titulo), ui-serif, Georgia, serif;
+  --font-mono: var(--fonte-numero), ui-monospace, monospace;
+}
+
+html {
+  font-size: 100%;
+}
+
+body {
+  background: var(--color-fundo);
+  color: var(--color-texto);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 2px;
+}
