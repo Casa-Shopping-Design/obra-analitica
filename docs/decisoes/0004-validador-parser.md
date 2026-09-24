@@ -1,0 +1,7 @@
+# 0004 Validador do assistente com o parser do Postgres e consulta assinada
+
+**Contexto.** O validador por expressão regular deixava passar tabela depois de vírgula. O plano sugeria `pgsql-ast-parser`, mas ele é uma gramática própria em TypeScript, que ficou dois anos sem versão até a 12.0.2, de janeiro de 2026, e tem cobertura parcial do Postgres; qualquer diferença entre o que ele entende e o que o banco executa vira brecha. Num teste local, um único `select` que chama `set_config` para trocar os claims do JWT leu parcelas de outro tenant, e `marts.executar_consulta` fica exposta pela API a qualquer usuário logado.
+
+**Decisão.** `pgsql-parser` 17.9.17 (libpg-query 17.7.3, o parser do próprio Postgres 17 compilado em wasm, e pgsql-deparser 17.18.5), versão exata no lockfile, mesma versão maior do banco. O validador trabalha por lista de permissão (tipos de nó, funções, tipos, operadores e tabelas do catálogo), confere que a reescrita volta à mesma árvore e devolve o SQL reescrito. O servidor assina esse SQL com HMAC-SHA256 (`ASSISTENTE_CHAVE_ASSINATURA`) e a função do banco só executa com assinatura conferida contra a chave guardada no Vault.
+
+**Consequência.** SQL que não passou pelo validador não roda, nem chamado direto pela API. O painel precisa de `serverExternalPackages: ["libpg-query"]` no `next.config.ts` quando a rota do assistente importar o validador; sem isso o Turbopack empacota o wasm e o parse falha. Função nova que o assistente precise usar entra na lista com teste.
