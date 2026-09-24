@@ -29,3 +29,22 @@ export function formatarData(iso: string): string {
   }
   return formatoDataHora.format(new Date(iso));
 }
+
+const formatoRealCompacto = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+  notation: "compact",
+  maximumFractionDigits: 1,
+});
+const nomesMes = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+
+// Para eixo de gráfico: 1.250.000 vira "R$ 1,3 mi".
+export function formatarRealCompacto(valor: number): string {
+  return formatoRealCompacto.format(valor);
+}
+
+// Recebe "aaaa-mm" ou data ISO e devolve "set/26".
+export function formatarMes(competencia: string): string {
+  const [ano, mes] = competencia.split("-");
+  return `${nomesMes[Number(mes) - 1]}/${ano.slice(2)}`;
+}

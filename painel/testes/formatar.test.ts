@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatarData, formatarPercentual, formatarReal } from "../lib/formatar";
+import { formatarData, formatarMes, formatarPercentual, formatarReal, formatarRealCompacto } from "../lib/formatar";
 
 // Intl separa "R$" do número com espaço não quebrável; o teste normaliza para comparar.
 const semEspacoEspecial = (texto: string) => texto.replace(/ | /g, " ");
@@ -35,5 +35,18 @@ describe("formatarData", () => {
 
   it("formata data e hora no fuso de Brasília", () => {
     expect(formatarData("2026-09-23T02:30:00Z")).toBe("22/09/2026");
+  });
+});
+
+describe("formatarRealCompacto", () => {
+  it("abrevia milhões para o eixo do gráfico", () => {
+    expect(semEspacoEspecial(formatarRealCompacto(1250000))).toBe("R$ 1,3 mi");
+  });
+});
+
+describe("formatarMes", () => {
+  it("mostra mês abreviado e ano com dois dígitos", () => {
+    expect(formatarMes("2026-09")).toBe("set/26");
+    expect(formatarMes("2027-01-01")).toBe("jan/27");
   });
 });

@@ -37,3 +37,16 @@ export async function listarPosicaoObras(): Promise<PosicaoObra[]> {
   if (error) throw new ErroConsulta(error.code);
   return data as PosicaoObra[];
 }
+
+// Obra de outro tenant ou fora das obras do usuário volta nula pelo RLS, igual a uma obra que não existe.
+export async function buscarPosicaoObra(centroCustoId: string): Promise<PosicaoObra | null> {
+  const supabase = await criarClienteServidor();
+  const { data, error } = await supabase
+    .schema("marts")
+    .from("posicao_financeira_obra")
+    .select("*")
+    .eq("centro_custo_id", centroCustoId)
+    .maybeSingle<PosicaoObra>();
+  if (error) throw new ErroConsulta(error.code);
+  return data;
+}
