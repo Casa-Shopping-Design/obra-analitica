@@ -73,6 +73,12 @@ export default async function PaginaObra({ params, searchParams }: PageProps<"/o
           Visão geral
         </Link>
         <h1 className="font-serif text-[34px] font-semibold">{posicao.obra}</h1>
+        <Link
+          href={`/obras/${posicao.centro_custo_id}/unidades`}
+          className="w-fit text-sm font-semibold underline underline-offset-4 hover:text-menu"
+        >
+          Ver o mapa de unidades
+        </Link>
       </div>
 
       <section aria-label="Resumo da obra" className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">

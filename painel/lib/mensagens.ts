@@ -15,4 +15,13 @@ export const mensagens = {
     indisponivel: "Não foi possível carregar esta obra agora. Recarregue a página em alguns minutos.",
     semMovimento: "Esta obra ainda não tem entradas nem saídas nos 36 meses mostrados no gráfico.",
   },
+  unidades: {
+    indisponivel: "Não foi possível carregar o mapa de unidades agora. Recarregue a página em alguns minutos.",
+    obraNaoEncontrada: "Obra não encontrada ou sem permissão para o seu perfil.",
+    semUnidades: "Esta obra ainda não tem unidades carregadas. Elas aparecem depois da próxima carga de dados.",
+  },
+  assistente: {
+    indisponivel: "Não foi possível responder agora. Tente de novo em alguns minutos.",
+    perguntaDesconhecida: "Essa pergunta não está na lista. Escolha uma das perguntas abaixo.",
+  },
 } as const;
