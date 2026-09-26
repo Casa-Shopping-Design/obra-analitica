@@ -436,14 +436,24 @@ select throws_ok(
       '{"novas_vendas": [{"competencia": "2026-08-01", "quantidade": 2}], "composicao": {"entrada": 1}}')$$,
   '22023', 'premissa inválida: novas_vendas.competencia', 'C18: venda em mês passado é recusada'
 );
-select throws_ok(
-  $$select * from marts.simular_fluxo('7c000000-0000-4000-8000-0000000000a2', '{"novas_vendas": [{"competencia": "2026-10-01", "quantidade": 2}]}')$$,
-  '22023', 'premissa inválida: composicao', 'Venda sem composição é recusada'
+-- Sem composição ou sem prazo do banco, valem os parâmetros simulacao.* da obra (padrão do catálogo)
+select results_eq(
+  $$select competencia, caixa_gerado_acumulado, premissas -> 'composicao'
+    from marts.simular_fluxo('7c000000-0000-4000-8000-0000000000a2', '{"novas_vendas": [{"competencia": "2026-10-01", "quantidade": 2}]}')$$,
+  $$select competencia, caixa_gerado_acumulado, premissas -> 'composicao'
+    from marts.simular_fluxo('7c000000-0000-4000-8000-0000000000a2',
+      '{"novas_vendas": [{"competencia": "2026-10-01", "quantidade": 2}],
+        "composicao": {"entrada": 0.10, "parcelas_mensais": 0.30, "quantidade_parcelas_mensais": 24, "financiamento": 0.60},
+        "meses_ate_liberacao_financiamento": 4}')$$,
+  'Venda sem composição usa a composição padrão da obra'
 );
-select throws_ok(
-  $$select * from marts.simular_fluxo('7c000000-0000-4000-8000-0000000000a2',
+select results_eq(
+  $$select competencia, caixa_gerado_acumulado from marts.simular_fluxo('7c000000-0000-4000-8000-0000000000a2',
       '{"novas_vendas": [{"competencia": "2026-10-01", "quantidade": 1}], "composicao": {"entrada": 0.4, "financiamento": 0.6}}')$$,
-  '22023', 'premissa inválida: meses_ate_liberacao_financiamento', 'Financiamento sem prazo de liberação é recusado'
+  $$select competencia, caixa_gerado_acumulado from marts.simular_fluxo('7c000000-0000-4000-8000-0000000000a2',
+      '{"novas_vendas": [{"competencia": "2026-10-01", "quantidade": 1}], "composicao": {"entrada": 0.4, "financiamento": 0.6},
+        "meses_ate_liberacao_financiamento": 4}')$$,
+  'Financiamento sem prazo de liberação usa o prazo padrão da obra'
 );
 select throws_ok(
   $$select * from marts.simular_fluxo('7c000000-0000-4000-8000-0000000000a2', '{"desconto_tabela": 1}')$$,

@@ -1,9 +1,9 @@
 -- Revisão independente das migrations 0007, 0011, 0012 e 0013 com casos próprios, valores calculados à mão
 -- e diferentes dos de docs/financeiro/casos_teste.md. Tudo roda numa transação que termina em rollback,
 -- com tenants e UUIDs próprios, e cada consulta filtra pelo próprio tenant: passa em banco limpo e com a demo.
--- As contas de cada número estão em docs/financeiro/revisao.md, seção "Casos independentes".
+-- As contas de cada número estão em docs/financeiro/revisao.md, seções "Casos independentes" e "Rodada 2".
 begin;
-select * from no_plan();
+select plan(218);
 
 \set tr 'a1000000-0000-4000-8000-000000000001'
 \set tx 'a1000000-0000-4000-8000-000000000002'
@@ -141,8 +141,8 @@ from (values ('parcela_receber', '1.01.001', 'venda_imoveis'), ('titulo_pagar', 
              ('titulo_pagar', '2.01.002', 'mao_de_obra'), ('titulo_pagar', '2.01.003', 'empreiteiros'),
              ('titulo_pagar', '2.04.001', 'despesas_administrativas')) as m(t, c, k);
 -- Só a obra D tem o percentual de conclusão validado; as demais ficam no padrão nao_definido.
-insert into app.criterio_reconhecimento (tenant_id, centro_custo_id, metodo, autor)
-values (:'tr', :'od', 'percentual_conclusao', '00000000-0000-0000-0000-000000000000');
+insert into app.criterio_reconhecimento (tenant_id, centro_custo_id, metodo, autor, validado_por)
+values (:'tr', :'od', 'percentual_conclusao', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000');
 
 select set_config('app.data_referencia', '2026-11-20', true);
 select staging.recarregar(:'tr');
@@ -614,6 +614,688 @@ select throws_ok(format($q$update app.versao_planejamento set descricao = 'x' wh
   '42501', 'versão registrada não pode ser alterada nem apagada', 'nem o dono do banco altera uma versão registrada');
 select is((select count(*) from staging.titulo_pagar_apropriacao where tenant_id = :'tr'), 9::bigint,
   'terceira recarga continua com nove apropriações');
+
+-- Rodada 2: configuração por cliente. Tenant C próprio, com as obras E e F, para que cada parâmetro mexa
+-- num número conhecido. Contas em docs/financeiro/revisao.md, seção "Rodada 2".
+
+\set tc 'a1000000-0000-4000-8000-000000000003'
+\set cd 'b1000000-0000-4000-8000-000000000011'
+\set cf 'b1000000-0000-4000-8000-000000000012'
+\set cg 'b1000000-0000-4000-8000-000000000013'
+\set cl 'b1000000-0000-4000-8000-000000000014'
+\set oe 'c1000000-0000-4000-8000-000000000011'
+\set of 'c1000000-0000-4000-8000-000000000012'
+
+reset role;
+select set_config('request.jwt.claims', '', true);
+select set_config('app.data_referencia', '2026-11-20', true);
+
+insert into app.tenant (id, razao_social) values (:'tc', 'Tenant sintetico da revisao C');
+insert into auth.users (id, email) values
+  (:'cd', 'diretor.c@exemplo.invalid'), (:'cf', 'financeiro.c@exemplo.invalid'),
+  (:'cg', 'gerente.c@exemplo.invalid'), (:'cl', 'leitura.c@exemplo.invalid');
+insert into app.centro_custo (id, tenant_id, id_origem, nome) values
+  (:'oe', :'tc', 9201, 'Obra Revisao E'), (:'of', :'tc', 9202, 'Obra Revisao F');
+insert into app.usuario_tenant (user_id, tenant_id, perfil) values
+  (:'cd', :'tc', 'diretor'), (:'cf', :'tc', 'financeiro'), (:'cg', :'tc', 'gerente_obra'), (:'cl', :'tc', 'leitura');
+insert into app.usuario_centro_custo (user_id, tenant_id, centro_custo_id) values (:'cg', :'tc', :'oe'), (:'cl', :'tc', :'of');
+
+create function pg_temp.unidade_c(p_obra int, p_id int, p_situacao text, p_area numeric, p_valor numeric, p_entrega date)
+returns jsonb language sql as $$
+  select jsonb_build_object('id', p_id, 'enterpriseId', p_obra, 'name', 'U-' || p_id, 'propertyType', '2Q',
+    'privateArea', p_area, 'commercialStock', p_situacao, 'deliveryDate', p_entrega, 'saleValuePrice', p_valor,
+    'saleValueDate', '2026-09-01')
+$$;
+
+create function pg_temp.titulo_c(p_id int, p_obra int, p_conta text, p_valor numeric, p_emissao date, p_vencimento date,
+  p_saldo numeric, p_pagamentos jsonb) returns jsonb
+language sql as $$
+  select jsonb_build_object('companyId', 1, 'creditorName', 'Fornecedor Ficticio', 'billId', p_id,
+    'dueDate', p_vencimento, 'issueDate', p_emissao, 'originalAmount', p_valor, 'balanceAmount', p_saldo,
+    'buildingsCosts', jsonb_build_array(jsonb_build_object('buildingId', p_obra, 'amount', p_valor)),
+    'payments', p_pagamentos,
+    'paymentsCategories', jsonb_build_array(jsonb_build_object('financialCategoryId', p_conta, 'financialCategoryRate', 100)))
+$$;
+
+select pg_temp.gravar(:'tc', 'units', array[
+  pg_temp.unidade_c(9201, 920101, 'V', 40, 100000, '2027-06-30'), pg_temp.unidade_c(9201, 920102, 'V', 80, 300000, '2027-06-30'),
+  pg_temp.unidade_c(9201, 920103, 'D', 80, 200000, '2027-06-30'), pg_temp.unidade_c(9201, 920104, 'D', 100, 500000, '2027-06-30'),
+  pg_temp.unidade_c(9202, 920201, 'V', 50, 200000, '2027-03-31'), pg_temp.unidade_c(9202, 920202, 'D', 50, 250000, '2027-03-31'),
+  pg_temp.unidade_c(9202, 920203, 'Z', 50, 180000, '2027-03-31')]);
+
+select pg_temp.gravar(:'tc', 'sales', array[
+  pg_temp.venda(9201, 7101, '2026-08-10', '1', null, 100000, 920101, '[{"conditionType":"AT","totalValue":100000}]'),
+  pg_temp.venda(9201, 7102, '2026-09-10', '1', null, 300000, 920102,
+    '[{"conditionType":"AT","totalValue":60000},{"conditionType":"FI","totalValue":240000}]', '2026-10-01'),
+  pg_temp.venda(9202, 7201, '2026-05-15', '1', null, 200000, 920201,
+    '[{"conditionType":"AT","totalValue":20000},{"conditionType":"PM","totalValue":80000},{"conditionType":"SF","totalValue":40000},{"conditionType":"FI","totalValue":60000}]'),
+  pg_temp.venda(9202, 7202, '2026-06-01', '9', null, 150000, 920202, '[{"conditionType":"PM","totalValue":150000}]')]);
+
+select pg_temp.gravar(:'tc', 'income', array[
+  pg_temp.parcela(9201, 7101, 1, 'AT', '2026-08-10', 100000, 0, '[{"paymentDate":"2026-08-10","amount":100000}]'),
+  pg_temp.parcela(9201, 7102, 1, 'AT', '2026-09-10', 60000, 0, '[{"paymentDate":"2026-09-10","amount":60000}]'),
+  pg_temp.parcela(9201, 7102, 2, 'FI', '2027-01-15', 240000, 240000, '[]'),
+  pg_temp.parcela(9202, 7201, 1, 'AT', '2026-05-15', 20000, 0, '[{"paymentDate":"2026-05-15","amount":20000}]'),
+  pg_temp.parcela(9202, 7201, 2, 'PM', '2026-10-15', 40000, 40000, '[]'),
+  pg_temp.parcela(9202, 7201, 3, 'PM', '2026-12-15', 40000, 40000, '[]'),
+  pg_temp.parcela(9202, 7201, 4, 'SF', '2027-02-10', 40000, 40000, '[]'),
+  pg_temp.parcela(9202, 7201, 5, 'FI', '2027-03-10', 60000, 60000, '[]')]);
+
+select pg_temp.gravar(:'tc', 'outcome', array[
+  pg_temp.titulo_c(8101, 9201, '2.06.001', 40000, '2026-03-05', '2026-03-10', 0, '[{"paymentDate":"2026-03-10","amount":40000}]'),
+  pg_temp.titulo_c(8102, 9201, '2.01.001', 60000, '2026-09-05', '2026-10-05', 60000, '[]'),
+  pg_temp.titulo_c(8103, 9201, '2.88.001', 20000, '2026-10-01', '2026-12-10', 20000, '[]'),
+  pg_temp.titulo_c(8201, 9202, '2.01.003', 10000, null, '2026-12-05', 10000, '[]'),
+  pg_temp.titulo_c(8202, 9202, '2.01.001', 300000, '2026-11-02', '2027-01-15', 300000, '[]')]);
+
+select pg_temp.gravar(:'tc', 'building-cost-estimation-items', array[
+  '{"buildingId":9201,"wbsCode":"01","description":"Terreno E","totalPrice":40000,"percentComplete":100}'::jsonb,
+  '{"buildingId":9201,"wbsCode":"02","description":"Obra E","totalPrice":160000,"percentComplete":30}',
+  '{"buildingId":9202,"wbsCode":"02","description":"Obra F","totalPrice":250000,"percentComplete":10}']);
+
+insert into app.mapa_conta_origem (tenant_id, tipo_origem, conta_origem, categoria_codigo, autor)
+select :'tc', t, c, k, '00000000-0000-0000-0000-000000000000'
+from (values ('parcela_receber', '1.01.001', 'venda_imoveis'), ('titulo_pagar', '2.06.001', 'terreno'),
+             ('titulo_pagar', '2.01.001', 'materiais'), ('titulo_pagar', '2.01.003', 'empreiteiros'),
+             ('orcamento', '01', 'terreno'), ('orcamento', '02', 'materiais')) as m(t, c, k);
+-- critério do tenant gravado pela carga, sem validador
+insert into app.criterio_reconhecimento (tenant_id, metodo, autor)
+values (:'tc', 'percentual_conclusao', '00000000-0000-0000-0000-000000000000');
+
+select staging.recarregar(:'tc');
+select staging.recarregar_precos(:'tc');
+
+-- Estado do produto, sem nenhum valor gravado
+
+select set_config('request.jwt.claims', json_build_object('sub', :'cd', 'role', 'authenticated')::text, true);
+set local role authenticated;
+
+select results_eq(
+  format($q$select dominio, codigo_origem, quantidade_registros, valor_envolvido, valor_aplicado
+            from marts.pendencia_codigo_origem where tenant_id = %L order by dominio$q$, :'tc'),
+  $q$values ('condicao_pagamento', 'SF', 1::bigint, 40000.00::numeric, 'entrada_direta'),
+            ('situacao_contrato', '9', 1, 150000.00, 'outro'),
+            ('situacao_unidade', 'Z', 1, 180000.00, 'fora_de_venda')$q$,
+  'config: os três códigos novos da obra F aparecem na pendência com o valor envolvido e o tratamento em vigor');
+select results_eq(
+  format($q$select disponiveis, reservadas, vendidas, indisponiveis, total from marts.estoque_atual where centro_custo_id = %L$q$, :'of'),
+  $q$values (1::bigint, 0::bigint, 1::bigint, 1::bigint, 1::bigint + 2)$q$,
+  'config: situação Z sem mapa conta como indisponível no estoque da obra F');
+select results_eq(
+  format($q$select vgv_contratado_ativo, contratos_ativos, vencido_direto, a_vencer_direto, a_vencer_financiamento
+            from marts.resumo_receitas_obra where centro_custo_id = %L$q$, :'of'),
+  $q$values (200000.00::numeric(18,2), 1, 40000.00::numeric(18,2), 80000.00::numeric(18,2), 60000.00::numeric(18,2))$q$,
+  'config: contrato 7202 de situação 9 fica fora do VGV; parcela SF conta como entrada direta');
+select results_eq(
+  format($q$select centro_custo_id, metodo, motivo from app.criterio_reconhecimento_efetivo where tenant_id = %L order by centro_custo_id$q$, :'tc'),
+  format($q$values (%L::uuid, 'nao_definido', 'criterio_sem_validador'), (%L::uuid, 'nao_definido', 'criterio_sem_validador')$q$, :'oe', :'of'),
+  'config: percentual de conclusão gravado pela carga sem validador não vale no padrão');
+select results_eq(
+  format($q$select competencia, caixa_gerado_acumulado from marts.fluxo_projetado_mensal
+            where centro_custo_id = %L and competencia in ('2026-11-01', '2026-12-01', '2027-01-01') order by 1$q$, :'oe'),
+  $q$values ('2026-11-01'::date, 60000.00::numeric(18,2)), ('2026-12-01', 40000.00), ('2027-01-01', 280000.00)$q$,
+  'config: obra E no padrão, com os 60 mil vencidos a pagar saindo em novembro');
+select results_eq(
+  format($q$select competencia, vencido_a_receber, caixa_gerado_acumulado, caixa_gerado_acumulado_conservador
+            from marts.fluxo_projetado_mensal where centro_custo_id = %L and competencia in ('2026-11-01', '2027-01-01', '2027-03-01')
+            order by 1$q$, :'of'),
+  $q$values ('2026-11-01'::date, 40000.00::numeric(18,2), 20000.00::numeric(18,2), 20000.00::numeric(18,2)),
+            ('2027-01-01', 0.00, -250000.00, -250000.00), ('2027-03-01', 0.00, -150000.00, -210000.00)$q$,
+  'config: obra F no padrão, vencido a receber fora do saldo e FI sem data do banco só no caixa principal');
+select results_eq(
+  format($q$select competencia, quantidade_obras, caixa_gerado_acumulado, necessidade_aporte_acumulada
+            from marts.fluxo_projetado_consolidado where tenant_id = %L
+              and competencia in ('2026-03-01', '2026-05-01', '2026-11-01', '2027-01-01', '2027-03-01') order by 1$q$, :'tc'),
+  $q$values ('2026-03-01'::date, 1, 40000.00::numeric(18,2) * -1, 40000.00::numeric(18,2)),
+            ('2026-05-01', 2, -20000.00, 20000.00), ('2026-11-01', 2, 80000.00, 0.00),
+            ('2027-01-01', 2, 30000.00, 0.00), ('2027-03-01', 1, 130000.00, 0.00)$q$,
+  'config: consolidado carrega o acumulado da obra E depois do último mês dela (280 mil mais os -150 mil da F em março)');
+select is((
+  with mensal as (
+    select competencia, sum(saldo_mes) as saldo from marts.fluxo_projetado_mensal where tenant_id = :'tc' group by 1
+  ), esperado as (select competencia, sum(saldo) over (order by competencia) as acumulado from mensal)
+  select count(*) from esperado e
+  full join marts.fluxo_projetado_consolidado c on c.tenant_id = :'tc' and c.competencia = e.competencia
+  where c.caixa_gerado_acumulado is distinct from e.acumulado), 0::bigint,
+  'config: fluxo consolidado do diretor é o acumulado da soma mensal das duas obras, mês a mês');
+select results_eq(
+  format($q$select competencia, meses_restantes, meta_valor_contratado, meta_unidades, motivo from marts.meta_automatica_mensal
+            where centro_custo_id = %L and competencia in ('2026-05-01', '2026-10-01', '2026-11-01', '2027-03-01') order by 1$q$, :'of'),
+  $q$values ('2026-05-01'::date, 11, 22727.27::numeric(18,2), 1, null::text), ('2026-10-01', 6, 8333.33, 1, null),
+            ('2026-11-01', 5, 10000.00, 1, null), ('2027-03-01', 5, 10000.00, 1, null)$q$,
+  'config: meta automática da obra F: falta vender 250 mil de custo menos 200 mil de VGV, em cinco meses até as chaves');
+select is((select meta_valor_contratado from marts.meta_automatica_mensal where centro_custo_id = :'oe' and competencia = '2026-11-01'),
+  0.00::numeric(18,2), 'config: obra E já vendeu mais que o custo orçado: meta automática zero');
+select results_eq(
+  format($q$select competencia, meta_unidades, meta_valor_contratado from marts.visao_gerencial_mensal
+            where centro_custo_id = %L and competencia = '2026-11-01'$q$, :'of'),
+  $q$values ('2026-11-01'::date, null::integer, null::numeric(18,2))$q$,
+  'config: com meta manual e sem versão gravada a visão gerencial fica sem meta');
+create temp table simulacao_padrao as
+select * from marts.simular_fluxo(:'oe', '{"novas_vendas":[{"competencia":"2026-12-01","quantidade":1}]}');
+select results_eq(
+  $q$select competencia, novas_vendas_valor, entradas_novas_vendas_direta, entradas_novas_vendas_financiamento
+     from simulacao_padrao where competencia in ('2026-12-01', '2027-01-01', '2027-04-01', '2028-12-01') order by 1$q$,
+  $q$values ('2026-12-01'::date, 350000.00::numeric(18,2), 35000.00::numeric(18,2), 0.00::numeric(18,2)),
+            ('2027-01-01', 0.00, 4375.00, 0.00), ('2027-04-01', 0.00, 4375.00, 210000.00), ('2028-12-01', 0.00, 4375.00, 0.00)$q$,
+  'config: venda simulada sem composição usa o padrão do produto: 10% de entrada, 30% em 24 vezes, 60% do banco 4 meses depois');
+select is((select sum(entradas_novas_vendas_direta + entradas_novas_vendas_financiamento) from simulacao_padrao), 350000.00::numeric,
+  'config: a venda simulada com o padrão entra inteira no caixa');
+
+-- Reconhecimento: validação, cobertura, terreno e base da fração vendida
+
+reset role;
+select set_config('request.jwt.claims', json_build_object('sub', :'cf', 'role', 'authenticated')::text, true);
+set local role authenticated;
+
+select throws_ok(format($q$insert into app.parametro_valor (tenant_id, codigo, valor) values (%L, 'reconhecimento.exigir_validacao_usuario', 'false')$q$, :'tc'),
+  '23514', null, 'config: parâmetro que muda número do financeiro exige observação');
+insert into app.parametro_valor (tenant_id, codigo, valor, observacao)
+values (:'tc', 'reconhecimento.exigir_validacao_usuario', 'false', 'critério aprovado em reunião');
+select results_eq(
+  format($q$select metodo, motivo from app.criterio_reconhecimento_efetivo where centro_custo_id = %L$q$, :'oe'),
+  $q$values ('percentual_conclusao', null::text)$q$,
+  'config: com a validação dispensada o critério da carga passa a valer');
+select results_eq(
+  format($q$select motivo, poc, cobertura_custo from marts.reconhecimento_obra_mensal where centro_custo_id = %L and competencia = '2026-11-01'$q$, :'oe'),
+  $q$values ('custo_sem_categoria', null::numeric(9,6), 0.833333::numeric(9,6))$q$,
+  'config: cobertura mínima 1 bloqueia com 20 mil sem categoria em 120 mil, e a cobertura real aparece');
+insert into app.parametro_valor (tenant_id, codigo, valor, observacao) values (:'tc', 'reconhecimento.cobertura_minima', '0.9', 'teste');
+insert into app.parametro_valor (tenant_id, centro_custo_id, codigo, valor, observacao)
+values (:'tc', :'of', 'reconhecimento.cobertura_minima', '0.5', 'teste');
+select is((select motivo from marts.reconhecimento_obra_mensal where centro_custo_id = :'oe' and competencia = '2026-11-01'),
+  'custo_sem_categoria', 'config: tenant com cobertura 0,9 continua bloqueando 0,833333 (o valor da obra F não vale para a E)');
+insert into app.parametro_valor (tenant_id, centro_custo_id, codigo, valor, observacao)
+values (:'tc', :'oe', 'reconhecimento.cobertura_minima', '0.8', 'teste');
+select results_eq(
+  format($q$select motivo, poc, fracao_vendida, receita_reconhecida_acumulada, custo_reconhecido_acumulado, base_fracao_vendida
+            from marts.reconhecimento_obra_mensal where centro_custo_id = %L and competencia = '2026-11-01'$q$, :'oe'),
+  $q$values (null::text, 0.500000::numeric(9,6), 0.500000::numeric(9,6), 200000.00::numeric(18,2), 50000.00::numeric(18,2), 'unidades')$q$,
+  'config: obra E com 0,8 vence o tenant: POC 100/200 mil, receita 400 mil x 0,5, custo 100 mil x 2/4 unidades');
+select results_eq(
+  format($q$select linha_codigo, valor_periodo from marts.dre_periodo('2026-01-01', '2026-11-30', %L)
+            where linha_codigo in ('receita_bruta', 'custo_imovel_vendido', 'resultado_gerencial') order by linha_ordem$q$, :'oe'),
+  $q$values ('receita_bruta', 200000.00::numeric(18,2)), ('custo_imovel_vendido', -50000.00), ('resultado_gerencial', 150000.00)$q$,
+  'config: DRE da obra E no ano com o reconhecimento liberado pela cobertura');
+insert into app.parametro_valor (tenant_id, centro_custo_id, codigo, valor, observacao)
+values (:'tc', :'oe', 'reconhecimento.incluir_terreno', 'false', 'teste');
+select results_eq(
+  format($q$select poc, receita_reconhecida_acumulada, custo_reconhecido_acumulado from marts.reconhecimento_obra_mensal
+            where centro_custo_id = %L and competencia = '2026-11-01'$q$, :'oe'),
+  $q$values (0.375000::numeric(9,6), 150000.00::numeric(18,2), 50000.00::numeric(18,2))$q$,
+  'config: sem terreno o POC é 60/160 mil e a receita cai a 150 mil; o custo reconhecido continua com o terreno');
+delete from app.parametro_valor where tenant_id = :'tc' and codigo = 'reconhecimento.incluir_terreno';
+insert into app.parametro_valor (tenant_id, codigo, valor, observacao) values (:'tc', 'reconhecimento.base_fracao_vendida', '"area_privativa"', 'teste');
+select results_eq(
+  format($q$select fracao_vendida, receita_reconhecida_acumulada, custo_reconhecido_acumulado, base_fracao_vendida
+            from marts.reconhecimento_obra_mensal where centro_custo_id = %L and competencia = '2026-11-01'$q$, :'oe'),
+  $q$values (0.400000::numeric(9,6), 200000.00::numeric(18,2), 40000.00::numeric(18,2), 'area_privativa')$q$,
+  'config: área privativa vendida 120 de 300 m²: custo reconhecido 40 mil, receita igual');
+insert into app.parametro_valor (tenant_id, centro_custo_id, codigo, valor, observacao)
+values (:'tc', :'oe', 'reconhecimento.base_fracao_vendida', '"valor_tabela"', 'teste');
+select results_eq(
+  format($q$select fracao_vendida, custo_reconhecido_acumulado from marts.reconhecimento_obra_mensal
+            where centro_custo_id = %L and competencia = '2026-11-01'$q$, :'oe'),
+  $q$values (0.363636::numeric(9,6), 36363.64::numeric(18,2))$q$,
+  'config: valor de tabela 400 mil de 1,1 milhão: custo reconhecido 36.363,64');
+select results_eq(
+  format($q$select centro_custo_id, base_fracao_vendida from app.criterio_reconhecimento_efetivo where tenant_id = %L order by 1$q$, :'tc'),
+  format($q$values (%L::uuid, 'valor_tabela'), (%L::uuid, 'area_privativa')$q$, :'oe', :'of'),
+  'config: obra E com o valor próprio, obra F com o do tenant');
+delete from app.parametro_valor where tenant_id = :'tc' and codigo like 'reconhecimento.%' and codigo <> 'reconhecimento.exigir_validacao_usuario';
+select is((select motivo from marts.reconhecimento_obra_mensal where centro_custo_id = :'oe' and competencia = '2026-11-01'),
+  'custo_sem_categoria', 'config: excluir os valores volta ao padrão do produto');
+
+-- DRE: competência dos títulos
+
+select results_eq(
+  format($q$select titulo_id_origem, data_competencia from marts.apropriacao_classificada where centro_custo_id = %L order by 1$q$, :'of'),
+  $q$values (8201, null::date), (8202, '2026-11-02'::date)$q$, 'config: competência pela emissão; título sem emissão fica sem competência');
+select is((select valor_periodo from marts.dre_periodo('2026-01-01', '2026-11-30', :'of') where linha_codigo = 'sem_data_competencia'),
+  -10000.00::numeric(18,2), 'config: os 10 mil sem emissão caem na linha sem data de competência');
+insert into app.parametro_valor (tenant_id, codigo, valor, observacao) values (:'tc', 'dre.competencia_titulo', '"emissao_ou_vencimento"', 'teste');
+select results_eq(
+  format($q$select titulo_id_origem, data_competencia from marts.apropriacao_classificada where centro_custo_id = %L order by 1$q$, :'of'),
+  $q$values (8201, '2026-12-05'::date), (8202, '2026-11-02'::date)$q$, 'config: emissão ou vencimento completa o título sem emissão');
+select is((select valor_periodo from marts.dre_periodo('2026-01-01', '2026-11-30', :'of') where linha_codigo = 'sem_data_competencia'),
+  0.00::numeric(18,2), 'config: a linha sem data de competência zera');
+update app.parametro_valor set valor = '"vencimento"' where tenant_id = :'tc' and codigo = 'dre.competencia_titulo';
+select results_eq(
+  format($q$select competencia, sum(lancado_competencia) from marts.despesa_mensal where centro_custo_id = %L
+            and lancado_competencia <> 0 group by 1 order by 1$q$, :'of'),
+  $q$values ('2026-12-01'::date, 10000.00::numeric), ('2027-01-01', 300000.00)$q$,
+  'config: pelo vencimento o título de 300 mil sai de novembro e vai para janeiro na despesa mensal');
+delete from app.parametro_valor where tenant_id = :'tc' and codigo = 'dre.competencia_titulo';
+
+-- Caixa
+
+insert into app.parametro_valor (tenant_id, codigo, valor) values (:'tc', 'caixa.receber_vencido', '"mes_referencia"');
+select results_eq(
+  format($q$select vencido_a_receber, vencido_recuperacao_prevista, caixa_gerado_acumulado from marts.fluxo_projetado_mensal
+            where centro_custo_id = %L and competencia = '2026-11-01'$q$, :'of'),
+  $q$values (40000.00::numeric(18,2), 40000.00::numeric(18,2), 60000.00::numeric(18,2))$q$,
+  'config: vencido a receber no mês de referência com fração 1 soma os 40 mil');
+insert into app.parametro_valor (tenant_id, centro_custo_id, codigo, valor) values (:'tc', :'of', 'caixa.fracao_recuperacao_vencido', '0.25');
+select results_eq(
+  format($q$select vencido_recuperacao_prevista, caixa_gerado_acumulado from marts.fluxo_projetado_mensal
+            where centro_custo_id = %L and competencia = '2026-11-01'$q$, :'of'),
+  $q$values (10000.00::numeric(18,2), 30000.00::numeric(18,2))$q$, 'config: fração 0,25 da obra F recupera 10 mil');
+select is(
+  (select s.carteira_prevista from marts.simular_fluxo(:'of', '{}') s where s.competencia = '2026-11-01')
+    - (select s.carteira_prevista from marts.simular_fluxo(:'of', '{"cancelar_contratos": [7201]}') s where s.competencia = '2026-11-01'),
+  10000.00::numeric,
+  'R2-M1: cancelar o contrato 7201 na simulação tira do mês de referência os 10 mil do vencido recuperado dele');
+insert into app.parametro_valor (tenant_id, centro_custo_id, codigo, valor) values (:'tc', :'of', 'caixa.receber_vencido', '"excluir"');
+select results_eq(
+  format($q$select vencido_recuperacao_prevista, caixa_gerado_acumulado from marts.fluxo_projetado_mensal
+            where centro_custo_id = %L and competencia = '2026-11-01'$q$, :'of'),
+  $q$values (0.00::numeric(18,2), 20000.00::numeric(18,2))$q$, 'config: obra F com excluir vence o mês de referência do tenant');
+select is((select count(*) from marts.fluxo_projetado_mensal f full join marts.simular_fluxo(:'of', '{}') s using (competencia)
+           where f.centro_custo_id = :'of' and f.caixa_gerado_acumulado is distinct from s.caixa_gerado_acumulado), 0::bigint,
+  'config: simulação vazia acompanha os parâmetros de caixa da obra');
+delete from app.parametro_valor where tenant_id = :'tc' and codigo like 'caixa.%';
+
+insert into app.parametro_valor (tenant_id, centro_custo_id, codigo, valor) values (:'tc', :'oe', 'caixa.pagar_vencido', '"excluir"');
+select results_eq(
+  format($q$select competencia, a_pagar_vencido, caixa_gerado_acumulado from marts.fluxo_projetado_mensal
+            where centro_custo_id = %L and competencia in ('2026-11-01', '2027-01-01') order by 1$q$, :'oe'),
+  $q$values ('2026-11-01'::date, 60000.00::numeric(18,2), 120000.00::numeric(18,2)), ('2027-01-01', 0.00, 340000.00)$q$,
+  'config: pagar vencido excluído deixa os 60 mil só na coluna informativa');
+select is((select count(*) from marts.fluxo_projetado_mensal f full join marts.simular_fluxo(:'oe', '{}') s using (competencia)
+           where f.centro_custo_id = :'oe' and f.caixa_gerado_acumulado is distinct from s.caixa_gerado_acumulado), 0::bigint,
+  'config: simulação vazia da obra E também tira o vencido a pagar');
+delete from app.parametro_valor where tenant_id = :'tc' and codigo like 'caixa.%';
+
+insert into app.parametro_valor (tenant_id, centro_custo_id, codigo, valor) values (:'tc', :'of', 'caixa.financiamento_pendente', '"excluir"');
+select results_eq(
+  format($q$select previsto_financiamento_pendente, total_entradas, caixa_gerado_acumulado, caixa_gerado_acumulado_conservador
+            from marts.fluxo_projetado_mensal where centro_custo_id = %L and competencia = '2027-03-01'$q$, :'of'),
+  $q$values (60000.00::numeric(18,2), 0.00::numeric(18,2), -210000.00::numeric(18,2), -210000.00::numeric(18,2))$q$,
+  'config: financiamento pendente excluído some do caixa principal e o conservador não o desconta duas vezes');
+delete from app.parametro_valor where tenant_id = :'tc' and codigo like 'caixa.%';
+
+-- Crédito à produção da obra F, sem retenção informada, com liberações previstas, pendentes e atrasadas
+reset role;
+select set_config('request.jwt.claims', json_build_object('sub', :'cd', 'role', 'authenticated')::text, true);
+set local role authenticated;
+insert into app.operacao_credito_obra (tenant_id, centro_custo_id, modalidade, instituicao, valor_contratado, fonte, autor)
+values (:'tc', :'of', 'credito_producao', 'Banco Ficticio', 500000, 'contrato ficticio', :'cd');
+select id as operacao_f from app.operacao_credito_obra where tenant_id = :'tc' \gset
+insert into app.liberacao_financiamento (tenant_id, centro_custo_id, nivel, operacao_credito_id, valor_previsto, data_prevista,
+  situacao, motivo, fonte, autor)
+values (:'tc', :'of', 'empreendimento', :'operacao_f', 100000, '2027-01-10', 'prevista', null, 'cronograma ficticio', :'cd'),
+       (:'tc', :'of', 'empreendimento', :'operacao_f', 50000, '2027-02-10', 'pendente', 'aguarda vistoria', 'cronograma ficticio', :'cd'),
+       (:'tc', :'of', 'empreendimento', :'operacao_f', 30000, '2026-10-10', 'prevista', null, 'cronograma ficticio', :'cd'),
+       (:'tc', :'of', 'empreendimento', :'operacao_f', 20000, '2026-11-01', 'pendente', 'aguarda vistoria', 'cronograma ficticio', :'cd');
+reset role;
+select set_config('request.jwt.claims', json_build_object('sub', :'cf', 'role', 'authenticated')::text, true);
+set local role authenticated;
+select results_eq(
+  format($q$select competencia, credito_producao_previsto from marts.fluxo_projetado_mensal
+            where centro_custo_id = %L and credito_producao_previsto <> 0 order by 1$q$, :'of'),
+  $q$values ('2027-01-01'::date, 100000.00::numeric(18,2))$q$,
+  'config: no padrão só a liberação prevista e no prazo entra no caixa');
+insert into app.parametro_valor (tenant_id, centro_custo_id, codigo, valor) values (:'tc', :'of', 'caixa.liberacao_pendente', '"incluir"');
+select results_eq(
+  format($q$select competencia, credito_producao_previsto from marts.fluxo_projetado_mensal
+            where centro_custo_id = %L and credito_producao_previsto <> 0 order by 1$q$, :'of'),
+  $q$values ('2027-01-01'::date, 100000.00::numeric(18,2)), ('2027-02-01', 50000.00)$q$,
+  'config: liberação pendente incluída entra em fevereiro; a pendente atrasada continua fora');
+insert into app.parametro_valor (tenant_id, codigo, valor) values (:'tc', 'caixa.liberacao_atrasada', '"mes_referencia"');
+select results_eq(
+  format($q$select competencia, credito_producao_previsto from marts.fluxo_projetado_mensal
+            where centro_custo_id = %L and credito_producao_previsto <> 0 order by 1$q$, :'of'),
+  $q$values ('2026-11-01'::date, 50000.00::numeric(18,2)), ('2027-01-01', 100000.00), ('2027-02-01', 50000.00)$q$,
+  'config: atrasadas no mês de referência: 30 mil prevista mais 20 mil pendente, porque a obra inclui pendentes');
+delete from app.parametro_valor where tenant_id = :'tc' and centro_custo_id = :'of' and codigo = 'caixa.liberacao_pendente';
+select is((select credito_producao_previsto from marts.fluxo_projetado_mensal where centro_custo_id = :'of' and competencia = '2026-11-01'),
+  30000.00::numeric(18,2), 'config: sem pendentes, só a prevista atrasada de 30 mil vai para novembro');
+delete from app.parametro_valor where tenant_id = :'tc' and codigo like 'caixa.%';
+
+-- Custo sem título: premissa com um mês já encerrado
+reset role;
+select set_config('request.jwt.claims', json_build_object('sub', :'cd', 'role', 'authenticated')::text, true);
+set local role authenticated;
+select ok(app.registrar_premissa_distribuicao(:'oe', 'cronograma ficticio', null,
+  '[{"competencia":"2026-10-01","fracao":0.25},{"competencia":"2026-12-01","fracao":0.75}]') is not null,
+  'config: diretor registra premissa com outubro já encerrado');
+select results_eq(
+  format($q$select competencia, custo_sem_titulo_distribuido from marts.fluxo_projetado_mensal
+            where centro_custo_id = %L and custo_sem_titulo_distribuido <> 0 order by 1$q$, :'oe'),
+  $q$values ('2026-11-01'::date, 20000.00::numeric(18,2)), ('2026-12-01', 60000.00)$q$,
+  'config: 80 mil sem título; a parte de outubro soma em novembro no padrão');
+reset role;
+select set_config('request.jwt.claims', json_build_object('sub', :'cf', 'role', 'authenticated')::text, true);
+set local role authenticated;
+insert into app.parametro_valor (tenant_id, centro_custo_id, codigo, valor) values (:'tc', :'oe', 'caixa.custo_sem_titulo_passado', '"ignorar"');
+select results_eq(
+  format($q$select competencia, custo_sem_titulo_distribuido from marts.fluxo_projetado_mensal
+            where centro_custo_id = %L and custo_sem_titulo_distribuido <> 0 order by 1$q$, :'oe'),
+  $q$values ('2026-12-01'::date, 60000.00::numeric(18,2))$q$, 'config: ignorar tira os 20 mil de outubro do fluxo');
+select results_eq(
+  format($q$select custo_sem_titulo_total, custo_sem_titulo_distribuido_total, custo_sem_titulo_nao_distribuido
+            from marts.resumo_projecao_obra where centro_custo_id = %L$q$, :'oe'),
+  $q$values (80000.00::numeric(18,2), 60000.00::numeric(18,2), 20000.00::numeric(18,2))$q$,
+  'config: o ignorado fica como não distribuído no resumo');
+delete from app.parametro_valor where tenant_id = :'tc' and codigo like 'caixa.%';
+
+-- Financiamento
+
+select results_eq(
+  format($q$select contrato_id_origem, etapa_efetiva from marts.financiamento_contrato where tenant_id = %L order by 1$q$, :'tc'),
+  $q$values (7102, 'elegivel'), (7201, null::text)$q$, 'config: data do banco na origem vale como contratação');
+insert into app.parametro_valor (tenant_id, codigo, valor, observacao) values (:'tc', 'financiamento.data_origem_significa', '"repasse"', 'teste');
+select results_eq(
+  format($q$select contrato_id_origem, etapa_efetiva from marts.financiamento_contrato where tenant_id = %L order by 1$q$, :'tc'),
+  $q$values (7102, 'liberado'), (7201, null::text)$q$, 'config: com repasse, a data do banco marca o contrato 7102 como liberado');
+select results_eq(
+  format($q$select competencia, previsto_financiamento_elegivel, caixa_gerado_acumulado from marts.fluxo_projetado_mensal
+            where centro_custo_id = %L and competencia >= '2026-11-01' order by 1$q$, :'oe'),
+  $q$values ('2026-11-01'::date, 240000.00::numeric(18,2), 280000.00::numeric(18,2)), ('2026-12-01', 0.00, 200000.00)$q$,
+  'config: repasse já passado (01/10) é esperado na data de referência: os 240 mil saem de janeiro, entram em novembro e o fluxo acaba em dezembro');
+delete from app.parametro_valor where tenant_id = :'tc' and codigo = 'financiamento.data_origem_significa';
+select results_eq(
+  format($q$select percentual_retencao, retencao_prevista, origem_retencao from marts.saldo_operacao_credito where operacao_credito_id = %L$q$, :'operacao_f'),
+  $q$values (null::numeric(9,6), null::numeric(18,2), null::text)$q$, 'config: sem retenção na operação nem padrão, nada é presumido');
+insert into app.parametro_valor (tenant_id, codigo, valor) values (:'tc', 'financiamento.retencao_padrao', '0.1');
+select results_eq(
+  format($q$select percentual_retencao, retencao_prevista, origem_retencao from marts.saldo_operacao_credito where operacao_credito_id = %L$q$, :'operacao_f'),
+  $q$values (0.100000::numeric(9,6), 50000.00::numeric(18,2), 'padrao')$q$, 'config: retenção padrão do tenant de 10% sobre 500 mil');
+insert into app.parametro_valor (tenant_id, centro_custo_id, codigo, valor) values (:'tc', :'of', 'financiamento.retencao_padrao', '0.2');
+select results_eq(
+  format($q$select retencao_prevista, saldo_liberavel from marts.saldo_operacao_credito where operacao_credito_id = %L$q$, :'operacao_f'),
+  $q$values (100000.00::numeric(18,2), 400000.00::numeric(18,2))$q$, 'config: obra F com 20% vence o tenant');
+select throws_ok(format($q$insert into app.parametro_valor (tenant_id, centro_custo_id, codigo, valor) values (%L, %L, 'financiamento.retencao_padrao', '0.6')$q$, :'tc', :'oe'),
+  '23514', null, 'config: retenção acima de 50% é recusada');
+delete from app.parametro_valor where tenant_id = :'tc' and codigo like 'financiamento.%';
+
+-- Comercial: meta automática
+
+insert into app.parametro_valor (tenant_id, codigo, valor) values (:'tc', 'comercial.meta_metodo', '"automatica"');
+select results_eq(
+  format($q$select centro_custo_id, meta_unidades, meta_valor_contratado from marts.visao_gerencial_mensal
+            where tenant_id = %L and competencia = '2026-11-01' order by 1$q$, :'tc'),
+  format($q$values (%L::uuid, 0, 0.00::numeric(18,2)), (%L::uuid, 1, 10000.00)$q$, :'oe', :'of'),
+  'config: tenant com meta automática: 10 mil e uma unidade na obra F, zero na E');
+insert into app.parametro_valor (tenant_id, centro_custo_id, codigo, valor) values (:'tc', :'oe', 'comercial.meta_metodo', '"manual"');
+select results_eq(
+  format($q$select centro_custo_id, meta_valor_contratado from marts.visao_gerencial_mensal
+            where tenant_id = %L and competencia = '2026-11-01' order by 1$q$, :'tc'),
+  format($q$values (%L::uuid, null::numeric(18,2)), (%L::uuid, 10000.00)$q$, :'oe', :'of'),
+  'config: obra E manual vence o tenant automático');
+select results_eq(
+  format($q$select causa_codigo, quantidade, valor, origem_dado from marts.explicacao_desvio
+            where centro_custo_id = %L and competencia = '2026-11-01' and causa_codigo like 'vendas%%'$q$, :'of'),
+  $q$values ('vendas_abaixo_meta', -1, -10000.00::numeric, 'origem')$q$,
+  'config: sem venda em novembro, o desvio compara com a meta automática');
+insert into app.parametro_valor (tenant_id, centro_custo_id, codigo, valor) values (:'tc', :'of', 'comercial.meta_base', '"estimativa_conclusao"');
+select results_eq(
+  format($q$select base_valor, falta_vender, meta_valor_contratado from marts.meta_automatica_mensal
+            where centro_custo_id = %L and competencia = '2026-11-01'$q$, :'of'),
+  $q$values (310000.00::numeric(18,2), 110000.00::numeric(18,2), 22000.00::numeric(18,2))$q$,
+  'config: estimativa até a conclusão usa os 310 mil lançados, acima do orçamento de 250 mil');
+delete from app.parametro_valor where tenant_id = :'tc' and codigo = 'comercial.meta_base';
+insert into app.parametro_valor (tenant_id, centro_custo_id, codigo, valor) values (:'tc', :'of', 'comercial.meta_horizonte', '"data_propria"');
+select is((select count(*) from marts.meta_automatica_mensal where centro_custo_id = :'of' and motivo = 'horizonte_ausente'
+           and meta_valor_contratado is null), 7::bigint, 'config: data própria sem data deixa a meta sem valor, com motivo');
+insert into app.parametro_valor (tenant_id, centro_custo_id, codigo, valor) values (:'tc', :'of', 'comercial.meta_data_horizonte', '"2027-01-31"');
+select results_eq(
+  format($q$select competencia, meses_restantes, meta_valor_contratado from marts.meta_automatica_mensal
+            where centro_custo_id = %L and competencia >= '2026-11-01' order by 1$q$, :'of'),
+  $q$values ('2026-11-01'::date, 3, 16666.67::numeric(18,2)), ('2026-12-01', 3, 16666.67), ('2027-01-01', 3, 16666.66)$q$,
+  'config: prazo em janeiro reparte 50 mil em três meses, com o centavo no último');
+update app.parametro_valor set valor = '"2026-09-30"' where tenant_id = :'tc' and codigo = 'comercial.meta_data_horizonte';
+select results_eq(
+  format($q$select competencia, meta_valor_contratado, motivo from marts.meta_automatica_mensal
+            where centro_custo_id = %L and competencia >= '2026-09-01' order by 1$q$, :'of'),
+  $q$values ('2026-09-01'::date, 50000.00::numeric(18,2), null::text), ('2026-10-01', null, 'horizonte_encerrado'),
+            ('2026-11-01', null, 'horizonte_encerrado')$q$,
+  'config: prazo já vencido encerra a meta depois de setembro');
+select throws_ok(format($q$update app.parametro_valor set valor = '"2026-02-30"' where tenant_id = %L and codigo = 'comercial.meta_data_horizonte'$q$, :'tc'),
+  '23514', null, 'config: data inexistente é recusada');
+delete from app.parametro_valor where tenant_id = :'tc' and codigo like 'comercial.%';
+
+-- Simulação
+
+insert into app.parametro_valor (tenant_id, codigo, valor) values (:'tc', 'simulacao.desconto', '0.1');
+insert into app.parametro_valor (tenant_id, centro_custo_id, codigo, valor)
+values (:'tc', :'oe', 'simulacao.desconto', '0.2'), (:'tc', :'oe', 'simulacao.fracao_entrada', '0.2'),
+       (:'tc', :'oe', 'simulacao.fracao_parcelas', '0.2'), (:'tc', :'oe', 'simulacao.fracao_financiamento', '0.6'),
+       (:'tc', :'oe', 'simulacao.quantidade_parcelas', '4'), (:'tc', :'oe', 'simulacao.meses_ate_liberacao', '2');
+select results_eq(
+  format($q$select competencia, novas_vendas_valor, entradas_novas_vendas_direta, entradas_novas_vendas_financiamento
+            from marts.simular_fluxo(%L, '{"novas_vendas":[{"competencia":"2026-12-01","quantidade":1}]}')
+            where competencia between '2026-12-01' and '2027-05-01' order by 1$q$, :'oe'),
+  $q$values ('2026-12-01'::date, 280000.00::numeric(18,2), 56000.00::numeric(18,2), 0.00::numeric(18,2)),
+            ('2027-01-01', 0.00, 14000.00, 0.00), ('2027-02-01', 0.00, 14000.00, 168000.00),
+            ('2027-03-01', 0.00, 14000.00, 0.00), ('2027-04-01', 0.00, 14000.00, 0.00)$q$,
+  'config: padrões da obra E: 20% de desconto (vence os 10% do tenant), 20% de entrada, 4 parcelas e banco 2 meses depois');
+select throws_ok(format($q$update app.parametro_valor set valor = '0.3' where tenant_id = %L and centro_custo_id = %L and codigo = 'simulacao.fracao_entrada'$q$, :'tc', :'oe'),
+  '23514', null, 'config: frações da obra que passam de 100% são recusadas');
+delete from app.parametro_valor where tenant_id = :'tc' and centro_custo_id = :'oe' and codigo like 'simulacao.fracao%';
+select throws_ok(format($q$insert into app.parametro_valor (tenant_id, centro_custo_id, codigo, valor) values (%L, %L, 'simulacao.fracao_entrada', '0.15')$q$, :'tc', :'of'),
+  '23514', null, 'config: uma fração sozinha na obra soma 1,05 com as do produto e é recusada');
+delete from app.parametro_valor where tenant_id = :'tc' and codigo like 'simulacao.%';
+
+-- Subcategoria e rótulo não mexem em total
+
+create temp table dre_antes as
+select null::uuid as centro_custo_id, linha_codigo, valor_periodo from marts.dre_periodo('2026-01-01', '2026-11-30', null)
+union all select :'of'::uuid, linha_codigo, valor_periodo from marts.dre_periodo('2026-01-01', '2026-11-30', :'of');
+create temp table custo_antes as select * from marts.custo_obra_categoria where tenant_id = :'tc';
+insert into app.categoria_tenant (tenant_id, categoria_codigo, codigo, nome) values (:'tc', 'materiais', 'aco', 'Aço e ferragens');
+select id as sub_aco from app.categoria_tenant where tenant_id = :'tc' and codigo = 'aco' \gset
+insert into app.categoria_tenant (tenant_id, categoria_codigo, codigo, nome) values (:'tc', 'terreno', 'escritura', 'Escritura');
+select id as sub_escritura from app.categoria_tenant where tenant_id = :'tc' and codigo = 'escritura' \gset
+select throws_ok(format($q$update app.mapa_conta_origem set subcategoria_id = %L where tenant_id = %L and conta_origem = '2.01.001'$q$, :'sub_escritura', :'tc'),
+  '23514', null, 'config: conta de materiais não aceita subcategoria de terreno');
+update app.mapa_conta_origem set subcategoria_id = :'sub_aco' where tenant_id = :'tc' and conta_origem = '2.01.001';
+insert into app.rotulo_personalizado (tenant_id, contexto, chave, rotulo) values (:'tc', 'linha_dre', 'custo_obra_incorrido', 'Gasto de obra');
+select throws_ok(format($q$insert into app.rotulo_personalizado (tenant_id, contexto, chave, rotulo) values (%L, 'linha_dre', 'lucro_liquido', 'Lucro')$q$, :'tc'),
+  '23514', null, 'config: rótulo de linha que o DRE não tem é recusado');
+select is((select count(*) from (
+  select null::uuid, linha_codigo, valor_periodo from marts.dre_periodo('2026-01-01', '2026-11-30', null)
+  union all select :'of'::uuid, linha_codigo, valor_periodo from marts.dre_periodo('2026-01-01', '2026-11-30', :'of')
+  except select * from dre_antes) d), 0::bigint, 'config: subcategoria e rótulo não mudam nenhuma linha do DRE');
+select is((select count(*) from (select * from marts.custo_obra_categoria where tenant_id = :'tc' except select * from custo_antes) d),
+  0::bigint, 'config: subcategoria não muda o custo por categoria');
+
+-- Mapa de códigos
+
+insert into app.mapa_codigo_origem (tenant_id, dominio, codigo_origem, valor, rotulo) values (:'tc', 'situacao_unidade', 'Z', 'reservada', 'Reserva comercial');
+select results_eq(
+  format($q$select disponiveis, reservadas, indisponiveis from marts.estoque_atual where centro_custo_id = %L$q$, :'of'),
+  $q$values (1::bigint, 1::bigint, 0::bigint)$q$, 'config: situação de unidade remapeada muda o estoque na hora, sem recarga');
+select is((select situacao from marts.mapa_unidades where centro_custo_id = :'of' and unidade_id = 920203), 'reservada',
+  'config: o mapa de unidades mostra a situação remapeada');
+insert into app.mapa_codigo_origem (tenant_id, dominio, codigo_origem, valor) values (:'tc', 'situacao_contrato', '9', 'ativo'),
+  (:'tc', 'condicao_pagamento', 'SF', 'financiamento_comprador');
+update app.mapa_codigo_origem set valor = 'entrada_direta' where tenant_id = :'tc' and dominio = 'condicao_pagamento' and codigo_origem = 'FI';
+select is((select count(*) from marts.pendencia_codigo_origem where tenant_id = :'tc'), 0::bigint, 'config: códigos mapeados saem da pendência');
+select results_eq(
+  format($q$select vgv_contratado_ativo, a_vencer_financiamento from marts.resumo_receitas_obra where centro_custo_id = %L$q$, :'of'),
+  $q$values (200000.00::numeric(18,2), 60000.00::numeric(18,2))$q$, 'config: contrato e condição só mudam na próxima recarga');
+select throws_ok(format($q$insert into app.mapa_codigo_origem (tenant_id, dominio, codigo_origem, valor) values (%L, 'situacao_contrato', '7', 'cancelado')$q$, :'tc'),
+  '23514', null, 'config: valor fora do domínio é recusado com a lista dos aceitos');
+reset role;
+select set_config('request.jwt.claims', '', true);
+select staging.recarregar(:'tc');
+select staging.recarregar(:'tr');
+select set_config('request.jwt.claims', json_build_object('sub', :'cf', 'role', 'authenticated')::text, true);
+set local role authenticated;
+select results_eq(
+  format($q$select centro_custo_id, vgv_contratado_ativo, contratos_ativos, a_vencer_direto, a_vencer_financiamento
+            from marts.resumo_receitas_obra where tenant_id = %L and tipo_centro = 'obra' order by 1$q$, :'tc'),
+  format($q$values (%L::uuid, 400000.00::numeric(18,2), 2, 240000.00::numeric(18,2), 0.00::numeric(18,2)),
+                   (%L::uuid, 350000.00, 2, 100000.00, 40000.00)$q$, :'oe', :'of'),
+  'config: depois da recarga: 7202 ativo soma 150 mil, SF vira financiamento e FI deste tenant vira entrada direta');
+select is((select valor_financiado from staging.contrato_venda where tenant_id = :'tc' and id_origem = 7201), 40000.00::numeric,
+  'config: valor financiado do contrato 7201 passa a ser só a parcela SF');
+reset role;
+select set_config('request.jwt.claims', json_build_object('sub', :'ud', 'role', 'authenticated')::text, true);
+set local role authenticated;
+select is((select origem from marts.carteira_recebiveis where tenant_id = :'tr' and contrato_id_origem = 7002 and parcela_id_origem = 2),
+  'financiamento', 'config: o mapa do tenant C não mexe no FI do tenant R');
+
+-- Fuso e limite de horas da carga
+
+reset role;
+insert into app.parametro_valor (tenant_id, codigo, valor, autor) values (:'tr', 'negocio.fuso_horario', '"Pacific/Pago_Pago"', :'ud');
+update raw.registro set carregado_em = now() - interval '30 hours' where tenant_id = :'tc';
+select set_config('request.jwt.claims', json_build_object('sub', :'cf', 'role', 'authenticated')::text, true);
+set local role authenticated;
+select throws_ok(format($q$insert into app.parametro_valor (tenant_id, codigo, valor) values (%L, 'negocio.fuso_horario', '"America/Sao_Paulox"')$q$, :'tc'),
+  '23514', null, 'config: fuso inexistente é recusado');
+select throws_ok(format($q$insert into app.parametro_valor (tenant_id, centro_custo_id, codigo, valor) values (%L, %L, 'negocio.fuso_horario', '"UTC"')$q$, :'tc', :'oe'),
+  '23514', null, 'config: fuso é da construtora, não da obra');
+insert into app.parametro_valor (tenant_id, codigo, valor) values (:'tc', 'negocio.fuso_horario', '"Pacific/Kiritimati"');
+select set_config('app.data_referencia', '', true);
+select is(app.data_referencia(), (now() at time zone 'Pacific/Kiritimati')::date, 'config: sem data fixada, o dia de referência é o do fuso do tenant');
+reset role;
+select set_config('request.jwt.claims', json_build_object('sub', :'ud', 'role', 'authenticated')::text, true);
+set local role authenticated;
+select is(app.data_referencia(), (now() at time zone 'Pacific/Pago_Pago')::date,
+  'config: trocar de usuário na mesma transação troca o fuso (a memória do fuso segue os claims)');
+select data_referencia as dia_pago_pago from app.situacao_carga() \gset
+reset role;
+select set_config('request.jwt.claims', json_build_object('sub', :'cd', 'role', 'authenticated')::text, true);
+set local role authenticated;
+select ok((select data_referencia from app.situacao_carga()) - :'dia_pago_pago'::date between 1 and 2,
+  'config: Kiritimati está sempre um ou dois dias à frente de Pago Pago');
+select results_eq($q$select horas_desde_carga, desatualizada from app.situacao_carga()$q$,
+  $q$values (30.0::numeric(9,1), true)$q$, 'config: carga de 30 horas atrás passa do limite padrão de 26');
+reset role;
+select set_config('request.jwt.claims', json_build_object('sub', :'cf', 'role', 'authenticated')::text, true);
+set local role authenticated;
+insert into app.parametro_valor (tenant_id, codigo, valor) values (:'tc', 'alerta.carga_desatualizada_horas', '48');
+select is((select desatualizada from app.situacao_carga()), false, 'config: com limite de 48 horas a mesma carga está em dia');
+select throws_ok(format($q$update app.parametro_valor set valor = '200' where tenant_id = %L and codigo = 'alerta.carga_desatualizada_horas'$q$, :'tc'),
+  '23514', null, 'config: limite acima de 168 horas é recusado');
+select throws_ok(format($q$update app.parametro_valor set valor = '"48"' where tenant_id = %L and codigo = 'alerta.carga_desatualizada_horas'$q$, :'tc'),
+  '23514', null, 'config: número em texto é recusado');
+select set_config('app.data_referencia', '2026-11-20', true);
+
+-- Isolamento e escrita
+
+insert into app.parametro_valor (tenant_id, centro_custo_id, codigo, valor) values (:'tc', :'of', 'caixa.fracao_recuperacao_vencido', '0.3');
+insert into app.parametro_valor (tenant_id, codigo, valor) values (:'tc', 'caixa.fracao_recuperacao_vencido', '0.7');
+select throws_ok(format($q$insert into app.parametro_valor (tenant_id, codigo, valor) values (%L, 'caixa.pagar_vencido', '"excluir"')$q$, :'tr'),
+  '42501', null, 'config: financeiro não grava no tenant R');
+select throws_ok(format($q$insert into app.parametro_valor (tenant_id, centro_custo_id, codigo, valor) values (%L, %L, 'caixa.pagar_vencido', '"excluir"')$q$, :'tc', :'oa'),
+  '23514', null, 'config: financeiro não grava valor numa obra de outro tenant');
+select throws_ok(format($q$insert into app.parametro_valor (tenant_id, codigo, valor) values (%L, 'caixa.pagar_vencido', '"excluir''); drop table app.tenant; --"')$q$, :'tc'),
+  '23514', null, 'config: texto com SQL no valor jsonb é só uma opção inexistente');
+reset role;
+select set_config('request.jwt.claims', json_build_object('sub', :'cg', 'role', 'authenticated')::text, true);
+set local role authenticated;
+select is((select count(*) from app.parametro_valor where centro_custo_id = :'of'), 0::bigint, 'config: gerente da obra E não lê o valor da obra F');
+select results_eq($q$select centro_custo_id, caixa__fracao_recuperacao_vencido from app.parametros_obra$q$,
+  format($q$values (%L::uuid, 0.700000::numeric(9,6))$q$, :'oe'), 'config: gerente vê só a obra E, com o valor do tenant');
+select is((select count(*) from app.configuracao_efetiva where centro_custo_id = :'of'), 0::bigint,
+  'config: a configuração em vigor da obra F não aparece para o gerente da E');
+select results_eq(
+  format($q$select competencia, quantidade_obras, caixa_gerado_acumulado from marts.fluxo_projetado_consolidado
+            where tenant_id = %L and competencia = '2027-01-01'$q$, :'tc'),
+  $q$values ('2027-01-01'::date, 1, 200000.00::numeric(18,2))$q$, 'config: consolidado do gerente só tem a obra E, já com a premissa');
+select throws_ok(format($q$insert into app.parametro_valor (tenant_id, centro_custo_id, codigo, valor) values (%L, %L, 'caixa.pagar_vencido', '"excluir"')$q$, :'tc', :'oe'),
+  '42501', null, 'config: gerente não grava parâmetro nem da própria obra');
+update app.parametro_valor set valor = '0.1' where tenant_id = :'tc' and codigo = 'caixa.fracao_recuperacao_vencido' and centro_custo_id is null;
+select throws_ok(format($q$insert into app.mapa_codigo_origem (tenant_id, dominio, codigo_origem, valor) values (%L, 'situacao_unidade', 'Q', 'vendida')$q$, :'tc'),
+  '42501', null, 'config: gerente não mapeia código');
+select throws_ok(format($q$insert into app.rotulo_personalizado (tenant_id, contexto, chave, rotulo) values (%L, 'categoria', 'materiais', 'x')$q$, :'tc'),
+  '42501', null, 'config: gerente não grava rótulo');
+reset role;
+select set_config('request.jwt.claims', json_build_object('sub', :'cl', 'role', 'authenticated')::text, true);
+set local role authenticated;
+select is((select caixa__fracao_recuperacao_vencido from app.parametros_obra where centro_custo_id = :'of'), 0.300000::numeric(9,6),
+  'config: leitura da obra F vê o valor dela, e o update do gerente não mudou o do tenant');
+select is((select valor::text from app.parametro_valor where tenant_id = :'tc' and codigo = 'caixa.fracao_recuperacao_vencido' and centro_custo_id is null),
+  '0.7', 'config: update do gerente passou por zero linhas');
+select throws_ok(format($q$insert into app.categoria_tenant (tenant_id, categoria_codigo, codigo, nome) values (%L, 'materiais', 'x', 'x')$q$, :'tc'),
+  '42501', null, 'config: leitura não cria subcategoria');
+delete from app.parametro_valor where tenant_id = :'tc';
+select is((select count(*) from app.parametro_valor where tenant_id = :'tc' and codigo = 'caixa.fracao_recuperacao_vencido'), 2::bigint,
+  'config: exclusão pela leitura passa por zero linhas');
+reset role;
+select set_config('request.jwt.claims', json_build_object('sub', :'ux', 'role', 'authenticated')::text, true);
+set local role authenticated;
+select is((select count(*) from app.parametro_valor where tenant_id = :'tc') + (select count(*) from app.mapa_codigo_origem where tenant_id = :'tc')
+        + (select count(*) from app.categoria_tenant where tenant_id = :'tc') + (select count(*) from app.rotulo_personalizado where tenant_id = :'tc')
+        + (select count(*) from app.configuracao_efetiva where tenant_id = :'tc') + (select count(*) from app.parametros_obra where tenant_id = :'tc')
+        + (select count(*) from marts.pendencia_codigo_origem where tenant_id = :'tc') + (select count(*) from marts.fluxo_projetado_consolidado where tenant_id = :'tc'),
+  0::bigint, 'config: outro tenant não vê nada da configuração do tenant C');
+select throws_ok('select app.gerar_views_parametros()', '42501', null, 'config: usuário não recria as views de parâmetros');
+select throws_ok(format($q$select app.semear_mapa_codigo_origem(%L)$q$, :'tc'), '42501', null, 'config: usuário não semeia o mapa de outro tenant');
+select throws_ok($q$insert into app.parametro (codigo, grupo, nome, descricao, tipo, padrao, escopo, ordem) values ('exibicao.x', 'exibicao', 'x', 'x', 'texto', '"x"', 'tenant', 9999)$q$,
+  '42501', null, 'config: catálogo é só leitura para o usuário');
+reset role;
+select set_config('request.jwt.claims', '', true);
+set local role anon;
+select throws_ok('select app.fuso_horario_atual()', '42501', null, 'config: anônimo não chama o fuso');
+select throws_ok('select count(*) from app.parametro', '42501', null, 'config: anônimo não lê o catálogo');
+reset role;
+
+select is((select count(*) from app.auditoria_alteracao where tenant_id = :'tc' and autor = :'cf'
+           and tabela in ('app.parametro_valor', 'app.mapa_codigo_origem', 'app.categoria_tenant', 'app.rotulo_personalizado')),
+  (select count(*) from app.auditoria_alteracao where tenant_id = :'tc'
+           and tabela in ('app.parametro_valor', 'app.mapa_codigo_origem', 'app.categoria_tenant', 'app.rotulo_personalizado')),
+  'config: todo registro de histórico da configuração do tenant C tem o financeiro como autor');
+select ok((select count(distinct tabela) from app.auditoria_alteracao where tenant_id = :'tc' and autor = :'cf') >= 4,
+  'config: o histórico cobre parâmetros, códigos, subcategorias e rótulos');
+
+-- Catálogo do banco
+
+select is((select count(*) from pg_class c join pg_namespace n on n.oid = c.relnamespace
+           where n.nspname = 'app' and c.relname in ('parametro', 'parametro_valor', 'mapa_codigo_origem', 'rotulo_personalizado',
+                                                     'categoria_tenant', 'valor_codigo_origem')
+             and c.relrowsecurity and c.relforcerowsecurity), 6::bigint,
+  'config: as seis tabelas novas com RLS ligado e forçado');
+select is((select count(*) from (select tablename, cmd from pg_policies where schemaname = 'app'
+           and tablename in ('parametro', 'parametro_valor', 'mapa_codigo_origem', 'rotulo_personalizado', 'categoria_tenant', 'valor_codigo_origem')
+           and permissive = 'PERMISSIVE' group by 1, 2 having count(*) > 1 or cmd = 'ALL') x), 0::bigint,
+  'config: uma política permissiva por tabela e ação, nenhuma ALL');
+select is((select count(*) from pg_policies where schemaname in ('app', 'staging', 'marts')
+           and (btrim(coalesce(qual, '')) = 'true' or btrim(coalesce(with_check, '')) = 'true')), 0::bigint,
+  'config: nenhuma política using (true) ou with check (true)');
+select is((select count(*) from pg_policies where schemaname = 'app'
+           and tablename in ('parametro_valor', 'mapa_codigo_origem', 'rotulo_personalizado', 'categoria_tenant')
+           and cmd <> 'SELECT'
+           and not (coalesce(qual, '') || coalesce(with_check, '')) ~ 'perfil_atual\(\).*diretor.*financeiro'), 0::bigint,
+  'config: toda escrita nas tabelas novas exige diretor ou financeiro pelo perfil_atual');
+select is((select count(*) from pg_policies where schemaname = 'app' and (coalesce(qual, '') || coalesce(with_check, '')) ~ 'user_metadata'),
+  0::bigint, 'config: nenhuma política lê user_metadata');
+select ok(not has_table_privilege('authenticated', 'app.parametro', 'INSERT, UPDATE, DELETE')
+          and not has_table_privilege('authenticated', 'app.valor_codigo_origem', 'INSERT, UPDATE, DELETE'),
+  'config: catálogo e valores aceitos sem escrita para authenticated');
+select is((select count(*) from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+           where n.nspname in ('app', 'staging', 'marts') and p.prosecdef
+             and not coalesce(p.proconfig, '{}') @> array['search_path=""']), 0::bigint,
+  'config: toda função security definer com search_path vazio');
+select is((select count(*) from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+           where n.nspname = 'app' and p.proname in ('gerar_views_parametros', 'semear_mapa_codigo_origem', 'semear_tenant_novo',
+                                                    'validar_parametro_valor', 'conferir_composicao_simulacao', 'validar_mapa_codigo_origem')
+             and (has_function_privilege('authenticated', p.oid, 'EXECUTE') or has_function_privilege('anon', p.oid, 'EXECUTE'))),
+  0::bigint, 'config: funções internas da configuração sem execute para authenticated e anon');
+select ok(has_function_privilege('authenticated', 'app.fuso_horario_atual()', 'EXECUTE')
+          and not has_function_privilege('anon', 'app.fuso_horario_atual()', 'EXECUTE'),
+  'config: fuso do tenant só para usuário logado');
+select is((select count(*) from pg_class c join pg_namespace n on n.oid = c.relnamespace
+           where n.nspname in ('app', 'marts') and c.relkind = 'v'
+             and not coalesce(c.reloptions, '{}') @> array['security_invoker=true']), 0::bigint,
+  'config: todas as views de app e marts com security_invoker');
+
+-- Injeção pelo catálogo: o código tem formato fixo e o gerador de views só usa %I e %L
+select throws_ok($q$insert into app.parametro (codigo, grupo, nome, descricao, tipo, padrao, escopo, ordem)
+                    values ('exibicao.x"; drop table app.tenant; --', 'exibicao', 'x', 'x', 'texto', '"x"', 'tenant', 9998)$q$,
+  '23514', null, 'config: código de parâmetro fora do formato é recusado até para o dono do banco');
+insert into app.parametro (codigo, grupo, nome, descricao, tipo, padrao, escopo, ordem)
+values ('exibicao.teste_revisao', 'exibicao', 'Teste''); drop table app.tenant; --', 'x', 'texto',
+        to_jsonb('x''); drop table app.tenant; --'::text), 'tenant', 9997);
+select lives_ok('select app.gerar_views_parametros()', 'config: gerador de views aceita o parâmetro novo');
+select is((select exibicao__teste_revisao from app.parametros_tenant where tenant_id = :'tc'), 'x''); drop table app.tenant; --',
+  'config: o texto do padrão volta como literal na coluna nova');
+select ok(to_regclass('app.tenant') is not null and (select count(*) from app.tenant where id = :'tc') = 1,
+  'config: nada do texto foi executado');
 
 select * from finish();
 rollback;

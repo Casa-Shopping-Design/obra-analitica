@@ -137,7 +137,7 @@ describe("validarPremissas", () => {
   });
 
   it("confere parcelas e liberação só quando há venda com essa parte", () => {
-    const resultado = validarPremissas(formulario({ quantidade_parcelas: "0", meses_liberacao: "99" }), contexto);
+    const resultado = validarPremissas(formulario({ quantidade_parcelas: "0", meses_liberacao: "601" }), contexto);
     expect(resultado.ok).toBe(false);
     if (resultado.ok) return;
     expect(resultado.erros.quantidade_parcelas).toBeDefined();
@@ -199,5 +199,14 @@ describe("piorMes e juntarBaseESimulacao", () => {
       { competencia: "2026-10-01", base: -100, simulado: -80 },
       { competencia: "2026-11-01", base: null, simulado: -50 },
     ]);
+  });
+});
+
+describe("limites que acompanham o catálogo", () => {
+  it("aceita até 600 parcelas e 600 meses até a liberação", () => {
+    const aceito = validarPremissas(formulario({ quantidade_parcelas: "600", meses_liberacao: "600" }), contexto);
+    expect(aceito.ok).toBe(true);
+    const recusado = validarPremissas(formulario({ quantidade_parcelas: "601" }), contexto);
+    expect(recusado.ok ? {} : recusado.erros).toEqual({ quantidade_parcelas: "Informe de 1 a 600 parcelas." });
   });
 });

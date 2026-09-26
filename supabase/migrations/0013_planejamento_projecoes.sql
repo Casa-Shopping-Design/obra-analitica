@@ -56,6 +56,7 @@ create table app.projecao_mensal (
   aporte_incremental_mes numeric(18,2) not null,
   caixa_gerado_acumulado_conservador numeric(18,2) not null,
   necessidade_aporte_conservadora numeric(18,2) not null,
+  vencido_recuperacao_prevista numeric(18,2) not null default 0,
   primary key (versao_id, competencia)
 );
 create index projecao_mensal_obra on app.projecao_mensal (tenant_id, centro_custo_id);
@@ -271,8 +272,9 @@ left join premissa p on p.tenant_id = cc.tenant_id and p.centro_custo_id = cc.id
 left join soma s on s.premissa_id = p.id
 where cc.tipo = 'obra';
 
--- Repartição mensal pela premissa vigente. Mês passado da premissa soma no mês corrente (pergunta P11);
--- o resíduo de centavo vai para o mês de maior fração, empate no mais cedo.
+-- Repartição mensal pela premissa vigente. Mês passado da premissa soma no mês corrente (pergunta P11)
+-- ou é ignorado, conforme caixa.custo_sem_titulo_passado da obra; ignorado, fica como não distribuído.
+-- O resíduo de centavo vai para o mês de maior fração, empate no mais cedo.
 create view app.custo_sem_titulo_mensal with (security_invoker = true) as
 with referencia as materialized (
   select date_trunc('month', app.data_referencia())::date as mes_ref
@@ -280,19 +282,23 @@ with referencia as materialized (
   select o.tenant_id, o.centro_custo_id, o.custo_sem_titulo_total as total,
          greatest(m.competencia, r.mes_ref) as competencia, sum(m.fracao) as fracao
   from app.custo_sem_titulo_obra o
+  join (select p.centro_custo_id, p.caixa__custo_sem_titulo_passado from app.parametros_obra p offset 0) po
+    on po.centro_custo_id = o.centro_custo_id
   join app.premissa_distribuicao_custo_mes m on m.premissa_id = o.premissa_distribuicao_id
   cross join referencia r
   where o.custo_sem_titulo_total > 0
+    and (m.competencia >= r.mes_ref or po.caixa__custo_sem_titulo_passado = 'mes_referencia')
   group by 1, 2, 3, 4
 ), arredondado as (
   select mes.*, round(mes.total * mes.fracao, 2) as parte,
          row_number() over (partition by mes.tenant_id, mes.centro_custo_id order by mes.fracao desc, mes.competencia) = 1
            as principal,
-         sum(round(mes.total * mes.fracao, 2)) over (partition by mes.tenant_id, mes.centro_custo_id) as soma_partes
+         sum(round(mes.total * mes.fracao, 2)) over (partition by mes.tenant_id, mes.centro_custo_id) as soma_partes,
+         round(mes.total * sum(mes.fracao) over (partition by mes.tenant_id, mes.centro_custo_id), 2) as a_distribuir
   from mes
 )
 select a.tenant_id, a.centro_custo_id, a.competencia,
-  (case when a.principal then a.parte + a.total - a.soma_partes else a.parte end)::numeric(18,2) as valor
+  (case when a.principal then a.parte + a.a_distribuir - a.soma_partes else a.parte end)::numeric(18,2) as valor
 from arredondado a;
 
 -- Versões usadas nas comparações. Original: a primeira projeção registrada no mês de referência; sem
@@ -330,14 +336,17 @@ $$;
 revoke execute on function app.meses_entre(date, date) from public, anon;
 grant execute on function app.meses_entre(date, date) to authenticated;
 
--- Fluxo por obra e mês: o realizado pelo dia do dinheiro e o previsto pela data esperada. Entrada vencida
--- fica fora do saldo (informativa em vencido_a_receber); saída vencida entra no mês de referência.
--- O acumulado é caixa gerado pela obra, não saldo bancário.
+-- Fluxo por obra e mês: o realizado pelo dia do dinheiro e o previsto pela data esperada. Por padrão a
+-- entrada vencida fica fora do saldo (informativa em vencido_a_receber) e a saída vencida entra no mês de
+-- referência; os parâmetros caixa.* da obra mudam o que entra no saldo, e as colunas informativas
+-- continuam mostrando tudo. O acumulado é caixa gerado pela obra, não saldo bancário.
 -- Uma passada só pelos eventos: agrupa por obra e mês e preenche os meses sem movimento até o próximo
--- mês com movimento, então o filtro por obra chega até as tabelas. O(eventos + meses).
+-- mês com movimento, então o filtro por obra chega até as tabelas. Os parâmetros entram por uma junção
+-- com uma linha por obra, depois da agregação. O(eventos + meses).
 create view marts.fluxo_projetado_mensal with (security_invoker = true) as
 with referencia as materialized (
-  select app.data_referencia() as ref, date_trunc('month', app.data_referencia())::date as mes_ref
+  select d.ref, date_trunc('month', d.ref)::date as mes_ref
+  from (select app.data_referencia() as ref) d
 ), movimento as (
   select r.tenant_id, r.centro_custo_id, date_trunc('month', r.data_recebimento)::date as competencia,
          case when r.origem = 'repasse' then 'recebido_financiamento' else 'recebido_direto' end as tipo,
@@ -351,11 +360,14 @@ with referencia as materialized (
   from app.liberacao_financiamento l
   where l.situacao = 'recebida' and l.nivel in ('empreendimento', 'lote') and l.vinculo_tipo = 'lancamento_manual'
   union all
-  select l.tenant_id, l.centro_custo_id, date_trunc('month', l.data_prevista)::date, 'credito_producao_previsto',
+  -- liberação a receber separada por situação e prazo; a vencida fica no mês de referência
+  select l.tenant_id, l.centro_custo_id,
+         case when l.data_prevista >= ref.ref then date_trunc('month', l.data_prevista)::date else ref.mes_ref end,
+         'liberacao_' || l.situacao || case when l.data_prevista >= ref.ref then '' else '_atrasada' end,
          l.valor_previsto
   from app.liberacao_financiamento l
   cross join referencia ref
-  where l.situacao = 'prevista' and l.nivel in ('empreendimento', 'lote') and l.data_prevista >= ref.ref
+  where l.situacao in ('prevista', 'pendente') and l.nivel in ('empreendimento', 'lote')
   union all
   select rp.tenant_id, rp.centro_custo_id,
          case when rp.incluida_projecao then date_trunc('month', rp.data_prevista)::date else ref.mes_ref end,
@@ -394,7 +406,10 @@ with referencia as materialized (
     coalesce(sum(m.valor) filter (where m.tipo = 'previsto_direto'), 0) as previsto_direto,
     coalesce(sum(m.valor) filter (where m.tipo = 'previsto_financiamento_elegivel'), 0) as previsto_financiamento_elegivel,
     coalesce(sum(m.valor) filter (where m.tipo = 'previsto_financiamento_pendente'), 0) as previsto_financiamento_pendente,
-    coalesce(sum(m.valor) filter (where m.tipo = 'credito_producao_previsto'), 0) as credito_producao_previsto,
+    coalesce(sum(m.valor) filter (where m.tipo = 'liberacao_prevista'), 0) as liberacao_prevista,
+    coalesce(sum(m.valor) filter (where m.tipo = 'liberacao_pendente'), 0) as liberacao_pendente,
+    coalesce(sum(m.valor) filter (where m.tipo = 'liberacao_prevista_atrasada'), 0) as liberacao_prevista_atrasada,
+    coalesce(sum(m.valor) filter (where m.tipo = 'liberacao_pendente_atrasada'), 0) as liberacao_pendente_atrasada,
     coalesce(sum(m.valor) filter (where m.tipo = 'vencido_a_receber'), 0) as vencido_a_receber,
     coalesce(sum(m.valor) filter (where m.tipo = 'pago'), 0) as pago,
     coalesce(sum(m.valor) filter (where m.tipo = 'a_pagar'), 0) as a_pagar,
@@ -403,11 +418,29 @@ with referencia as materialized (
   from movimento m
   where m.centro_custo_id in (select cc.id from app.centro_custo cc where cc.tipo = 'obra')
   group by 1, 2, 3
-), com_proximo as (
-  select me.*, lead(me.competencia) over (partition by me.tenant_id, me.centro_custo_id order by me.competencia) as proximo
+), com_parametro as (
+  -- a liberação pendente entra como prevista quando a obra pede; a vencida, no mês de referência
+  select me.*,
+    me.liberacao_prevista
+      + case when po.caixa__liberacao_pendente = 'incluir' then me.liberacao_pendente else 0 end
+      + case when po.caixa__liberacao_atrasada = 'mes_referencia'
+             then me.liberacao_prevista_atrasada
+                  + case when po.caixa__liberacao_pendente = 'incluir' then me.liberacao_pendente_atrasada else 0 end
+             else 0 end as credito_producao_previsto,
+    case when po.caixa__receber_vencido = 'mes_referencia'
+         then round(me.vencido_a_receber * po.caixa__fracao_recuperacao_vencido, 2) else 0 end
+      as vencido_recuperacao_prevista,
+    po.caixa__pagar_vencido = 'mes_referencia' as soma_pagar_vencido,
+    po.caixa__financiamento_pendente = 'incluir' as soma_financiamento_pendente,
+    lead(me.competencia) over (partition by me.tenant_id, me.centro_custo_id order by me.competencia) as proximo
   from mensal me
+  -- offset 0: os parâmetros saem do jsonb uma vez por obra, não uma vez por mês
+  join (select p.centro_custo_id, p.caixa__liberacao_pendente, p.caixa__liberacao_atrasada, p.caixa__receber_vencido,
+               p.caixa__fracao_recuperacao_vencido, p.caixa__pagar_vencido, p.caixa__financiamento_pendente
+        from app.parametros_obra p offset 0) po on po.centro_custo_id = me.centro_custo_id
 ), linha as (
   select c.tenant_id, c.centro_custo_id, g.competencia::date as competencia, g.competencia < ref.mes_ref as eh_passado,
+    c.soma_pagar_vencido, c.soma_financiamento_pendente,
     case when g.competencia = c.competencia then c.recebido_direto else 0 end as recebido_direto,
     case when g.competencia = c.competencia then c.recebido_financiamento else 0 end as recebido_financiamento,
     case when g.competencia = c.competencia then c.credito_producao_recebido else 0 end as credito_producao_recebido,
@@ -416,25 +449,32 @@ with referencia as materialized (
     case when g.competencia = c.competencia then c.previsto_financiamento_pendente else 0 end as previsto_financiamento_pendente,
     case when g.competencia = c.competencia then c.credito_producao_previsto else 0 end as credito_producao_previsto,
     case when g.competencia = c.competencia then c.vencido_a_receber else 0 end as vencido_a_receber,
+    case when g.competencia = c.competencia then c.vencido_recuperacao_prevista else 0 end as vencido_recuperacao_prevista,
     case when g.competencia = c.competencia then c.pago else 0 end as pago,
     case when g.competencia = c.competencia then c.a_pagar else 0 end as a_pagar,
     case when g.competencia = c.competencia then c.a_pagar_vencido else 0 end as a_pagar_vencido,
     case when g.competencia = c.competencia then c.custo_sem_titulo_distribuido else 0 end as custo_sem_titulo_distribuido
-  from com_proximo c
+  from com_parametro c
   cross join referencia ref
   cross join lateral app.meses_entre(c.competencia, coalesce((c.proximo - interval '1 month')::date, c.competencia))
     as g(competencia)
 ), saldo as (
   select li.*,
     li.recebido_direto + li.recebido_financiamento + li.credito_producao_recebido + li.previsto_direto
-      + li.previsto_financiamento_elegivel + li.previsto_financiamento_pendente + li.credito_producao_previsto
+      + li.previsto_financiamento_elegivel
+      + case when li.soma_financiamento_pendente then li.previsto_financiamento_pendente else 0 end
+      + li.credito_producao_previsto + li.vencido_recuperacao_prevista
       as total_entradas,
-    li.pago + li.a_pagar + li.a_pagar_vencido + li.custo_sem_titulo_distribuido as total_saidas
+    li.pago + li.a_pagar + case when li.soma_pagar_vencido then li.a_pagar_vencido else 0 end
+      + li.custo_sem_titulo_distribuido as total_saidas
   from linha li
 ), acumulado as (
+  -- a variante conservadora nunca conta o financiamento pendente
   select s.*, s.total_entradas - s.total_saidas as saldo_mes,
     sum(s.total_entradas - s.total_saidas) over w as caixa_gerado_acumulado,
-    sum(s.total_entradas - s.total_saidas - s.previsto_financiamento_pendente) over w as caixa_gerado_acumulado_conservador
+    sum(s.total_entradas - s.total_saidas
+        - case when s.soma_financiamento_pendente then s.previsto_financiamento_pendente else 0 end) over w
+      as caixa_gerado_acumulado_conservador
   from saldo s
   window w as (partition by s.tenant_id, s.centro_custo_id order by s.competencia)
 )
@@ -460,6 +500,73 @@ select a.tenant_id, a.centro_custo_id, a.competencia, a.eh_passado,
            - coalesce(lag(greatest(-a.caixa_gerado_acumulado, 0))
                         over (partition by a.tenant_id, a.centro_custo_id order by a.competencia), 0), 0)::numeric(18,2)
     as aporte_incremental_mes,
+  a.caixa_gerado_acumulado_conservador::numeric(18,2) as caixa_gerado_acumulado_conservador,
+  greatest(-a.caixa_gerado_acumulado_conservador, 0)::numeric(18,2) as necessidade_aporte_conservadora,
+  a.vencido_recuperacao_prevista::numeric(18,2) as vencido_recuperacao_prevista
+from acumulado a;
+
+-- Obras visíveis ao usuário somadas mês a mês, como se o caixa de uma cobrisse a falta da outra. O
+-- acumulado corre sobre a soma mensal, não é a soma dos acumulados das obras; a variante conservadora
+-- usa o saldo conservador de cada obra, que já respeita o parâmetro de financiamento pendente dela.
+-- O(obras x meses).
+create view marts.fluxo_projetado_consolidado with (security_invoker = true) as
+with obra as (
+  select f.*,
+    f.caixa_gerado_acumulado_conservador
+      - coalesce(lag(f.caixa_gerado_acumulado_conservador)
+                   over (partition by f.tenant_id, f.centro_custo_id order by f.competencia), 0) as saldo_mes_conservador
+  from marts.fluxo_projetado_mensal f
+), mensal as (
+  select o.tenant_id, o.competencia, bool_and(o.eh_passado) as eh_passado,
+    count(*) as quantidade_obras,
+    sum(o.recebido_direto) as recebido_direto,
+    sum(o.recebido_financiamento) as recebido_financiamento,
+    sum(o.credito_producao_recebido) as credito_producao_recebido,
+    sum(o.previsto_direto) as previsto_direto,
+    sum(o.previsto_financiamento_elegivel) as previsto_financiamento_elegivel,
+    sum(o.previsto_financiamento_pendente) as previsto_financiamento_pendente,
+    sum(o.credito_producao_previsto) as credito_producao_previsto,
+    sum(o.vencido_a_receber) as vencido_a_receber,
+    sum(o.vencido_recuperacao_prevista) as vencido_recuperacao_prevista,
+    sum(o.pago) as pago,
+    sum(o.a_pagar) as a_pagar,
+    sum(o.a_pagar_vencido) as a_pagar_vencido,
+    sum(o.custo_sem_titulo_distribuido) as custo_sem_titulo_distribuido,
+    sum(o.total_entradas) as total_entradas,
+    sum(o.total_saidas) as total_saidas,
+    sum(o.saldo_mes) as saldo_mes,
+    sum(o.saldo_mes_conservador) as saldo_mes_conservador
+  from obra o
+  group by o.tenant_id, o.competencia
+), acumulado as (
+  select m.*,
+    sum(m.saldo_mes) over w as caixa_gerado_acumulado,
+    sum(m.saldo_mes_conservador) over w as caixa_gerado_acumulado_conservador
+  from mensal m
+  window w as (partition by m.tenant_id order by m.competencia)
+)
+select a.tenant_id, a.competencia, a.eh_passado, a.quantidade_obras::integer as quantidade_obras,
+  a.recebido_direto::numeric(18,2) as recebido_direto,
+  a.recebido_financiamento::numeric(18,2) as recebido_financiamento,
+  a.credito_producao_recebido::numeric(18,2) as credito_producao_recebido,
+  a.previsto_direto::numeric(18,2) as previsto_direto,
+  a.previsto_financiamento_elegivel::numeric(18,2) as previsto_financiamento_elegivel,
+  a.previsto_financiamento_pendente::numeric(18,2) as previsto_financiamento_pendente,
+  a.credito_producao_previsto::numeric(18,2) as credito_producao_previsto,
+  a.vencido_a_receber::numeric(18,2) as vencido_a_receber,
+  a.vencido_recuperacao_prevista::numeric(18,2) as vencido_recuperacao_prevista,
+  a.pago::numeric(18,2) as pago,
+  a.a_pagar::numeric(18,2) as a_pagar,
+  a.a_pagar_vencido::numeric(18,2) as a_pagar_vencido,
+  a.custo_sem_titulo_distribuido::numeric(18,2) as custo_sem_titulo_distribuido,
+  a.total_entradas::numeric(18,2) as total_entradas,
+  a.total_saidas::numeric(18,2) as total_saidas,
+  a.saldo_mes::numeric(18,2) as saldo_mes,
+  a.caixa_gerado_acumulado::numeric(18,2) as caixa_gerado_acumulado,
+  greatest(-a.caixa_gerado_acumulado, 0)::numeric(18,2) as necessidade_aporte_acumulada,
+  greatest(greatest(-a.caixa_gerado_acumulado, 0)
+           - coalesce(lag(greatest(-a.caixa_gerado_acumulado, 0)) over (partition by a.tenant_id order by a.competencia), 0),
+           0)::numeric(18,2) as aporte_incremental_mes,
   a.caixa_gerado_acumulado_conservador::numeric(18,2) as caixa_gerado_acumulado_conservador,
   greatest(-a.caixa_gerado_acumulado_conservador, 0)::numeric(18,2) as necessidade_aporte_conservadora
 from acumulado a;
@@ -542,12 +649,126 @@ select a.tenant_id, a.centro_custo_id, a.competencia, a.versao_original_id, a.ve
 from acumulado a
 cross join referencia r;
 
--- Causas de desvio só quando o dado sustenta; mês sem causa comprovada não ganha linha.
+-- Meta automática de vendas (CONTEXTO, tela da obra de 23/09): falta vender = base (custo orçado ou
+-- estimativa até a conclusão) menos o VGV contratado ativo no início do mês, dividido pelos meses até o
+-- prazo, refeita todo mês. Mês passado mostra a meta como foi calculada no início dele; do mês de
+-- referência em diante, o que falta hoje é repartido em partes iguais, com o centavo no último mês.
+-- Unidades pelo ticket médio das unidades disponíveis a preço de hoje, arredondado para cima. Calculada
+-- para toda obra; a visão gerencial só a usa quando comercial.meta_metodo da obra é automática.
+-- O(M x C): meses do calendário vezes contratos da obra.
+create view marts.meta_automatica_mensal with (security_invoker = true) as
+with referencia as materialized (
+  select date_trunc('month', app.data_referencia())::date as mes_ref
+), obra as (
+  select cc.tenant_id, cc.id as centro_custo_id, po.comercial__meta_metodo as metodo,
+         po.comercial__meta_base as base, po.comercial__meta_horizonte as horizonte_tipo,
+         po.comercial__meta_data_horizonte as data_horizonte
+  from app.centro_custo cc
+  join (select p.centro_custo_id, p.comercial__meta_metodo, p.comercial__meta_base, p.comercial__meta_horizonte,
+               p.comercial__meta_data_horizonte
+        from app.parametros_obra p offset 0) po on po.centro_custo_id = cc.id
+  where cc.tipo = 'obra'
+), entrega as (
+  select u.tenant_id, u.centro_custo_id, max(u.data_entrega) as data_entrega
+  from staging.unidade u
+  group by u.tenant_id, u.centro_custo_id
+), orcamento as (
+  select io.tenant_id, io.centro_custo_id, sum(io.valor_total) as orcado
+  from staging.item_orcamento io
+  group by io.tenant_id, io.centro_custo_id
+), lancado as (
+  select a.tenant_id, a.centro_custo_id, sum(a.valor_original) as lancado
+  from staging.titulo_pagar_apropriacao a
+  group by a.tenant_id, a.centro_custo_id
+), ticket as (
+  select mu.tenant_id, mu.centro_custo_id, sum(mu.valor) / count(*) as ticket_medio
+  from marts.mapa_unidades mu
+  where mu.situacao = 'disponivel' and mu.valor is not null
+  group by mu.tenant_id, mu.centro_custo_id
+), contrato as not materialized (
+  select c.tenant_id, c.centro_custo_id, c.valor, c.situacao_normalizada, c.data_venda, c.data_distrato
+  from staging.contrato_venda c
+  where c.data_venda is not null and c.situacao_normalizada in ('ativo', 'distratado')
+), parametro as (
+  -- estimativa até a conclusão = custo lançado mais o que falta do orçamento, a mesma conta de custo_obra_resumo
+  select o.*,
+    case o.base when 'estimativa_conclusao' then greatest(oc.orcado, coalesce(l.lancado, 0)) else oc.orcado end
+      as base_valor,
+    date_trunc('month', case o.horizonte_tipo when 'data_propria' then o.data_horizonte else e.data_entrega end)::date
+      as horizonte,
+    t.ticket_medio
+  from obra o
+  left join orcamento oc on oc.tenant_id = o.tenant_id and oc.centro_custo_id = o.centro_custo_id
+  left join lancado l on l.tenant_id = o.tenant_id and l.centro_custo_id = o.centro_custo_id
+  left join entrega e on e.tenant_id = o.tenant_id and e.centro_custo_id = o.centro_custo_id
+  left join ticket t on t.tenant_id = o.tenant_id and t.centro_custo_id = o.centro_custo_id
+), calendario as (
+  select p.*, g::date as competencia, r.mes_ref
+  from parametro p
+  cross join referencia r
+  cross join lateral app.meses_entre(
+    least(r.mes_ref, (select date_trunc('month', min(c.data_venda))::date from contrato c
+                      where c.tenant_id = p.tenant_id and c.centro_custo_id = p.centro_custo_id)),
+    greatest(r.mes_ref, coalesce(p.horizonte, r.mes_ref))) as g
+), conta as (
+  -- contrato conta no início do mês se foi vendido antes dele e não foi distratado antes dele. Junção
+  -- lateral, e não CTE, para o filtro por método e por obra chegar até o calendário.
+  select k.*, v.vgv_inicio_mes,
+    k.base_valor - case when k.competencia < k.mes_ref then v.vgv_inicio_mes else v.vgv_inicio_mes_ref end as falta_vender,
+    (extract(year from age(k.horizonte, k.mes_ref)) * 12 + extract(month from age(k.horizonte, k.mes_ref)))::integer + 1
+      as meses_restantes,
+    (extract(year from age(k.horizonte, k.competencia)) * 12 + extract(month from age(k.horizonte, k.competencia)))::integer + 1
+      as meses_ate_horizonte,
+    case
+      when k.base_valor is null then 'orcamento_ausente'
+      when k.horizonte is null then 'horizonte_ausente'
+      when k.competencia > k.horizonte then 'horizonte_encerrado'
+    end as motivo
+  from calendario k
+  cross join lateral (
+    select
+      coalesce(sum(c.valor) filter (where c.data_venda < k.competencia
+                                      and (c.situacao_normalizada = 'ativo' or c.data_distrato >= k.competencia)), 0)
+        as vgv_inicio_mes,
+      coalesce(sum(c.valor) filter (where c.data_venda < k.mes_ref
+                                      and (c.situacao_normalizada = 'ativo' or c.data_distrato >= k.mes_ref)), 0)
+        as vgv_inicio_mes_ref
+    from contrato c
+    where c.tenant_id = k.tenant_id and c.centro_custo_id = k.centro_custo_id
+  ) v
+), valor as (
+  select c.*,
+    case when c.motivo is not null then null
+         when c.falta_vender <= 0 then 0
+         when c.competencia < c.mes_ref then round(c.falta_vender / c.meses_ate_horizonte, 2)
+         when c.competencia < c.horizonte then round(c.falta_vender / c.meses_restantes, 2)
+         else c.falta_vender - (c.meses_restantes - 1) * round(c.falta_vender / c.meses_restantes, 2)
+    end as meta_valor
+  from conta c
+)
+select v.tenant_id, v.centro_custo_id, v.competencia, v.metodo, v.base, v.base_valor::numeric(18,2) as base_valor,
+  v.horizonte, v.vgv_inicio_mes::numeric(18,2) as vgv_contratado_inicio_mes,
+  case when v.motivo is null then v.falta_vender end::numeric(18,2) as falta_vender,
+  case when v.motivo is null then case when v.competencia < v.mes_ref then v.meses_ate_horizonte else v.meses_restantes end
+  end as meses_restantes,
+  v.meta_valor::numeric(18,2) as meta_valor_contratado,
+  round(v.ticket_medio, 2)::numeric(18,2) as ticket_medio_disponivel,
+  case when v.ticket_medio > 0 then ceil(v.meta_valor / v.ticket_medio) end::integer as meta_unidades,
+  coalesce(v.motivo, case when v.meta_valor > 0 and v.ticket_medio is null then 'sem_estoque_disponivel' end) as motivo
+from valor v;
+
+-- Causas de desvio só quando o dado sustenta; mês sem causa comprovada não ganha linha. A meta é a da
+-- última versão gravada ou, na obra com meta automática, a de marts.meta_automatica_mensal.
 create view marts.explicacao_desvio with (security_invoker = true) as
 with referencia as materialized (
-  select app.data_referencia() as ref, date_trunc('month', app.data_referencia())::date as mes_ref
+  select d.ref, date_trunc('month', d.ref)::date as mes_ref
+  from (select app.data_referencia() as ref) d
 ), obra as (
-  select cc.tenant_id, cc.id as centro_custo_id from app.centro_custo cc where cc.tipo = 'obra'
+  select cc.tenant_id, cc.id as centro_custo_id, po.comercial__meta_metodo as meta_metodo
+  from app.centro_custo cc
+  join (select p.centro_custo_id, p.comercial__meta_metodo from app.parametros_obra p offset 0) po
+    on po.centro_custo_id = cc.id
+  where cc.tipo = 'obra'
 ), venda as (
   select c.tenant_id, c.centro_custo_id, date_trunc('month', c.data_venda)::date as competencia,
          count(*) as unidades, sum(c.valor) as valor
@@ -555,11 +776,18 @@ with referencia as materialized (
   where c.data_venda is not null
   group by 1, 2, 3
 ), meta as (
-  select mm.tenant_id, mm.centro_custo_id, mm.competencia, mm.unidades, mm.valor_contratado
+  select mm.tenant_id, mm.centro_custo_id, mm.competencia, mm.unidades, mm.valor_contratado,
+         'versao_planejamento' as origem_dado
   from app.versao_referencia_obra v
   join app.meta_mensal mm on mm.versao_id = v.versao_meta_id
+  join obra o on o.tenant_id = mm.tenant_id and o.centro_custo_id = mm.centro_custo_id and o.meta_metodo = 'manual'
   cross join referencia r
   where mm.unidades is not null and mm.competencia <= r.mes_ref
+  union all
+  select ma.tenant_id, ma.centro_custo_id, ma.competencia, ma.meta_unidades, ma.meta_valor_contratado, 'origem'
+  from marts.meta_automatica_mensal ma
+  cross join referencia r
+  where ma.metodo = 'automatica' and ma.meta_unidades is not null and ma.competencia <= r.mes_ref
 ), recebivel as not materialized (
   select rp.tenant_id, rp.centro_custo_id, date_trunc('month', rp.vencimento)::date as competencia,
          count(*) filter (where rp.situacao = 'vencida') as parcelas_vencidas,
@@ -592,7 +820,7 @@ with referencia as materialized (
          case when coalesce(v.unidades, 0) < m.unidades then 'vendas_abaixo_meta' else 'vendas_acima_meta' end as causa_codigo,
          (coalesce(v.unidades, 0) - m.unidades)::integer as quantidade,
          coalesce(v.valor, 0) - m.valor_contratado as valor,
-         'versao_planejamento' as origem_dado
+         m.origem_dado
   from meta m
   left join venda v on v.tenant_id = m.tenant_id and v.centro_custo_id = m.centro_custo_id and v.competencia = m.competencia
   where coalesce(v.unidades, 0) <> m.unidades
@@ -632,7 +860,9 @@ select c.tenant_id, c.centro_custo_id, c.competencia, c.causa_codigo,
 from causa c
 join obra o on o.tenant_id = c.tenant_id and o.centro_custo_id = c.centro_custo_id;
 
--- Painel do gestor: meta, vendas, entradas, gastos e caixa do mês, contra a versão original.
+-- Painel do gestor: meta, vendas, entradas, gastos e caixa do mês, contra a versão original. Meta de
+-- unidades e valor da última versão gravada ou, com comercial.meta_metodo automática, da meta automática;
+-- o limite de aporte vem sempre da versão gravada.
 create view marts.visao_gerencial_mensal with (security_invoker = true) as
 with comercial as (
   select c.tenant_id, c.centro_custo_id, date_trunc('month', e.data)::date as competencia,
@@ -645,7 +875,10 @@ with comercial as (
   group by 1, 2, 3
 )
 select f.tenant_id, f.centro_custo_id, f.competencia,
-  mm.unidades as meta_unidades, mm.valor_contratado as meta_valor_contratado, mm.limite_aporte_proprio as meta_limite_aporte,
+  case when pa.comercial__meta_metodo = 'automatica' then ma.meta_unidades else mm.unidades end as meta_unidades,
+  case when pa.comercial__meta_metodo = 'automatica' then ma.meta_valor_contratado else mm.valor_contratado end
+    as meta_valor_contratado,
+  mm.limite_aporte_proprio as meta_limite_aporte,
   coalesce(co.vendas_unidades, 0)::integer as vendas_unidades,
   coalesce(co.vendas_valor, 0)::numeric(18,2) as vendas_valor,
   coalesce(co.distratos_unidades, 0)::integer as distratos_unidades,
@@ -663,8 +896,13 @@ select f.tenant_id, f.centro_custo_id, f.competencia,
   oa.caixa_gerado_acumulado as caixa_gerado_acumulado_original,
   (f.caixa_gerado_acumulado - oa.caixa_gerado_acumulado)::numeric(18,2) as diferenca_original_atual
 from marts.fluxo_projetado_mensal f
+join (select p.centro_custo_id, p.comercial__meta_metodo from app.parametros_obra p offset 0) pa
+  on pa.centro_custo_id = f.centro_custo_id
 left join app.versao_referencia_obra v on v.tenant_id = f.tenant_id and v.centro_custo_id = f.centro_custo_id
 left join app.meta_mensal mm on mm.versao_id = v.versao_meta_id and mm.competencia = f.competencia
+left join marts.meta_automatica_mensal ma
+  on ma.metodo = 'automatica' and ma.tenant_id = f.tenant_id and ma.centro_custo_id = f.centro_custo_id
+ and ma.competencia = f.competencia
 left join comercial co on co.tenant_id = f.tenant_id and co.centro_custo_id = f.centro_custo_id
                       and co.competencia = f.competencia
 left join app.projecao_mensal po on po.versao_id = v.versao_original_id and po.competencia = f.competencia
@@ -732,12 +970,15 @@ left join liberacao l on l.tenant_id = cc.tenant_id and l.centro_custo_id = cc.i
 left join credito cr on cr.tenant_id = cc.tenant_id and cr.centro_custo_id = cc.id
 where cc.tipo = 'obra' and e.data_entrega < r.ref;
 
-grant select on marts.fluxo_projetado_mensal, marts.resumo_projecao_obra, marts.comparativo_projecao,
-  marts.explicacao_desvio, marts.visao_gerencial_mensal, marts.pendencias_pos_entrega to authenticated;
+grant select on marts.fluxo_projetado_mensal, marts.fluxo_projetado_consolidado, marts.resumo_projecao_obra,
+  marts.comparativo_projecao, marts.meta_automatica_mensal, marts.explicacao_desvio, marts.visao_gerencial_mensal,
+  marts.pendencias_pos_entrega to authenticated;
 
 -- Simulação: parte do fluxo projetado da obra e aplica as premissas sem gravar nada (função stable não
--- escreve). Com '{}' devolve o mesmo caixa gerado acumulado da view. Custo O(meses + vendas x parcelas),
--- mais o fluxo da obra; validação percorre só as listas das premissas.
+-- escreve). Com '{}' devolve o mesmo caixa gerado acumulado da view, com os mesmos parâmetros caixa.* da
+-- obra. Desconto, composição, parcelas e prazo do banco que a premissa não informa vêm dos parâmetros
+-- simulacao.* da obra. Custo O(meses + vendas x parcelas), mais o fluxo da obra; validação percorre só as
+-- listas das premissas.
 create function marts.simular_fluxo(p_centro_custo_id uuid, p_premissas jsonb)
 returns table (
   competencia date, recebido numeric(18,2), carteira_prevista numeric(18,2), novas_vendas_unidades integer,
@@ -768,7 +1009,21 @@ declare
   v_cancelar integer[];
   v_campanha jsonb;
   v_premissas jsonb;
+  v_padrao record;
 begin
+  -- uma linha só, da obra pedida; obra invisível deixa os padrões nulos e a validação exige tudo
+  select trim_scale(po.simulacao__desconto) as desconto, trim_scale(po.simulacao__fracao_entrada) as entrada,
+         trim_scale(po.simulacao__fracao_parcelas) as parcelas,
+         trim_scale(po.simulacao__fracao_financiamento) as financiamento,
+         po.simulacao__quantidade_parcelas as quantidade_parcelas, po.simulacao__meses_ate_liberacao as meses_liberacao,
+         po.caixa__pagar_vencido = 'mes_referencia' as soma_pagar_vencido,
+         po.caixa__financiamento_pendente = 'incluir' as soma_financiamento_pendente,
+         case when po.caixa__receber_vencido = 'mes_referencia' then po.caixa__fracao_recuperacao_vencido else 0 end
+           as fracao_recuperacao_vencido
+  into v_padrao
+  from app.parametros_obra po
+  where po.centro_custo_id = p_centro_custo_id;
+
   if jsonb_typeof(v_entrada_json) <> 'object' then
     raise exception 'premissa inválida: premissas' using errcode = '22023';
   end if;
@@ -805,7 +1060,7 @@ begin
     raise exception 'premissa inválida: novas_vendas.competencia' using errcode = '22023';
   end if;
 
-  v_desconto := coalesce(app.premissa_numero(v_entrada_json -> 'desconto_tabela', 'desconto_tabela'), 0);
+  v_desconto := coalesce(app.premissa_numero(v_entrada_json -> 'desconto_tabela', 'desconto_tabela'), v_padrao.desconto, 0);
   if v_desconto < 0 or v_desconto >= 1 then
     raise exception 'premissa inválida: desconto_tabela' using errcode = '22023';
   end if;
@@ -823,7 +1078,8 @@ begin
     end if;
     if v_parcelas > 0 then
       v_quantidade_parcelas := app.premissa_inteiro(coalesce(v_composicao -> 'quantidade_parcelas_mensais', 'null'),
-                                                    'composicao.quantidade_parcelas_mensais', null, 600);
+                                                    'composicao.quantidade_parcelas_mensais',
+                                                    v_padrao.quantidade_parcelas, 600);
       if v_quantidade_parcelas < 1 then
         raise exception 'premissa inválida: composicao.quantidade_parcelas_mensais' using errcode = '22023';
       end if;
@@ -832,7 +1088,16 @@ begin
                                        'quantidade_parcelas_mensais', v_quantidade_parcelas,
                                        'financiamento', v_financiamento);
   elsif v_quantidade_total > 0 then
-    raise exception 'premissa inválida: composicao' using errcode = '22023';
+    if v_padrao.entrada is null then
+      raise exception 'premissa inválida: composicao' using errcode = '22023';
+    end if;
+    v_entrada := v_padrao.entrada;
+    v_parcelas := v_padrao.parcelas;
+    v_financiamento := v_padrao.financiamento;
+    v_quantidade_parcelas := case when v_parcelas > 0 then v_padrao.quantidade_parcelas end;
+    v_composicao := jsonb_build_object('entrada', v_entrada, 'parcelas_mensais', v_parcelas,
+                                       'quantidade_parcelas_mensais', v_quantidade_parcelas,
+                                       'financiamento', v_financiamento);
   else
     v_composicao := null;
     v_entrada := 0; v_parcelas := 0; v_financiamento := 0;
@@ -840,7 +1105,7 @@ begin
 
   if v_financiamento > 0 then
     v_meses_liberacao := app.premissa_inteiro(coalesce(v_entrada_json -> 'meses_ate_liberacao_financiamento', 'null'),
-                                              'meses_ate_liberacao_financiamento', null, 600);
+                                              'meses_ate_liberacao_financiamento', v_padrao.meses_liberacao, 600);
   else
     v_meses_liberacao := app.premissa_inteiro(v_entrada_json -> 'meses_ate_liberacao_financiamento',
                                               'meses_ate_liberacao_financiamento', 0, 600);
@@ -911,10 +1176,19 @@ begin
     from marts.recebivel_projetado rp
     where rp.centro_custo_id = p_centro_custo_id and rp.incluida_projecao
       and not coalesce(rp.contrato_id_origem = any (v_cancelar), false)
+      and (rp.classe <> 'financiamento_pendente' or v_padrao.soma_financiamento_pendente)
     union all
     select (b.competencia + make_interval(months => v_atraso))::date, b.credito_producao_previsto
     from base b
     where b.credito_producao_previsto <> 0
+    union all
+    -- recuperação do vencido refeita sem os contratos cancelados na simulação; sem cancelamento é igual à da base
+    select date_trunc('month', app.data_referencia())::date,
+           round(sum(rp.saldo) * v_padrao.fracao_recuperacao_vencido, 2)
+    from marts.recebivel_projetado rp
+    where rp.centro_custo_id = p_centro_custo_id and not rp.incluida_projecao
+      and not coalesce(rp.contrato_id_origem = any (v_cancelar), false)
+    having coalesce(round(sum(rp.saldo) * v_padrao.fracao_recuperacao_vencido, 2), 0) <> 0
   ), custo as (
     select (b.competencia + make_interval(months => v_deslocamento))::date as competencia,
            round(b.custo_sem_titulo_distribuido * v_fator, 2) as valor
@@ -998,7 +1272,7 @@ begin
       coalesce(im.nova_direta, 0) as nova_direta,
       coalesce(im.nova_financiamento, 0) as nova_financiamento,
       coalesce(b.pago, 0) as pago,
-      coalesce(b.a_pagar + b.a_pagar_vencido, 0) as a_pagar,
+      coalesce(b.a_pagar + case when v_padrao.soma_pagar_vencido then b.a_pagar_vencido else 0 end, 0) as a_pagar,
       coalesce(im.custo_sem_titulo, 0) as custo_sem_titulo,
       coalesce(im.custo_campanha, 0) as custo_campanha,
       case when vv.aplicada < vv.pedida then 'vendas_limitadas_ao_estoque' end as aviso
@@ -1059,13 +1333,13 @@ begin
     previsto_financiamento_pendente, credito_producao_previsto, vencido_a_receber, pago, a_pagar, a_pagar_vencido,
     custo_sem_titulo_distribuido, total_entradas, total_saidas, saldo_mes, caixa_gerado_acumulado,
     necessidade_aporte_acumulada, aporte_incremental_mes, caixa_gerado_acumulado_conservador,
-    necessidade_aporte_conservadora)
+    necessidade_aporte_conservadora, vencido_recuperacao_prevista)
   select v_versao, f.tenant_id, f.centro_custo_id, f.competencia, f.recebido_direto, f.recebido_financiamento,
     f.credito_producao_recebido, f.previsto_direto, f.previsto_financiamento_elegivel, f.previsto_financiamento_pendente,
     f.credito_producao_previsto, f.vencido_a_receber, f.pago, f.a_pagar, f.a_pagar_vencido,
     f.custo_sem_titulo_distribuido, f.total_entradas, f.total_saidas, f.saldo_mes, f.caixa_gerado_acumulado,
     f.necessidade_aporte_acumulada, f.aporte_incremental_mes, f.caixa_gerado_acumulado_conservador,
-    f.necessidade_aporte_conservadora
+    f.necessidade_aporte_conservadora, f.vencido_recuperacao_prevista
   from marts.fluxo_projetado_mensal f
   where f.centro_custo_id = p_centro_custo_id;
   return v_versao;

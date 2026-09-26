@@ -11,6 +11,18 @@ export const rotulosTipoPeriodo: Record<TipoPeriodo, string> = {
   doze_meses: "Últimos 12 meses",
 };
 
+// Valores de exibicao.periodo_padrao no catálogo de configuração e o tipo de período que cada um abre.
+export const periodosDaPreferencia: Record<string, TipoPeriodo> = {
+  mes: "mes",
+  trimestre: "trimestre",
+  ano_ate_mes: "ano",
+  ultimos_12: "doze_meses",
+};
+
+export function tipoPeriodoDaPreferencia(valor: unknown, padrao: TipoPeriodo): TipoPeriodo {
+  return typeof valor === "string" && Object.hasOwn(periodosDaPreferencia, valor) ? periodosDaPreferencia[valor] : padrao;
+}
+
 // inicio e fim são o primeiro dia do mês ("aaaa-mm-01"), como a coluna competencia do banco.
 export type Periodo = { tipo: TipoPeriodo; mes: string; inicio: string; fim: string; rotulo: string };
 

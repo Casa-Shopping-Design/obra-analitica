@@ -1,5 +1,7 @@
 # Contrato de dados: eventos financeiros, DRE gerencial, receitas, despesas, financiamento e planejamento
 
+As regras que variam por construtora ou por obra estão em `configuracao.md`, que complementa este contrato; onde os dois divergirem, vale `configuracao.md`.
+
 Versão 1, 26/09/2026. Fonte de verdade para os agentes `banco_eventos` (migration 0007), `banco_dre` (0011), `banco_planejamento` (0012 e 0013), `painel_demonstrativos`, `painel_planejamento` e `revisor`. Nome de tabela, coluna, função, código de motivo e rótulo escritos aqui são finais. Quem precisar mudar um deles pede ao coordenador antes, porque outro agente depende do nome.
 
 Casos de teste com valores calculados à mão: `docs/financeiro/casos_teste.md`. Decisões resumidas: ADRs 0002, 0005, 0006 e 0007 em `docs/decisoes/`.

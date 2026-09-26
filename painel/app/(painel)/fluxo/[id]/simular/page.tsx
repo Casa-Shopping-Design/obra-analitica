@@ -16,6 +16,7 @@ import {
   simularFluxo,
   type LinhaSimulacao,
 } from "@/lib/consultas/fluxo";
+import { buscarPadroesSimulacao } from "@/lib/consultas/configuracao";
 import { carregarReferencia, tentarConsulta } from "@/lib/consultas/referencia";
 import { formatarMes } from "@/lib/formatar";
 import { mensagens } from "@/lib/mensagens";
@@ -186,13 +187,14 @@ export default async function PaginaSimular({ params, searchParams }: PageProps<
   const filtros = await searchParams;
   const centroId = lerIdCentro(id);
   const referencia = await carregarReferencia();
-  const [resumos, base, estoque] = centroId
+  const [resumos, base, estoque, padroes] = centroId
     ? await Promise.all([
         tentarConsulta(listarResumoProjecao(centroId)),
         tentarConsulta(listarFluxoProjetado({ centroCustoId: centroId })),
         tentarConsulta(contarEstoqueSimulacao(centroId)),
+        buscarPadroesSimulacao(centroId),
       ])
-    : [[], null, null];
+    : [[], null, null, null];
   if (!centroId || (resumos !== null && resumos.length === 0)) {
     return (
       <>
@@ -205,7 +207,7 @@ export default async function PaginaSimular({ params, searchParams }: PageProps<
   }
 
   const nomeObra = resumos?.[0]?.obra ?? "Obra";
-  const formulario = lerFormularioSimulacao(filtros, referencia.dataReferencia);
+  const formulario = lerFormularioSimulacao(filtros, referencia.dataReferencia, padroes);
   const pediuSimulacao = filtros.simular === "1";
   const validacao = pediuSimulacao
     ? validarPremissas(formulario, { dataReferencia: referencia.dataReferencia, estoque })
@@ -262,6 +264,15 @@ export default async function PaginaSimular({ params, searchParams }: PageProps<
             Voltar às premissas padrão
           </Link>
         </div>
+        <p className="text-sm text-suave">
+          Desconto, composição do pagamento, número de parcelas e meses até a liberação começam com os padrões da obra.{" "}
+          <Link
+            href={`/configuracoes?escopo=${centroId}#grupo-simulacao`}
+            className="underline underline-offset-4 hover:text-menu"
+          >
+            Ver os padrões em Configurações
+          </Link>
+        </p>
         <div aria-live="polite" className="text-sm">
           {validacao && !validacao.ok && <p className="text-alerta">{mensagensPlanejamento.simulacao.corrijaCampos}</p>}
           {resultado?.erro && <p className="text-alerta">{resultado.erro}</p>}

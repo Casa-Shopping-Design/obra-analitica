@@ -21,6 +21,8 @@ import { carregarReferencia, listarCentrosCusto, tentarConsulta } from "@/lib/co
 import { formatarData, formatarPercentual } from "@/lib/formatar";
 import { mensagens } from "@/lib/mensagens";
 import { lerIdCentro, lerPeriodo } from "@/lib/periodo";
+import { aplicarRotulos, type RotuloPersonalizado } from "@/lib/configuracao";
+import { buscarPreferenciasTenant, listarRotulos } from "@/lib/consultas/configuracao";
 
 export const metadata: Metadata = { title: "Despesas" };
 
@@ -234,10 +236,13 @@ export default async function PaginaDespesas({ searchParams }: PageProps<"/despe
   await exigirIdentidade();
   const filtrosUrl = await searchParams;
   const centrosPedido = tentarConsulta(listarCentrosCusto());
+  const preferenciasPedido = buscarPreferenciasTenant();
+  const rotulosPedido = tentarConsulta(listarRotulos());
   const referencia = await carregarReferencia();
   const centros = await centrosPedido;
+  const rotulos: RotuloPersonalizado[] = (await rotulosPedido) ?? [];
 
-  const periodo = lerPeriodo(filtrosUrl, referencia.dataReferencia);
+  const periodo = lerPeriodo(filtrosUrl, referencia.dataReferencia, (await preferenciasPedido).periodoPadrao);
   const centroPedido = lerIdCentro(filtrosUrl.obra);
   const centro = centros?.find((item) => item.id === centroPedido) ?? null;
   const centroNaoEncontrado = centroPedido !== null && centros !== null && centro === null;
@@ -360,7 +365,7 @@ export default async function PaginaDespesas({ searchParams }: PageProps<"/despe
               legenda={`Custos por categoria, ${nomeRecorte}, ${posicaoEm.toLowerCase()}, em reais`}
               rotuloPrimeira="Categoria"
               colunas={colunasPorCentro.slice(0, 6)}
-              grupos={[{ linhas: linhasCategoria(categorias, resumoCentro?.motivo ?? null) }]}
+              grupos={[{ linhas: aplicarRotulos(linhasCategoria(categorias, resumoCentro?.motivo ?? null), (linha) => linha.id, rotulos, "categoria") }]}
             />
           )}
         </Bloco>
@@ -381,7 +386,7 @@ export default async function PaginaDespesas({ searchParams }: PageProps<"/despe
               { chave: "lancado", rotulo: "Lançado por competência", explicacao: "lancado_competencia" },
               { chave: "pago", rotulo: "Pago no período", explicacao: "pago_periodo" },
             ]}
-            grupos={[{ linhas: linhasDesembolso(desembolso) }]}
+            grupos={[{ linhas: aplicarRotulos(linhasDesembolso(desembolso), (linha) => linha.id, rotulos, "categoria") }]}
           />
         )}
       </Bloco>

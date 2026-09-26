@@ -322,3 +322,37 @@ export async function buscarObraParaEscrita(
   if (error) throw new ErroConsulta(error.code);
   return data;
 }
+
+export type LinhaMetaAutomatica = {
+  competencia: string;
+  metodo: "manual" | "automatica";
+  base: "custo_orcado" | "estimativa_conclusao";
+  base_valor: number | null;
+  horizonte: string | null;
+  falta_vender: number | null;
+  meses_restantes: number | null;
+  meta_valor_contratado: number | null;
+  meta_unidades: number | null;
+  motivo: string | null;
+};
+
+// Meta automática da obra (comercial.meta_metodo = automatica), um mês por linha, calculada no banco.
+export async function listarMetaAutomatica(janela: JanelaMeses): Promise<LinhaMetaAutomatica[]> {
+  const supabase = await criarClienteServidor();
+  let consulta = supabase
+    .schema("marts")
+    .from("meta_automatica_mensal")
+    .select(
+      "competencia, metodo, base, base_valor, horizonte, falta_vender, meses_restantes, meta_valor_contratado, meta_unidades, motivo",
+    );
+  if (janela.centroCustoId) consulta = consulta.eq("centro_custo_id", janela.centroCustoId);
+  if (janela.inicio) consulta = consulta.gte("competencia", janela.inicio);
+  if (janela.fim) consulta = consulta.lte("competencia", janela.fim);
+  const { data, error } = await consulta.order("competencia");
+  if (error) throw new ErroConsulta(error.code);
+  return converterColunas<LinhaMetaAutomatica>(
+    data ?? [],
+    [],
+    ["base_valor", "falta_vender", "meses_restantes", "meta_valor_contratado", "meta_unidades"],
+  );
+}

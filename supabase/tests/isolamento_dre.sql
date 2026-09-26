@@ -71,8 +71,9 @@ select staging.recarregar('7e000000-0000-4000-8000-00000000000a');
 select staging.recarregar('7e000000-0000-4000-8000-00000000000b');
 insert into app.mapa_conta_origem (tenant_id, tipo_origem, conta_origem, categoria_codigo, autor) values
   ('7e000000-0000-4000-8000-00000000000b', 'titulo_pagar', '2.01.001', 'materiais', '7a000000-0000-4000-8000-00000000d00b');
-insert into app.criterio_reconhecimento (tenant_id, metodo, autor) values
-  ('7e000000-0000-4000-8000-00000000000b', 'percentual_conclusao', '7a000000-0000-4000-8000-00000000d00b');
+insert into app.criterio_reconhecimento (tenant_id, metodo, autor, validado_por) values
+  ('7e000000-0000-4000-8000-00000000000b', 'percentual_conclusao', '7a000000-0000-4000-8000-00000000d00b',
+   '7a000000-0000-4000-8000-00000000d00b');
 select set_config('app.data_referencia', '2026-02-28', true);
 
 -- Financeiro grava mapeamento e critério; autor e validação vêm do JWT e a auditoria registra tudo

@@ -1,5 +1,6 @@
 // Premissas da simulação de caixa: lidas do formulário, validadas aqui no servidor com as regras da
 // seção 4.1 do contrato de dados e mandadas ao banco como objeto. Nada de texto concatenado.
+import type { PadroesSimulacao } from "./configuracao";
 import { mesDaData, mesPorExtenso, somarMeses } from "./periodo";
 
 export type PremissasSimulacao = {
@@ -61,25 +62,36 @@ export const limitesSimulacao = {
   vendasPorMes: 200,
   mesesVendas: 36,
   mesesAFrente: 60,
-  quantidadeParcelas: 240,
-  mesesLiberacao: 60,
+  // Mesmo teto do catálogo de configuração (simulacao.quantidade_parcelas e simulacao.meses_ate_liberacao).
+  quantidadeParcelas: 600,
+  mesesLiberacao: 600,
   atrasoLiberacao: 24,
   deslocamentoGastos: 24,
   fatorGastosMaximo: 300,
   custoCampanhaMaximo: 1_000_000_000,
 } as const;
 
-export function formularioPadrao(dataReferencia: string): FormularioSimulacao {
+// Fração vira o percentual que a pessoa digita: 0.125 aparece como "12,5".
+function textoPercentual(fracao: number): string {
+  return String(Number((fracao * 100).toFixed(4))).replace(".", ",");
+}
+
+// Sem padrão da obra (ou com a consulta falhando), valem os números fixos anteriores à configuração.
+export function formularioPadrao(dataReferencia: string, padroes?: PadroesSimulacao | null): FormularioSimulacao {
+  const percentual = (fracao: number | null | undefined, reserva: string) =>
+    fracao === null || fracao === undefined ? reserva : textoPercentual(fracao);
+  const inteiro = (valor: number | null | undefined, reserva: string) =>
+    valor === null || valor === undefined || !Number.isInteger(valor) ? reserva : String(valor);
   return {
     vendas_por_mes: "2",
     mes_inicio_vendas: somarMeses(dataReferencia, 1).slice(0, 7),
     meses_vendas: "6",
-    desconto: "0",
-    entrada: "10",
-    parcelas: "30",
-    quantidade_parcelas: "24",
-    financiamento: "60",
-    meses_liberacao: "4",
+    desconto: percentual(padroes?.desconto, "0"),
+    entrada: percentual(padroes?.fracao_entrada, "10"),
+    parcelas: percentual(padroes?.fracao_parcelas, "30"),
+    quantidade_parcelas: inteiro(padroes?.quantidade_parcelas, "24"),
+    financiamento: percentual(padroes?.fracao_financiamento, "60"),
+    meses_liberacao: inteiro(padroes?.meses_ate_liberacao, "4"),
     atraso_liberacao: "0",
     deslocamento_gastos: "0",
     fator_gastos: "100",
@@ -88,12 +100,13 @@ export function formularioPadrao(dataReferencia: string): FormularioSimulacao {
   };
 }
 
-// Campo ausente na URL fica com o valor padrão; campo presente e vazio continua vazio.
+// Campo ausente na URL fica com o valor padrão (o da obra, quando houver); campo presente e vazio continua vazio.
 export function lerFormularioSimulacao(
   valores: Record<string, string | string[] | undefined>,
   dataReferencia: string,
+  padroes?: PadroesSimulacao | null,
 ): FormularioSimulacao {
-  const padrao = formularioPadrao(dataReferencia);
+  const padrao = formularioPadrao(dataReferencia, padroes);
   const lido = { ...padrao };
   for (const campo of camposSimulacao) {
     const valor = valores[campo];

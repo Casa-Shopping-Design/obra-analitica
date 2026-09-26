@@ -29,6 +29,8 @@ export type FinanciamentoContrato = {
   classificacao: ClassificacaoFinanciamento;
   saldo_financiamento_aberto: number;
   recebido_financiamento: number;
+  // Etapa cadastrada ou, sem ela, a que a data do banco na origem indica (financiamento.data_origem_significa).
+  etapa_efetiva: EtapaFinanciamento | null;
 };
 
 export type SaldoOperacaoCredito = {
@@ -48,6 +50,8 @@ export type SaldoOperacaoCredito = {
   medido_elegivel: number;
   elegivel_nao_liberado: number;
   excede_limite: boolean;
+  // "operacao" quando a operação informa a retenção; "padrao" quando vem de financiamento.retencao_padrao.
+  origem_retencao: "operacao" | "padrao" | null;
 };
 
 export type LinhaLiberacao = {
@@ -111,7 +115,7 @@ export async function listarFinanciamentoContratos(centroCustoId: string | null)
     .schema("marts")
     .from("financiamento_contrato")
     .select(
-      "centro_custo_id, contrato_id_origem, contrato_numero, unidade, valor_contrato, valor_financiado, instituicao_financeira, data_financiamento_origem, credito_associativo, etapa, pendencia, motivo_pendencia, data_etapa, data_prevista_liberacao, classificacao, saldo_financiamento_aberto, recebido_financiamento",
+      "centro_custo_id, contrato_id_origem, contrato_numero, unidade, valor_contrato, valor_financiado, instituicao_financeira, data_financiamento_origem, credito_associativo, etapa, pendencia, motivo_pendencia, data_etapa, data_prevista_liberacao, classificacao, saldo_financiamento_aberto, recebido_financiamento, etapa_efetiva",
     );
   if (centroCustoId) consulta = consulta.eq("centro_custo_id", centroCustoId);
   const { data, error } = await consulta.order("classificacao", { ascending: false }).order("contrato_numero");
@@ -140,7 +144,7 @@ export async function listarSaldoOperacoes(centroCustoId: string | null): Promis
     .schema("marts")
     .from("saldo_operacao_credito")
     .select(
-      `centro_custo_id, operacao_credito_id, modalidade, instituicao, percentual_retencao, retencao_prevista, excede_limite, ${colunasSaldoValor.join(", ")}`,
+      `centro_custo_id, operacao_credito_id, modalidade, instituicao, percentual_retencao, retencao_prevista, excede_limite, origem_retencao, ${colunasSaldoValor.join(", ")}`,
     );
   if (centroCustoId) consulta = consulta.eq("centro_custo_id", centroCustoId);
   const { data, error } = await consulta.order("centro_custo_id").order("instituicao");

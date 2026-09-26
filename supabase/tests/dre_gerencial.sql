@@ -425,8 +425,10 @@ select results_eq(
 select pg_temp.limpar();
 select set_config('app.data_referencia', '2026-06-10', true);
 select pg_temp.mapa('2.01.001', 'materiais');
-insert into app.criterio_reconhecimento (tenant_id, metodo, autor)
-values ('7e000000-0000-4000-8000-00000000000a', 'percentual_conclusao', '7a000000-0000-4000-8000-00000000f00a');
+-- sem JWT a carga informa quem validou; sem validador o critério não vale (reconhecimento.exigir_validacao_usuario)
+insert into app.criterio_reconhecimento (tenant_id, metodo, autor, validado_por)
+values ('7e000000-0000-4000-8000-00000000000a', 'percentual_conclusao', '7a000000-0000-4000-8000-00000000f00a',
+        '7a000000-0000-4000-8000-00000000f00a');
 select pg_temp.titulo('7c000000-0000-4000-8000-0000000000a1', 7911, '9.99.999', '2026-05-05', '2026-07-10', 2000.00);
 select pg_temp.titulo('7c000000-0000-4000-8000-0000000000a1', 7912, null, '2026-05-06', '2026-07-10', 1000.00);
 select pg_temp.titulo('7c000000-0000-4000-8000-0000000000a1', 7913, '2.01.001', '2026-05-07', '2026-07-10', 7000.00);
@@ -677,9 +679,9 @@ select results_eq(
 reset role;
 
 -- Critério por obra vence o do tenant; motivos de bloqueio em ordem
-insert into app.criterio_reconhecimento (tenant_id, centro_custo_id, metodo, autor)
+insert into app.criterio_reconhecimento (tenant_id, centro_custo_id, metodo, autor, validado_por)
 values ('7e000000-0000-4000-8000-00000000000a', '7c000000-0000-4000-8000-0000000000a1', 'percentual_conclusao',
-        '7a000000-0000-4000-8000-00000000f00a');
+        '7a000000-0000-4000-8000-00000000f00a', '7a000000-0000-4000-8000-00000000f00a');
 select is(
   (select receita_reconhecida_acumulada from marts.reconhecimento_obra_mensal
     where centro_custo_id = '7c000000-0000-4000-8000-0000000000a1' and competencia = '2026-02-01'),

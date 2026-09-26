@@ -19,6 +19,8 @@ import {
   type LinhaFluxoProjetado,
   type MesesAtraso,
 } from "@/lib/consultas/fluxo";
+import { janelaDoHorizonte, limitesDoHorizonte } from "@/lib/configuracao";
+import { buscarParametrosObra, buscarPreferenciasTenant } from "@/lib/consultas/configuracao";
 import { carregarReferencia, tentarConsulta } from "@/lib/consultas/referencia";
 import { formatarData, formatarMes } from "@/lib/formatar";
 import { fraseMotivo, mensagens } from "@/lib/mensagens";
@@ -58,6 +60,12 @@ const colunasMensais = [
     rotulo: "Crédito à produção previsto",
     explicacao: e.credito_producao_previsto,
   },
+  {
+    chave: "vencido_recuperacao_prevista",
+    rotulo: "Vencido que deve ser recebido",
+    explicacao:
+      "Parcelas vencidas que a construtora espera receber, somadas no mês de referência pela fração de recuperação escolhida em Configurações.",
+  },
   { chave: "pago", rotulo: "Pago" },
   { chave: "a_pagar", rotulo: "A pagar" },
   { chave: "a_pagar_vencido", rotulo: "A pagar vencido", explicacao: e.a_pagar_vencido },
@@ -72,7 +80,13 @@ const colunasMensais = [
   { chave: "aporte_incremental_mes", rotulo: "Aporte do mês", explicacao: e.aporte_incremental_mes },
 ] as const;
 
-function linhasMensais(fluxo: LinhaFluxoProjetado[], mesReferencia: string): LinhaPlanejamento[] {
+type ColunaMensal = (typeof colunasMensais)[number];
+
+function linhasMensais(
+  fluxo: LinhaFluxoProjetado[],
+  mesReferencia: string,
+  colunas: readonly ColunaMensal[],
+): LinhaPlanejamento[] {
   return fluxo.map((linha) => {
     const mes = linha.competencia.slice(0, 10);
     return {
@@ -87,7 +101,7 @@ function linhasMensais(fluxo: LinhaFluxoProjetado[], mesReferencia: string): Lin
       ),
       destaque: mes === mesReferencia,
       celulas: Object.fromEntries(
-        colunasMensais.map((coluna) => [coluna.chave, <Valor key={coluna.chave} valor={linha[coluna.chave]} />]),
+        colunas.map((coluna) => [coluna.chave, <Valor key={coluna.chave} valor={linha[coluna.chave]} />]),
       ),
     };
   });
@@ -116,17 +130,32 @@ export default async function PaginaFluxoObra({ params, searchParams }: PageProp
   const mesesAtraso = lerCenario(filtros.cenario);
   const janela = lerOpcao(filtros.janela, opcoesJanela, "longa");
 
-  const referencia = await carregarReferencia();
+  const [referencia, preferencias] = await Promise.all([carregarReferencia(), buscarPreferenciasTenant()]);
   const mesReferencia = mesDaData(referencia.dataReferencia);
-  const limites = limitesDaJanela(janela, referencia.dataReferencia);
+  // A janela "longa" (a que abre) segue o horizonte de exibicao.meses_grafico; 36 meses dão 12 antes e 24 depois.
+  const limites =
+    janela === "longa"
+      ? limitesDoHorizonte(preferencias.mesesGrafico, referencia.dataReferencia)
+      : limitesDaJanela(janela, referencia.dataReferencia);
+  const rotulosJanela: Record<Janela, string> = {
+    ...Object.fromEntries(opcoesJanela.map((opcao) => [opcao, janelasPlanejamento[opcao].rotulo])),
+    longa: janelaDoHorizonte(preferencias.mesesGrafico).rotulo,
+  } as Record<Janela, string>;
   // Até três consultas em paralelo: resumo, meses da obra e, só com atraso escolhido, o cenário.
-  const [resumos, fluxo, cenario] = await Promise.all([
+  const [resumos, fluxo, cenario, regrasCaixa] = await Promise.all([
     tentarConsulta(listarResumoProjecao(centroId)),
     tentarConsulta(listarFluxoProjetado({ centroCustoId: centroId })),
     mesesAtraso > 0
       ? tentarConsulta(simularFluxo(centroId, { atraso_liberacao_bancaria_meses: mesesAtraso }))
       : Promise.resolve(null),
+    buscarParametrosObra(centroId, ["caixa__receber_vencido", "caixa__pagar_vencido"]),
   ]);
+  // Com caixa.receber_vencido = mes_referencia o vencido entra no mês de referência; a coluna aparece só aí.
+  const vencidoNoMes = regrasCaixa?.caixa__receber_vencido === "mes_referencia";
+  const pagarForaDoCaixa = regrasCaixa?.caixa__pagar_vencido === "excluir";
+  const colunasTela = colunasMensais.filter(
+    (coluna) => vencidoNoMes || coluna.chave !== "vencido_recuperacao_prevista",
+  );
   if (resumos !== null && resumos.length === 0) return <ObraNaoEncontrada />;
   const resumo = resumos?.[0] ?? null;
   const doMes = fluxo?.find((linha) => linha.competencia.slice(0, 10) === mesReferencia) ?? null;
@@ -212,13 +241,21 @@ export default async function PaginaFluxoObra({ params, searchParams }: PageProp
           rotulo="Vencido a receber"
           explicacao={e.vencido_a_receber}
           valor={resumo ? <Valor valor={resumo.vencido_a_receber} /> : naoCarregado}
-          contexto="Fora do caixa previsto até ser recebido."
+          contexto={
+            vencidoNoMes
+              ? `A parte que se espera receber entra no caixa de ${mesPorExtenso(mesReferencia)}.`
+              : "Fora do caixa previsto até ser recebido."
+          }
         />
         <CartaoPlanejamento
           rotulo="A pagar vencido"
           explicacao={e.a_pagar_vencido}
           valor={resumo ? <Valor valor={resumo.a_pagar_vencido} /> : naoCarregado}
-          contexto={`Entra no caixa de ${mesPorExtenso(mesReferencia)}.`}
+          contexto={
+            pagarForaDoCaixa
+              ? "Fora do caixa projetado, pela regra escolhida em Configurações."
+              : `Entra no caixa de ${mesPorExtenso(mesReferencia)}.`
+          }
         />
       </section>
 
@@ -247,7 +284,11 @@ export default async function PaginaFluxoObra({ params, searchParams }: PageProp
       <Bloco
         id="mes-a-mes"
         titulo="Mês a mês"
-        contexto={`Posição em ${formatarData(referencia.dataReferencia)}. Entrada vencida fica fora; saída vencida entra no mês de referência.`}
+        contexto={`Posição em ${formatarData(referencia.dataReferencia)}. ${
+          vencidoNoMes
+            ? "Entrada vencida entra no mês de referência pela fração de recuperação"
+            : "Entrada vencida fica fora"
+        }; ${pagarForaDoCaixa ? "saída vencida fica fora" : "saída vencida entra no mês de referência"}.`}
       >
         <form method="get" aria-label="Meses mostrados" className="flex flex-col gap-2 sm:flex-row sm:items-end">
           <div className="flex flex-col gap-1.5">
@@ -262,7 +303,7 @@ export default async function PaginaFluxoObra({ params, searchParams }: PageProp
             >
               {opcoesJanela.map((opcao) => (
                 <option key={opcao} value={opcao}>
-                  {janelasPlanejamento[opcao].rotulo}
+                  {rotulosJanela[opcao]}
                 </option>
               ))}
             </select>
@@ -286,8 +327,8 @@ export default async function PaginaFluxoObra({ params, searchParams }: PageProp
             <TabelaPlanejamento
               legenda="Fluxo de caixa projetado da obra, mês a mês, em reais"
               rotuloPrimeira="Mês"
-              colunas={[...colunasMensais]}
-              linhas={linhasMensais(naJanela, mesReferencia)}
+              colunas={colunasTela}
+              linhas={linhasMensais(naJanela, mesReferencia, colunasTela)}
             />
           </>
         )}

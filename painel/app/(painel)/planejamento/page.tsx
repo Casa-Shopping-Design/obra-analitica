@@ -29,13 +29,16 @@ import {
   listarPendenciasPosEntrega,
   listarProjecaoDaVersao,
   listarVersoes,
+  listarMetaAutomatica,
   listarVisaoGerencial,
+  type LinhaMetaAutomatica,
   type LinhaExplicacaoDesvio,
   type LinhaMetaMensal,
   type LinhaPendenciaPosEntrega,
   type LinhaVisaoGerencial,
   type VersaoPlanejamento,
 } from "@/lib/consultas/planejamento";
+import { buscarParametrosObra } from "@/lib/consultas/configuracao";
 import { carregarReferencia, listarCentrosCusto, tentarConsulta } from "@/lib/consultas/referencia";
 import { formatarData, formatarMes } from "@/lib/formatar";
 import { fraseMotivo, mensagens } from "@/lib/mensagens";
@@ -150,6 +153,68 @@ function ListaDesvios({ desvios }: { desvios: LinhaExplicacaoDesvio[] }) {
         </li>
       ))}
     </ul>
+  );
+}
+
+const rotulosBaseMeta: Record<LinhaMetaAutomatica["base"], string> = {
+  custo_orcado: "custo orçado",
+  estimativa_conclusao: "estimativa até a conclusão",
+};
+
+// Diz de onde vem a meta da visão gerencial: versão gravada (manual) ou cálculo do banco (automática).
+function OrigemMeta({
+  automatica,
+  linhas,
+  versaoVigente,
+  obraId,
+}: {
+  automatica: boolean;
+  linhas: LinhaMetaAutomatica[] | null;
+  versaoVigente: number | null;
+  obraId: string;
+}) {
+  const configuracao = (
+    <Link
+      href={`/configuracoes?escopo=${obraId}#grupo-comercial`}
+      className="underline underline-offset-4 hover:text-menu"
+    >
+      Configurações
+    </Link>
+  );
+  if (!automatica) {
+    return (
+      <p className="text-sm">
+        <Selo tipo="informativo">meta manual</Selo>{" "}
+        {versaoVigente === null
+          ? "Nenhuma meta registrada. As metas vêm das versões gravadas abaixo."
+          : `As metas vêm da versão ${versaoVigente} registrada abaixo.`}{" "}
+        Para calcular a meta todo mês a partir do que falta vender, mude o método em {configuracao}.
+      </p>
+    );
+  }
+  const primeira = linhas?.find((linha) => linha.motivo === null) ?? null;
+  const motivos = [...new Set((linhas ?? []).map((linha) => linha.motivo).filter((motivo) => motivo !== null))];
+  return (
+    <div className="flex flex-col gap-1 text-sm">
+      <p>
+        <Selo tipo="informativo">meta automática</Selo> Calculada todo mês: o que falta vender até o prazo, dividido
+        pelos meses restantes, em unidades pelo ticket médio das unidades disponíveis. As versões de meta gravadas
+        abaixo não entram na visão. Regra em {configuracao}.
+      </p>
+      {primeira && (
+        <p className="text-suave">
+          Base: {rotulosBaseMeta[primeira.base] ?? primeira.base}
+          {primeira.horizonte ? `, prazo em ${formatarMes(primeira.horizonte)}` : ""}.
+        </p>
+      )}
+      {linhas === null && <ErroBloco />}
+      {motivos.map((motivo) => (
+        <p key={motivo} className="text-atencao">
+          <span aria-hidden="true">! </span>
+          {fraseMotivo(motivo)}
+        </p>
+      ))}
+    </div>
   );
 }
 
@@ -332,7 +397,7 @@ export default async function PaginaPlanejamento({ searchParams }: PageProps<"/p
   const versaoPedida = lerVersao(filtros.versao);
   const metaComparada = lerVersao(filtros.meta_comparar);
   // Primeira leva em paralelo; as metas dependem das versões e vão numa consulta só em seguida.
-  const [visao, desvios, comparativo, versoesProjecao, versoesMeta, premissaConsultada, resumos, pendencias] =
+  const [visao, desvios, comparativo, versoesProjecao, versoesMeta, premissaConsultada, resumos, pendencias, regraMeta] =
     await Promise.all([
       tentarConsulta(listarVisaoGerencial(janelaObra)),
       tentarConsulta(listarExplicacaoDesvio({ ...janelaObra, fim: mesReferencia })),
@@ -342,16 +407,19 @@ export default async function PaginaPlanejamento({ searchParams }: PageProps<"/p
       tentarConsulta(buscarPremissaVigente(obra.id).then((vigente) => ({ vigente }))),
       tentarConsulta(listarResumoProjecao(obra.id)),
       tentarConsulta(listarPendenciasPosEntrega(obra.id)),
+      buscarParametrosObra(obra.id, ["comercial__meta_metodo"]),
     ]);
+  const metaAutomatica = regraMeta?.comercial__meta_metodo === "automatica";
   const metaVigente = versoesMeta?.[0] ?? null;
   const metaParaComparar =
     versoesMeta?.find((versao) => versao.id === metaComparada && versao.id !== metaVigente?.id) ?? null;
   const versaoParaComparar = versoesProjecao?.find((versao) => versao.id === versaoPedida) ?? null;
-  const [metas, projecaoVersao] = await Promise.all([
+  const [metas, projecaoVersao, metaCalculada] = await Promise.all([
     metaVigente
       ? tentarConsulta(listarMetasDasVersoes([metaVigente.id, ...(metaParaComparar ? [metaParaComparar.id] : [])]))
       : Promise.resolve([] as LinhaMetaMensal[]),
     versaoParaComparar ? tentarConsulta(listarProjecaoDaVersao(versaoParaComparar.id)) : Promise.resolve(null),
+    metaAutomatica ? tentarConsulta(listarMetaAutomatica(janelaObra)) : Promise.resolve(null),
   ]);
   const resumo = resumos?.[0] ?? null;
   const premissa = premissaConsultada?.vigente ?? null;
@@ -395,6 +463,12 @@ export default async function PaginaPlanejamento({ searchParams }: PageProps<"/p
         titulo={`${obra.nome}: visão gerencial mensal`}
         contexto={`Posição em ${formatarData(referencia.dataReferencia)}. "Original" é a primeira projeção registrada no mês de referência; sem ela, a última dos meses anteriores.`}
       >
+        <OrigemMeta
+          automatica={metaAutomatica}
+          linhas={metaCalculada}
+          versaoVigente={metaVigente?.numero ?? null}
+          obraId={obra.id}
+        />
         {visao === null && <ErroBloco />}
         {visao?.length === 0 && <p>{mensagensPlanejamento.planejamento.semVisao}</p>}
         {visao && visao.length > 0 && (

@@ -265,8 +265,10 @@ def main():
                         "values (%s, %s, %s, %s, 'volume sintetico', '00000000-0000-0000-0000-000000000000') "
                         "on conflict (tenant_id, tipo_origem, conta_origem) do nothing",
                         [(tenant, *m) for m in MAPA_CONTAS])
-        cur.execute("insert into app.criterio_reconhecimento (tenant_id, metodo, autor) "
-                    "values (%s, 'percentual_conclusao', '00000000-0000-0000-0000-000000000000') "
+        # validado_por preenchido porque, no padrão, critério sem validador não vale
+        cur.execute("insert into app.criterio_reconhecimento (tenant_id, metodo, autor, validado_por) "
+                    "values (%s, 'percentual_conclusao', '00000000-0000-0000-0000-000000000000', "
+                    "'00000000-0000-0000-0000-000000000000') "
                     "on conflict (tenant_id, centro_custo_id) do nothing", (tenant,))
         cur.execute("analyze")
         conexao.commit()

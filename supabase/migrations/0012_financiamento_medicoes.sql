@@ -121,7 +121,7 @@ create table app.liberacao_financiamento (
        and vinculo_tipo is null and vinculo_chave is null)),
   constraint liberacao_chave_recebimento check (
     vinculo_tipo is distinct from 'recebimento' or vinculo_chave ~ '^[0-9]+\|[0-9]+\|[0-9]+$'),
-  -- no nível contrato o dinheiro é a parcela FI do staging; lançamento manual ali duplicaria a entrada
+  -- no nível contrato o dinheiro é a parcela de financiamento do staging; lançamento manual ali duplicaria a entrada
   constraint liberacao_contrato_sem_lancamento check (nivel <> 'contrato' or vinculo_tipo is distinct from 'lancamento_manual'),
   foreign key (tenant_id, centro_custo_id, operacao_credito_id)
     references app.operacao_credito_obra (tenant_id, centro_custo_id, id),
@@ -144,7 +144,7 @@ begin
   if new.contrato_id_origem is not null and not exists (
     select 1 from staging.contrato_venda c
     where c.tenant_id = new.tenant_id and c.centro_custo_id = new.centro_custo_id
-      and c.id_origem = new.contrato_id_origem and c.situacao = '1'
+      and c.id_origem = new.contrato_id_origem and c.situacao_normalizada = 'ativo'
   ) then
     raise exception 'contrato de venda ativo não encontrado na obra' using errcode = '23514';
   end if;
@@ -169,7 +169,7 @@ begin
     if not exists (
       select 1 from staging.contrato_venda c
       where c.tenant_id = new.tenant_id and c.centro_custo_id = new.centro_custo_id
-        and c.id_origem = new.contrato_id_origem and c.situacao = '1'
+        and c.id_origem = new.contrato_id_origem and c.situacao_normalizada = 'ativo'
     ) then
       raise exception 'contrato de venda ativo não encontrado na obra' using errcode = '23514';
     end if;
@@ -260,7 +260,9 @@ begin
 end $$;
 
 -- Financiamento do comprador por contrato ativo. Não há coluna de liberação agregada por contrato:
--- liberação de empreendimento ou lote nunca é repartida entre unidades.
+-- liberação de empreendimento ou lote nunca é repartida entre unidades. A etapa em vigor é a cadastrada;
+-- sem ela, a data do banco no contrato vale como elegível ou, quando o tenant diz que essa data é a do
+-- repasse (financiamento.data_origem_significa), como liberado.
 create view marts.financiamento_contrato with (security_invoker = true) as
 with referencia as materialized (
   select app.data_referencia() as ref
@@ -275,7 +277,7 @@ with referencia as materialized (
          coalesce(sum(p.valor_recebido), 0) as recebido_financiamento
   from staging.parcela_receber p
   cross join referencia r
-  where p.tipo_condicao = 'FI'
+  where p.origem = 'repasse'
   group by p.tenant_id, p.contrato_id_origem
 )
 select c.tenant_id, c.centro_custo_id, c.id_origem as contrato_id_origem, c.numero as contrato_numero,
@@ -288,36 +290,50 @@ select c.tenant_id, c.centro_custo_id, c.id_origem as contrato_id_origem, c.nume
   e.etapa, e.pendencia, e.motivo_pendencia, e.data_etapa, e.data_prevista_liberacao,
   app.classificar_financiamento(e.etapa, e.pendencia, c.data_repasse) as classificacao,
   coalesce(fi.saldo_financiamento_aberto, 0)::numeric(18,2) as saldo_financiamento_aberto,
-  coalesce(fi.recebido_financiamento, 0)::numeric(18,2) as recebido_financiamento
+  coalesce(fi.recebido_financiamento, 0)::numeric(18,2) as recebido_financiamento,
+  coalesce(e.etapa, case when c.data_repasse is null then null
+                         when pt.financiamento__data_origem_significa = 'repasse' then 'liberado'
+                         else 'elegivel' end) as etapa_efetiva
 from staging.contrato_venda c
+-- offset 0: o parâmetro sai do jsonb uma vez por tenant, não uma vez por contrato
+join (select p.tenant_id, p.financiamento__data_origem_significa from app.parametros_tenant p offset 0) pt
+  on pt.tenant_id = c.tenant_id
 left join parcela_fi fi on fi.tenant_id = c.tenant_id and fi.contrato_id_origem = c.id_origem
 left join app.etapa_financiamento_contrato e on e.tenant_id = c.tenant_id and e.contrato_id_origem = c.id_origem
 left join staging.unidade u on u.tenant_id = c.tenant_id and u.id_origem = c.unidade_id_origem
-where c.situacao = '1' and (c.valor_financiado > 0 or fi.contrato_id_origem is not null);
+where c.situacao_normalizada = 'ativo' and (c.valor_financiado > 0 or fi.contrato_id_origem is not null);
 
--- Parcela em aberto com a data em que se espera o dinheiro. Para FI vale a data prevista da etapa do
--- financiamento; sem ela, o vencimento. O que ficou para trás da referência sai da projeção.
+-- Parcela em aberto com a data em que se espera o dinheiro. Para financiamento vale a data prevista da
+-- etapa; sem ela, quando a data do banco no contrato é a do repasse, o dinheiro já foi liberado e é
+-- esperado nela ou, se já passou, na data de referência; senão, o vencimento. O que ficou para trás da
+-- referência sai da projeção.
 -- Contrato e etapa entram por junção direta, para o planejador usar hash join e avaliar o filtro de tenant
--- uma vez por consulta. A situação só é calculada nas parcelas com saldo e a classificação só nas FI:
--- O(parcelas em aberto).
+-- uma vez por consulta. A situação só é calculada nas parcelas com saldo e a classificação só nas de
+-- financiamento: O(parcelas em aberto).
 create view marts.recebivel_projetado with (security_invoker = true) as
 with referencia as materialized (
   select app.data_referencia() as ref
 ), parcela as (
   select p.tenant_id, p.centro_custo_id, p.contrato_id_origem, p.id_origem as parcela_id_origem,
-         case when p.tipo_condicao = 'FI' then 'financiamento' else 'direta' end as origem,
-         case when p.tipo_condicao is distinct from 'FI' then 'direta'
+         case when p.origem = 'repasse' then 'financiamento' else 'direta' end as origem,
+         case when p.origem is distinct from 'repasse' then 'direta'
               when c.id_origem is null then 'financiamento_pendente'
               else app.classificar_financiamento(e.etapa, e.pendencia, c.data_repasse) end as classe,
          p.vencimento,
          coalesce(p.saldo_corrigido, p.saldo)::numeric(18,2) as saldo,
          app.situacao_parcela(coalesce(p.saldo_corrigido, p.saldo), p.valor_recebido, p.vencimento,
-                              coalesce(c.situacao = '3', false), r.ref) as situacao,
-         case when p.tipo_condicao = 'FI' then coalesce(e.data_prevista_liberacao, p.vencimento)
+                              coalesce(c.situacao_normalizada = 'distratado', false), r.ref) as situacao,
+         case when p.origem = 'repasse'
+              then coalesce(e.data_prevista_liberacao,
+                            case when pt.financiamento__data_origem_significa = 'repasse' and c.data_repasse is not null
+                                 then greatest(c.data_repasse, r.ref) end,
+                            p.vencimento)
               else p.vencimento end as data_prevista,
          r.ref
   from staging.parcela_receber p
   cross join referencia r
+  join (select t.tenant_id, t.financiamento__data_origem_significa from app.parametros_tenant t offset 0) pt
+    on pt.tenant_id = p.tenant_id
   left join staging.contrato_venda c on c.tenant_id = p.tenant_id and c.id_origem = p.contrato_id_origem
   left join app.etapa_financiamento_contrato e on e.tenant_id = p.tenant_id and e.contrato_id_origem = p.contrato_id_origem
   where coalesce(p.saldo_corrigido, p.saldo) > 0
@@ -327,6 +343,8 @@ select tenant_id, centro_custo_id, contrato_id_origem, parcela_id_origem, origem
 from parcela
 where situacao in ('vencida', 'a_vencer');
 
+-- Retenção da operação; sem ela, a retenção padrão da obra (financiamento.retencao_padrao), e a coluna
+-- origem_retencao diz de onde veio.
 create view marts.saldo_operacao_credito with (security_invoker = true) as
 with liberacao as (
   select l.operacao_credito_id,
@@ -342,12 +360,18 @@ with liberacao as (
   group by m.operacao_credito_id
 ), base as (
   select o.tenant_id, o.centro_custo_id, o.id as operacao_credito_id, o.modalidade, o.instituicao,
-         o.valor_contratado, o.percentual_retencao,
-         round(o.valor_contratado * o.percentual_retencao, 2)::numeric(18,2) as retencao_prevista,
+         o.valor_contratado,
+         coalesce(o.percentual_retencao, po.financiamento__retencao_padrao)::numeric(9,6) as percentual_retencao,
+         round(o.valor_contratado * coalesce(o.percentual_retencao, po.financiamento__retencao_padrao), 2)::numeric(18,2)
+           as retencao_prevista,
+         case when o.percentual_retencao is not null then 'operacao'
+              when po.financiamento__retencao_padrao is not null then 'padrao' end as origem_retencao,
          coalesce(l.liberado_recebido, 0)::numeric(18,2) as liberado_recebido,
          coalesce(l.previsto_aberto, 0)::numeric(18,2) as previsto_aberto,
          coalesce(m.medido_elegivel, 0)::numeric(18,2) as medido_elegivel
   from app.operacao_credito_obra o
+  join (select p.centro_custo_id, p.financiamento__retencao_padrao from app.parametros_obra p offset 0) po
+    on po.centro_custo_id = o.centro_custo_id
   left join liberacao l on l.operacao_credito_id = o.id
   left join medicao m on m.operacao_credito_id = o.id
 )
@@ -361,7 +385,8 @@ select b.tenant_id, b.centro_custo_id, b.operacao_credito_id, b.modalidade, b.in
     as saldo_nao_programado,
   b.medido_elegivel,
   greatest(b.medido_elegivel - b.liberado_recebido, 0)::numeric(18,2) as elegivel_nao_liberado,
-  b.liberado_recebido + b.previsto_aberto > b.valor_contratado - coalesce(b.retencao_prevista, 0) as excede_limite
+  b.liberado_recebido + b.previsto_aberto > b.valor_contratado - coalesce(b.retencao_prevista, 0) as excede_limite,
+  b.origem_retencao
 from base b;
 
 create view marts.liberacao_status with (security_invoker = true) as

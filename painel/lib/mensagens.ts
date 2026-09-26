@@ -13,7 +13,6 @@ export const mensagens = {
   obra: {
     naoEncontrada: "Obra não encontrada ou sem permissão.",
     indisponivel: "Não foi possível carregar esta obra agora. Recarregue a página em alguns minutos.",
-    semMovimento: "Esta obra ainda não tem entradas nem saídas nos 36 meses mostrados no gráfico.",
   },
   unidades: {
     indisponivel: "Não foi possível carregar o mapa de unidades agora. Recarregue a página em alguns minutos.",
@@ -74,11 +73,27 @@ export const mensagens = {
     sem_premissa_distribuicao: "Não há premissa de meses para o custo sem título.",
     premissa_invalida: "A premissa de meses não soma 100%.",
     consolidado_parcial: "Alguma obra do consolidado está indisponível.",
+    criterio_sem_validador:
+      "O critério foi gravado pela carga, sem um usuário do financeiro. Registre o critério em DRE gerencial para liberar o cálculo.",
+    area_privativa_ausente:
+      "Falta a área privativa de alguma unidade da obra; a fração vendida por área não pode ser calculada. Complete o cadastro na origem ou troque a base em Configurações.",
+    valor_tabela_ausente:
+      "Falta o preço de tabela de alguma unidade da obra; a fração vendida por valor não pode ser calculada. Complete a tabela na origem ou troque a base em Configurações.",
+    horizonte_ausente:
+      "A meta automática não tem prazo: a obra não tem data de entrega das unidades nem data final informada em Configurações.",
+    horizonte_encerrado: "O prazo da meta automática já passou. Informe uma nova data final em Configurações.",
+    sem_estoque_disponivel:
+      "Não há unidade disponível com preço de tabela; a meta em unidades não pode ser calculada.",
   },
   motivoDesconhecido: "Indisponível no momento.",
 } as const;
 
 export type CodigoMotivo = keyof typeof mensagens.motivos;
+
+// O horizonte do gráfico da obra vem de exibicao.meses_grafico.
+export function textoSemMovimentoObra(meses: number): string {
+  return `Esta obra ainda não tem entradas nem saídas nos ${meses} meses mostrados no gráfico.`;
+}
 
 // Código de erro do banco vira frase; a mensagem crua, o SQL e o nome da tabela nunca chegam à tela.
 export function fraseErroGravacao(codigo: string | undefined): string {

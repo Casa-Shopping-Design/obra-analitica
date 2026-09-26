@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 // Uma entrada por visão, sem repetir número: DRE é competência, Receitas e Despesas são carteira e caixa,
 // Fluxo de caixa é o mês a mês de entradas e saídas, Planejamento compara metas com o realizado.
+// Configurações fica no fim: todo perfil vê os valores em vigor, só diretor e financeiro alteram.
 const itens = [
   { rotulo: "Visão geral", destino: "/" },
   { rotulo: "Obras", destino: "/obras" },
@@ -15,6 +16,7 @@ const itens = [
   { rotulo: "Planejamento", destino: "/planejamento" },
   { rotulo: "Mapa de unidades", destino: "/unidades" },
   { rotulo: "Assistente", destino: "/assistente" },
+  { rotulo: "Configurações", destino: "/configuracoes" },
 ];
 
 function estaAtivo(caminho: string, destino: string): boolean {

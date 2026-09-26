@@ -60,8 +60,17 @@ def main():
                 [tenant] * len(TABELAS_STAGING),
             )
             contagens = cur.fetchall()
+            # código da origem sem linha no mapa do tenant vale o padrão sem mapa; avisa em vez de passar calado
+            cur.execute(
+                "select dominio, coalesce(codigo_origem, '(sem código)'), sum(quantidade_registros), valor_aplicado "
+                "from marts.pendencia_codigo_origem where tenant_id = %s group by 1, 2, 4 order by 1, 2",
+                (tenant,),
+            )
+            pendencias = cur.fetchall()
         conexao.commit()
     print("staging recarregado: " + ", ".join(f"{tabela} {total}" for tabela, total in contagens))
+    for dominio, codigo, quantidade, valor_aplicado in pendencias:
+        print(f"código sem mapa em {dominio}: {codigo} ({quantidade} registros, tratados como {valor_aplicado})")
 
 
 if __name__ == "__main__":

@@ -2,6 +2,7 @@ import "server-only";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
 import { ErroConsulta } from "@/lib/consultas/posicao";
 import { converterColunas } from "@/lib/consultas/referencia";
+import { objetoAusente } from "@/lib/consultas/configuracao";
 import type { CodigoMotivo } from "@/lib/mensagens";
 import type { LinhaFluxoCenario, LinhaFluxoMensal } from "@/lib/serie-fluxo";
 import type { LinhaSimulacao, PremissasSimulacao } from "@/lib/simulacao";
@@ -81,6 +82,8 @@ export type LinhaFluxoProjetado = {
   aporte_incremental_mes: number;
   caixa_gerado_acumulado_conservador: number;
   necessidade_aporte_conservadora: number;
+  // Parte do vencido a receber que entra no mês de referência quando caixa.receber_vencido = mes_referencia.
+  vencido_recuperacao_prevista: number;
 };
 
 export type ResumoProjecaoObra = {
@@ -123,6 +126,7 @@ export const colunasValorFluxoProjetado = [
   "aporte_incremental_mes",
   "caixa_gerado_acumulado_conservador",
   "necessidade_aporte_conservadora",
+  "vencido_recuperacao_prevista",
 ] as const;
 
 export type FiltroFluxoProjetado = { centroCustoId: string | null; inicio?: string | null; fim?: string | null };
@@ -211,4 +215,47 @@ export async function contarEstoqueSimulacao(centroCustoId: string): Promise<num
     .not("valor", "is", null);
   if (error) throw new ErroConsulta(error.code);
   return count ?? 0;
+}
+
+export type LinhaFluxoConsolidado = Pick<
+  LinhaFluxoProjetado,
+  | "competencia"
+  | "eh_passado"
+  | "total_entradas"
+  | "total_saidas"
+  | "saldo_mes"
+  | "caixa_gerado_acumulado"
+  | "necessidade_aporte_acumulada"
+  | "aporte_incremental_mes"
+  | "caixa_gerado_acumulado_conservador"
+  | "necessidade_aporte_conservadora"
+  | "vencido_recuperacao_prevista"
+>;
+
+const colunasConsolidado = [
+  "total_entradas",
+  "total_saidas",
+  "saldo_mes",
+  "caixa_gerado_acumulado",
+  "necessidade_aporte_acumulada",
+  "aporte_incremental_mes",
+  "caixa_gerado_acumulado_conservador",
+  "necessidade_aporte_conservadora",
+  "vencido_recuperacao_prevista",
+] as const;
+
+// Série do tenant com as obras somadas (o caixa de uma cobre a outra), uma linha por mês, somada no banco.
+// Nulo quando a view ainda não existe no banco: a tela mostra então só a lista por obra.
+export async function listarFluxoConsolidado(): Promise<LinhaFluxoConsolidado[] | null> {
+  const supabase = await criarClienteServidor();
+  const { data, error } = await supabase
+    .schema("marts")
+    .from("fluxo_projetado_consolidado")
+    .select(`competencia, eh_passado, ${colunasConsolidado.join(", ")}`)
+    .order("competencia");
+  if (error) {
+    if (objetoAusente(error.code)) return null;
+    throw new ErroConsulta(error.code);
+  }
+  return converterColunas<LinhaFluxoConsolidado>(data ?? [], colunasConsolidado);
 }

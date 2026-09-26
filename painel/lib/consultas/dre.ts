@@ -80,7 +80,13 @@ export type LinhaReconhecimentoObra = {
   custo_reconhecido_acumulado: number | null;
   receita_reconhecida_mes: number | null;
   custo_reconhecido_mes: number | null;
+  // Base em vigor na obra (reconhecimento.base_fracao_vendida, obra sobre construtora sobre padrão).
+  base_fracao_vendida: BaseFracaoVendida;
+  // Fração do custo acumulado que tem categoria; nula sem custo lançado.
+  cobertura_custo: number | null;
 };
+
+export type BaseFracaoVendida = "unidades" | "area_privativa" | "valor_tabela";
 
 export type LinhaPendenciaClassificacao = {
   tenant_id: string;
@@ -98,7 +104,6 @@ export type CriterioReconhecimento = {
   tenant_id: string;
   centro_custo_id: string | null;
   metodo: "nao_definido" | "percentual_conclusao";
-  base_fracao_vendida: "unidades";
   validado_por: string | null;
   validado_em: string | null;
   observacao: string | null;
@@ -199,6 +204,7 @@ export async function listarReconhecimentoNoMes(
       "custo_reconhecido_acumulado",
       "receita_reconhecida_mes",
       "custo_reconhecido_mes",
+      "cobertura_custo",
     ],
   );
 }
@@ -259,7 +265,7 @@ export async function listarCriteriosReconhecimento(): Promise<CriterioReconheci
   const { data, error } = await supabase
     .schema("app")
     .from("criterio_reconhecimento")
-    .select("id, tenant_id, centro_custo_id, metodo, base_fracao_vendida, validado_por, validado_em, observacao")
+    .select("id, tenant_id, centro_custo_id, metodo, validado_por, validado_em, observacao")
     .order("centro_custo_id", { nullsFirst: true });
   if (error) throw new ErroConsulta(error.code);
   return (data ?? []) as CriterioReconhecimento[];

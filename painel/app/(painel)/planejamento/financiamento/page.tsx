@@ -76,6 +76,11 @@ function TabelaOperacoes({ operacoes, nomes }: { operacoes: SaldoOperacaoCredito
             <span className="inline-flex flex-col items-end">
               <Percentual fracao={operacao.percentual_retencao} />
               <Valor valor={operacao.retencao_prevista} ausente="" />
+              {operacao.origem_retencao && (
+                <span className="text-xs text-suave">
+                  {operacao.origem_retencao === "operacao" ? "da operação" : "padrão da configuração"}
+                </span>
+              )}
             </span>
           ),
           liberado: <Valor valor={operacao.liberado_recebido} />,
@@ -120,6 +125,11 @@ function TabelaContratos({ contratos }: { contratos: FinanciamentoContrato[] }) 
               <span className="text-sm">{rotulosEtapa[contrato.etapa]}</span>
               {contrato.data_etapa && <span className="text-suave">em {formatarData(contrato.data_etapa)}</span>}
               {contrato.pendencia && <span className="text-atencao">Pendência: {contrato.motivo_pendencia}</span>}
+            </span>
+          ) : contrato.etapa_efetiva ? (
+            <span className="flex flex-col text-xs">
+              <span className="text-sm">{rotulosEtapa[contrato.etapa_efetiva]}</span>
+              <span className="text-suave">pela data do banco na origem</span>
             </span>
           ) : (
             <span className="text-suave">Sem etapa cadastrada</span>

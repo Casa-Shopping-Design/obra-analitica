@@ -32,6 +32,8 @@ import {
   listarReconhecimentoNoMes,
   type LinhaReconhecimentoObra,
 } from "@/lib/consultas/dre";
+import { aplicarRotulos } from "@/lib/configuracao";
+import { buscarPreferenciasTenant, listarRotulos } from "@/lib/consultas/configuracao";
 import { exigirIdentidade } from "@/lib/consultas/identidade";
 import {
   buscarPerfilAtual,
@@ -57,6 +59,12 @@ const rotulosMetodo: Record<LinhaReconhecimentoObra["metodo"], string> = {
   percentual_conclusao: "Percentual de conclusão",
 };
 
+const rotulosBase: Record<LinhaReconhecimentoObra["base_fracao_vendida"], string> = {
+  unidades: "Unidades",
+  area_privativa: "Área privativa",
+  valor_tabela: "Valor de tabela",
+};
+
 function percentualOuTraco(valor: number | null, disponivel: boolean, motivo: string | null) {
   if (valor === null) return <ValorEstado estado={estadoDoValor(null, disponivel, motivo)} mostrarMotivo={false} />;
   return <>{formatarPercentual(valor)}</>;
@@ -70,6 +78,13 @@ function linhasReconhecimento(linhas: LinhaReconhecimentoObra[], nomes: Map<stri
       metodo: rotulosMetodo[linha.metodo],
       poc: percentualOuTraco(linha.poc, linha.disponivel, linha.motivo),
       fracao: percentualOuTraco(linha.fracao_vendida, linha.disponivel, linha.motivo),
+      base: rotulosBase[linha.base_fracao_vendida] ?? linha.base_fracao_vendida,
+      cobertura:
+        linha.cobertura_custo === null ? (
+          <span className="text-suave">Sem custo lançado</span>
+        ) : (
+          formatarPercentual(linha.cobertura_custo)
+        ),
       incorrido: <ValorEstado estado={estadoDoValor(linha.custo_incorrido_acumulado)} />,
       estimado: <ValorEstado estado={estadoDoValor(linha.custo_total_estimado)} />,
       situacao: linha.disponivel ? (
@@ -122,18 +137,21 @@ async function carregarDre(periodo: Periodo, centroId: string | null, podeGravar
   return { linhasPeriodo, mensal, reconhecimento, pendencias, criterios, categorias, mapeamentos };
 }
 
-// Identidade, referência, perfil e centros primeiro (a data define o período), depois até sete em paralelo;
-// categorias e contas classificadas só para quem pode gravar.
+// Identidade, referência, perfil, centros e preferências primeiro (a data e o período padrão da construtora
+// definem o período), depois até oito em paralelo; categorias e contas classificadas só para quem pode gravar.
 export default async function PaginaDre({ searchParams }: PageProps<"/dre">) {
   await exigirIdentidade();
   const filtrosUrl = await searchParams;
   const centrosPedido = tentarConsulta(listarCentrosCusto());
   const perfilPedido = tentarConsulta(buscarPerfilAtual());
+  const preferenciasPedido = buscarPreferenciasTenant();
+  const rotulosPedido = tentarConsulta(listarRotulos());
   const referencia = await carregarReferencia();
   const centros: CentroCusto[] | null = await centrosPedido;
   const podeGravar = podeGravarFinanceiro(await perfilPedido);
 
-  const periodo = lerPeriodo(filtrosUrl, referencia.dataReferencia);
+  const preferencias = await preferenciasPedido;
+  const periodo = lerPeriodo(filtrosUrl, referencia.dataReferencia, preferencias.periodoPadrao);
   const centroPedido = lerIdCentro(filtrosUrl.obra);
   const medida = lerOpcao(filtrosUrl.visao, medidasMensais, "valor_mes");
   const centro = centros?.find((item) => item.id === centroPedido) ?? null;
@@ -181,10 +199,20 @@ export default async function PaginaDre({ searchParams }: PageProps<"/dre">) {
     centroId,
     podeGravar,
   );
-  const linhasTela = linhasPeriodo ? montarLinhasPeriodo(linhasPeriodo) : null;
+  const rotulos = (await rotulosPedido) ?? [];
+  const nomeDaLinha = <T extends { codigo: string; nome: string }>(linhas: T[]) =>
+    aplicarRotulos(linhas, (linha) => linha.codigo, rotulos, "linha_dre");
+  const montadas = linhasPeriodo ? montarLinhasPeriodo(linhasPeriodo) : null;
+  const linhasTela = montadas
+    ? { resultado: nomeDaLinha(montadas.resultado), informativas: nomeDaLinha(montadas.informativas) }
+    : null;
   const cobertura = linhasPeriodo ? coberturaDoPeriodo(linhasPeriodo) : null;
   const semCriterio = criterioPendente(linhasPeriodo ?? [], reconhecimento ?? []);
-  const grade = mensal ? montarGradeMensal(mensal, medida) : null;
+  const gradeProduto = mensal ? montarGradeMensal(mensal, medida) : null;
+  const grade = gradeProduto ? { ...gradeProduto, linhas: nomeDaLinha(gradeProduto.linhas) } : null;
+  const categoriasTela = categorias
+    ? aplicarRotulos(categorias, (categoria) => categoria.codigo, rotulos, "categoria")
+    : null;
   const recorte = `${nomeRecorte}, ${periodo.rotulo}`;
 
   return (
@@ -258,7 +286,7 @@ export default async function PaginaDre({ searchParams }: PageProps<"/dre">) {
         <Bloco
           id="conclusao"
           titulo="Percentual de conclusão por obra"
-          contexto={`Posição no fim de ${formatarMes(periodo.fim)}. Base do reconhecimento de receita e custo quando o critério estiver validado.`}
+          contexto={`Posição no fim de ${formatarMes(periodo.fim)}. Base do reconhecimento de receita e custo quando o critério estiver validado. A base da fração vendida e a cobertura mínima do custo com categoria vêm de Configurações.`}
         >
           {reconhecimento === null && <ErroBloco />}
           {reconhecimento && reconhecimento.length === 0 && <p>{mensagens.dre.semLancamentos}</p>}
@@ -270,6 +298,8 @@ export default async function PaginaDre({ searchParams }: PageProps<"/dre">) {
                 { chave: "metodo", rotulo: "Critério" },
                 { chave: "poc", rotulo: "Percentual de conclusão", explicacao: "poc" },
                 { chave: "fracao", rotulo: "Fração vendida", explicacao: "fracao_vendida" },
+                { chave: "base", rotulo: "Base da fração vendida" },
+                { chave: "cobertura", rotulo: "Custo com categoria" },
                 { chave: "incorrido", rotulo: "Custo de obra lançado até o mês", explicacao: "custo_obra_incorrido" },
                 { chave: "estimado", rotulo: "Custo total estimado" },
                 { chave: "situacao", rotulo: "Situação" },
@@ -298,11 +328,11 @@ export default async function PaginaDre({ searchParams }: PageProps<"/dre">) {
             <TabelaPendencias linhas={pendencias.linhas} />
           </>
         )}
-        {podeGravar && categorias === null && <ErroBloco />}
-        {podeGravar && categorias && (
+        {podeGravar && categoriasTela === null && <ErroBloco />}
+        {podeGravar && categoriasTela && (
           <GestaoClassificacao
             pendencias={pendencias?.linhas ?? []}
-            categorias={categorias}
+            categorias={categoriasTela}
             mapeamentos={mapeamentos}
           />
         )}

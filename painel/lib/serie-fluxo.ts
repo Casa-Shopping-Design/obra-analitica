@@ -88,14 +88,16 @@ function pontoVazio(competencia: string): PontoFluxo {
   };
 }
 
-// O(n log n) pela ordenação, com n no máximo de algumas centenas de meses por obra.
+// O(n log n) pela ordenação, com n no máximo de algumas centenas de meses por obra. A janela padrão é a
+// anterior à configuração; a tela da obra passa a de exibicao.meses_grafico.
 export function montarSerieFluxo(
   linhasMensais: LinhaFluxoMensal[],
   linhasCenario: LinhaFluxoCenario[] | null,
   mesReferencia: string,
+  janela: { antes: number; depois: number } = { antes: mesesParaTras, depois: mesesParaFrente },
 ): PontoFluxo[] {
-  const inicio = deslocarMes(mesReferencia, -mesesParaTras);
-  const fim = deslocarMes(mesReferencia, mesesParaFrente - 1);
+  const inicio = deslocarMes(mesReferencia, -janela.antes);
+  const fim = deslocarMes(mesReferencia, janela.depois - 1);
   const dentroDaJanela = (mes: string) => mes >= inicio && mes <= fim;
   const pontos = new Map<string, PontoFluxo>();
 

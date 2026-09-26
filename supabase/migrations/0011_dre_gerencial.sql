@@ -41,6 +41,23 @@ create policy leitura_autenticado on app.categoria_gerencial
   using ((select auth.uid()) is not null);
 grant select on app.categoria_gerencial to authenticated;
 
+-- Subcategorias próprias do tenant (docs/financeiro/configuracao.md, 2.5). Cada uma soma na categoria
+-- global, então o DRE não muda; só as telas de despesa abrem o detalhe.
+create table app.categoria_tenant (
+  id uuid primary key default gen_random_uuid(),
+  tenant_id uuid not null references app.tenant(id) on delete cascade,
+  categoria_codigo text not null references app.categoria_gerencial(codigo),
+  codigo text not null check (codigo ~ '^[a-z0-9_.-]{1,40}$'),
+  nome text not null check (length(btrim(nome)) between 1 and 80),
+  ativa boolean not null default true,
+  autor uuid not null,
+  atualizado_em timestamptz not null default now(),
+  constraint categoria_tenant_codigo_unico unique (tenant_id, codigo),
+  -- alvo da chave composta do mapa de contas, que impede apontar para subcategoria de outro tenant
+  constraint categoria_tenant_tenant_id unique (tenant_id, id)
+);
+create index categoria_tenant_categoria on app.categoria_tenant (categoria_codigo);
+
 -- Mapeamento por tenant da conta da origem para a categoria. Autor sempre do JWT, histórico na auditoria.
 create table app.mapa_conta_origem (
   tenant_id uuid not null references app.tenant(id) on delete cascade,
@@ -50,17 +67,24 @@ create table app.mapa_conta_origem (
   observacao text,
   autor uuid not null,
   atualizado_em timestamptz not null default now(),
-  primary key (tenant_id, tipo_origem, conta_origem)
+  subcategoria_id uuid,
+  primary key (tenant_id, tipo_origem, conta_origem),
+  foreign key (tenant_id, subcategoria_id) references app.categoria_tenant (tenant_id, id)
 );
 create index mapa_conta_origem_categoria on app.mapa_conta_origem (categoria_codigo);
+create index mapa_conta_origem_subcategoria on app.mapa_conta_origem (tenant_id, subcategoria_id)
+  where subcategoria_id is not null;
 
 -- Título só em categoria de saída, parcela só em entrada, orçamento só em custo do imóvel: assim toda
--- conta mapeada cai numa linha do DRE com o sinal certo.
+-- conta mapeada cai numa linha do DRE com o sinal certo. A subcategoria precisa somar na mesma categoria
+-- global; subcategoria desativada continua nas contas que já tinha, mas não recebe conta nova.
 create function app.validar_mapa_conta_origem() returns trigger
 language plpgsql security invoker set search_path = '' as $$
 declare
   v_grupo text;
   v_natureza text;
+  v_categoria_sub text;
+  v_ativa boolean;
 begin
   select c.grupo_dre, c.natureza into v_grupo, v_natureza
   from app.categoria_gerencial c where c.codigo = new.categoria_codigo;
@@ -68,6 +92,17 @@ begin
      or (new.tipo_origem = 'parcela_receber' and v_natureza is distinct from 'entrada')
      or (new.tipo_origem = 'orcamento' and v_grupo is distinct from 'custo_imovel') then
     raise exception 'categoria % não serve para %', new.categoria_codigo, new.tipo_origem using errcode = '23514';
+  end if;
+  if new.subcategoria_id is not null then
+    select s.categoria_codigo, s.ativa into v_categoria_sub, v_ativa
+    from app.categoria_tenant s where s.id = new.subcategoria_id and s.tenant_id = new.tenant_id;
+    if v_categoria_sub is distinct from new.categoria_codigo then
+      raise exception 'a subcategoria escolhida soma em outra categoria; escolha uma subcategoria de %', new.categoria_codigo
+        using errcode = '23514';
+    end if;
+    if not v_ativa and (tg_op = 'INSERT' or old.subcategoria_id is distinct from new.subcategoria_id) then
+      raise exception 'a subcategoria está desativada; reative-a antes de ligar contas a ela' using errcode = '23514';
+    end if;
   end if;
   return new;
 end $$;
@@ -97,6 +132,66 @@ create policy exclusao_diretor_financeiro on app.mapa_conta_origem
   using (tenant_id = (select app.tenant_atual()) and (select app.perfil_atual()) in ('diretor', 'financeiro'));
 grant select, insert, update, delete on app.mapa_conta_origem to authenticated;
 
+-- Trocar a categoria global de uma subcategoria já ligada a contas mudaria o DRE dessas contas por fora
+-- do mapeamento; para isso o financeiro cria outra subcategoria.
+create function app.validar_categoria_tenant() returns trigger
+language plpgsql security invoker set search_path = '' as $$
+begin
+  if new.categoria_codigo is distinct from old.categoria_codigo and exists (
+    select 1 from app.mapa_conta_origem m where m.tenant_id = old.tenant_id and m.subcategoria_id = old.id
+  ) then
+    raise exception 'a subcategoria já tem contas ligadas; crie outra para a categoria %', new.categoria_codigo
+      using errcode = '23514';
+  end if;
+  return new;
+end $$;
+revoke execute on function app.validar_categoria_tenant() from public, anon, authenticated;
+
+create trigger definir_autor before insert or update on app.categoria_tenant
+  for each row execute function app.definir_autor();
+create trigger validar_categoria before update on app.categoria_tenant
+  for each row execute function app.validar_categoria_tenant();
+create trigger registrar_auditoria after insert or update or delete on app.categoria_tenant
+  for each row execute function app.registrar_auditoria('id');
+
+alter table app.categoria_tenant enable row level security;
+alter table app.categoria_tenant force row level security;
+create policy leitura_tenant on app.categoria_tenant
+  for select to authenticated
+  using (tenant_id = (select app.tenant_atual()));
+create policy inclusao_diretor_financeiro on app.categoria_tenant
+  for insert to authenticated
+  with check (tenant_id = (select app.tenant_atual()) and (select app.perfil_atual()) in ('diretor', 'financeiro'));
+create policy alteracao_diretor_financeiro on app.categoria_tenant
+  for update to authenticated
+  using (tenant_id = (select app.tenant_atual()) and (select app.perfil_atual()) in ('diretor', 'financeiro'))
+  with check (tenant_id = (select app.tenant_atual()) and (select app.perfil_atual()) in ('diretor', 'financeiro'));
+create policy exclusao_diretor_financeiro on app.categoria_tenant
+  for delete to authenticated
+  using (tenant_id = (select app.tenant_atual()) and (select app.perfil_atual()) in ('diretor', 'financeiro'));
+grant select, insert, update, delete on app.categoria_tenant to authenticated;
+
+-- A chave do rótulo personalizado (0007) precisa existir no produto: linha do DRE desta migration ou
+-- categoria global. Indicador não tem lista no banco e fica sem conferência aqui.
+create function app.validar_rotulo_personalizado() returns trigger
+language plpgsql security invoker set search_path = '' as $$
+begin
+  if new.contexto = 'linha_dre' and new.chave <> all (array['receita_bruta', 'deducoes', 'receita_liquida',
+       'custo_imovel_vendido', 'resultado_bruto', 'despesas_comerciais', 'despesas_administrativas',
+       'resultado_financeiro', 'resultado_gerencial', 'custo_obra_incorrido', 'fora_do_resultado', 'sem_categoria',
+       'sem_data_competencia']) then
+    raise exception 'o DRE não tem a linha %', new.chave using errcode = '23514';
+  end if;
+  if new.contexto = 'categoria' and not exists (select 1 from app.categoria_gerencial c where c.codigo = new.chave) then
+    raise exception 'a categoria % não existe', new.chave using errcode = '23514';
+  end if;
+  return new;
+end $$;
+revoke execute on function app.validar_rotulo_personalizado() from public, anon, authenticated;
+
+create trigger validar_chave before insert or update on app.rotulo_personalizado
+  for each row execute function app.validar_rotulo_personalizado();
+
 -- Critério de reconhecimento por tenant (centro nulo) ou por obra. Sem linha vale nao_definido.
 create table app.criterio_reconhecimento (
   id uuid primary key default gen_random_uuid(),
@@ -113,7 +208,9 @@ create table app.criterio_reconhecimento (
 );
 create index criterio_reconhecimento_obra on app.criterio_reconhecimento (centro_custo_id);
 
--- Quem valida é quem liga o percentual de conclusão; o valor mandado pelo cliente é ignorado.
+-- Quem valida é quem liga o percentual de conclusão; o valor mandado pelo usuário logado é ignorado.
+-- Sem JWT (carga ou dono do banco) fica o validador informado, como em app.definir_autor; sem validador,
+-- o parâmetro reconhecimento.exigir_validacao_usuario decide se o método vale.
 -- Obra de outro tenant ou centro que não é obra não recebem critério próprio.
 create function app.registrar_validacao_criterio() returns trigger
 language plpgsql security invoker set search_path = '' as $$
@@ -128,7 +225,9 @@ begin
     new.validado_por := null;
     new.validado_em := null;
   elsif tg_op = 'INSERT' or old.metodo is distinct from new.metodo then
-    new.validado_por := auth.uid();
+    if auth.uid() is not null or current_user in ('authenticated', 'anon') then
+      new.validado_por := auth.uid();
+    end if;
     new.validado_em := now();
   else
     new.validado_por := old.validado_por;
@@ -173,18 +272,27 @@ create index pagamento_conta on staging.pagamento (tenant_id, conta_origem);
 
 -- Apoio das views abaixo. Precisa de grant porque view com security_invoker confere o privilégio de
 -- quem consulta em cada objeto lido; não expõe nada além da apropriação que o usuário já lê.
+-- data_competencia já sai pela regra do tenant (dre.competencia_titulo): a emissão, a emissão ou o vencimento,
+-- ou sempre o vencimento. Todas as views de DRE e despesa leem a competência daqui.
 create view marts.apropriacao_classificada with (security_invoker = true) as
 select a.tenant_id, a.centro_custo_id, a.titulo_id_origem, a.sequencia_obra, a.sequencia_conta, a.conta_origem,
-       a.valor_original, a.valor_pago, a.ajuste_baixa, a.saldo, a.vencimento, a.data_competencia,
+       a.valor_original, a.valor_pago, a.ajuste_baixa, a.saldo, a.vencimento,
+       case pt.dre__competencia_titulo
+         when 'vencimento' then a.vencimento
+         when 'emissao_ou_vencimento' then coalesce(a.data_competencia, a.vencimento)
+         else a.data_competencia
+       end as data_competencia,
        m.categoria_codigo, c.nome as categoria_nome, c.grupo_dre
 from staging.titulo_pagar_apropriacao a
+-- offset 0: o parâmetro sai do jsonb uma vez por tenant, não uma vez por apropriação
+join (select p.tenant_id, p.dre__competencia_titulo from app.parametros_tenant p offset 0) pt on pt.tenant_id = a.tenant_id
 left join app.mapa_conta_origem m
   on m.tenant_id = a.tenant_id and m.tipo_origem = 'titulo_pagar' and m.conta_origem = a.conta_origem
 left join app.categoria_gerencial c on c.codigo = m.categoria_codigo;
 
 -- Carteira por parcela, sem dado do comprador.
 create view marts.carteira_recebiveis with (security_invoker = true) as
-with referencia as (
+with referencia as materialized (
   select app.data_referencia() as ref
 )
 select p.tenant_id, p.centro_custo_id, p.contrato_id_origem, c.numero as contrato_numero,
@@ -199,8 +307,8 @@ select p.tenant_id, p.centro_custo_id, p.contrato_id_origem, c.numero as contrat
        coalesce(p.valor_recebido, 0) > 0 and s.saldo > 0 as parcial,
        case when s.situacao = 'vencida' then r.ref - p.vencimento end as dias_atraso,
        case when c.id_origem is null then null
-            when c.situacao = '1' then 'ativo'
-            when c.situacao = '3' then 'distratado'
+            when c.situacao_normalizada = 'ativo' then 'ativo'
+            when c.situacao_normalizada = 'distratado' then 'distratado'
             else 'outra' end as situacao_contrato,
        p.inadimplente as inadimplente_origem
 from staging.parcela_receber p
@@ -210,14 +318,14 @@ left join staging.unidade u on u.tenant_id = c.tenant_id and u.id_origem = c.uni
 cross join lateral (
   select coalesce(p.saldo_corrigido, p.saldo, 0)::numeric(18,2) as saldo,
          app.situacao_parcela(coalesce(p.saldo_corrigido, p.saldo, 0), p.valor_recebido, p.vencimento,
-                              coalesce(c.situacao = '3', false), r.ref) as situacao
+                              coalesce(c.situacao_normalizada = 'distratado', false), r.ref) as situacao
 ) s;
 
 -- Somas sem linha dão zero: a carteira existe e está vazia naquele recorte.
 create view marts.resumo_receitas_obra with (security_invoker = true) as
-with referencia as (
-  select app.data_referencia() as ref,
-         (date_trunc('month', app.data_referencia()) + interval '1 month')::date as proximo_mes
+with referencia as materialized (
+  select d.ref, (date_trunc('month', d.ref) + interval '1 month')::date as proximo_mes
+  from (select app.data_referencia() as ref) d
 ), carteira as (
   select k.tenant_id, k.centro_custo_id,
     sum(k.valor_recebido) filter (where k.origem = 'direta') as recebido_direto,
@@ -236,9 +344,9 @@ with referencia as (
   group by k.tenant_id, k.centro_custo_id
 ), contrato as (
   select c.tenant_id, c.centro_custo_id,
-    sum(c.valor) filter (where c.situacao = '1') as vgv_contratado_ativo,
-    count(*) filter (where c.situacao = '1') as contratos_ativos,
-    count(*) filter (where c.situacao = '3') as contratos_distratados
+    sum(c.valor) filter (where c.situacao_normalizada = 'ativo') as vgv_contratado_ativo,
+    count(*) filter (where c.situacao_normalizada = 'ativo') as contratos_ativos,
+    count(*) filter (where c.situacao_normalizada = 'distratado') as contratos_distratados
   from staging.contrato_venda c
   group by c.tenant_id, c.centro_custo_id
 )
@@ -317,7 +425,7 @@ group by m.tenant_id, m.competencia, m.origem;
 -- Custo por centro e categoria. Remanescente e estimativa ficam só no resumo, porque por categoria
 -- contariam o mesmo real duas vezes quando o orçamento não usa as categorias dos títulos.
 create view marts.custo_obra_categoria with (security_invoker = true) as
-with referencia as (
+with referencia as materialized (
   select app.data_referencia() as ref
 ), movimento as (
   select a.tenant_id, a.centro_custo_id, a.categoria_codigo, 'titulo' as fonte,
@@ -455,7 +563,7 @@ left join classificado cl on cl.tenant_id = a.tenant_id and cl.grupo = a.grupo;
 
 -- Dois eixos de tempo em colunas separadas: competência do título e data do dinheiro.
 create view marts.despesa_mensal with (security_invoker = true) as
-with referencia as (
+with referencia as materialized (
   select app.data_referencia() as ref
 ), movimento as (
   select a.tenant_id, a.centro_custo_id, date_trunc('month', a.data_competencia)::date as competencia,
@@ -522,50 +630,98 @@ select pc.tenant_id, pc.tipo_origem, pc.conta_origem,
 from por_conta pc
 where pc.pendente;
 
+-- Critério em vigor por obra com os parâmetros de reconhecimento: a linha da obra vence a do tenant.
+-- Percentual de conclusão sem validador vale só quando o tenant dispensa a validação por usuário.
+create view app.criterio_reconhecimento_efetivo with (security_invoker = true) as
+with criterio as (
+  select cc.tenant_id, cc.id as centro_custo_id,
+         case when co.id is not null then co.metodo else ct.metodo end as metodo_gravado,
+         case when co.id is not null then co.validado_por else ct.validado_por end as validado_por,
+         po.reconhecimento__exigir_validacao_usuario as exigir_validador,
+         po.reconhecimento__base_fracao_vendida as base_fracao_vendida,
+         po.reconhecimento__incluir_terreno as incluir_terreno,
+         po.reconhecimento__cobertura_minima as cobertura_minima
+  from app.centro_custo cc
+  join (select p.centro_custo_id, p.reconhecimento__exigir_validacao_usuario, p.reconhecimento__base_fracao_vendida,
+               p.reconhecimento__incluir_terreno, p.reconhecimento__cobertura_minima
+        from app.parametros_obra p offset 0) po on po.centro_custo_id = cc.id
+  left join app.criterio_reconhecimento co on co.tenant_id = cc.tenant_id and co.centro_custo_id = cc.id
+  left join app.criterio_reconhecimento ct on ct.tenant_id = cc.tenant_id and ct.centro_custo_id is null
+  where cc.tipo = 'obra'
+)
+select c.tenant_id, c.centro_custo_id,
+  case when c.metodo_gravado = 'percentual_conclusao' and (c.validado_por is not null or not c.exigir_validador)
+       then 'percentual_conclusao' else 'nao_definido' end as metodo,
+  case when c.metodo_gravado is distinct from 'percentual_conclusao' then 'criterio_nao_validado'
+       when c.validado_por is null and c.exigir_validador then 'criterio_sem_validador' end as motivo,
+  c.base_fracao_vendida, c.incluir_terreno, c.cobertura_minima
+from criterio c;
+grant select on app.criterio_reconhecimento_efetivo to authenticated;
+
 -- Percentual de conclusão por obra e mês. Fatos (custo incorrido, VGV ativo, unidades vendidas) saem
 -- sempre; receita e custo reconhecidos só com o critério validado e sem nenhum motivo de bloqueio.
+-- Parâmetros da obra: base da fração vendida (unidades, área privativa ou valor de tabela), terreno no
+-- percentual de conclusão e cobertura mínima do custo classificado. Sem terreno, o percentual e a receita
+-- saem sem ele, mas o custo reconhecido continua com o terreno das unidades vendidas: o terreno sai do
+-- estoque junto com a unidade.
 -- O(M x C) na junção do calendário com os contratos (M meses, C contratos da obra): cerca de 30 mil
 -- linhas por tenant no volume do piloto.
 create view marts.reconhecimento_obra_mensal with (security_invoker = true) as
-with referencia as (
+with referencia as materialized (
   select date_trunc('month', app.data_referencia())::date as mes_ref
 ), obra as (
-  select cc.tenant_id, cc.id as centro_custo_id
-  from app.centro_custo cc
-  where cc.tipo = 'obra'
-), criterio as (
-  select o.tenant_id, o.centro_custo_id, coalesce(co.metodo, ct.metodo, 'nao_definido') as metodo
-  from obra o
-  left join app.criterio_reconhecimento co on co.tenant_id = o.tenant_id and co.centro_custo_id = o.centro_custo_id
-  left join app.criterio_reconhecimento ct on ct.tenant_id = o.tenant_id and ct.centro_custo_id is null
+  select * from app.criterio_reconhecimento_efetivo
 ), apropriacao as (
   select a.tenant_id, a.centro_custo_id, date_trunc('month', a.data_competencia)::date as competencia,
-         a.categoria_codigo, a.grupo_dre, a.valor_original, a.data_competencia
+         a.categoria_codigo, a.grupo_dre, a.valor_original, a.data_competencia,
+         a.grupo_dre = 'custo_imovel' and (o.incluir_terreno or a.categoria_codigo <> 'terreno') as custo_percentual
   from marts.apropriacao_classificada a
   join obra o on o.tenant_id = a.tenant_id and o.centro_custo_id = a.centro_custo_id
 ), custo_obra as (
   select ap.tenant_id, ap.centro_custo_id,
-    sum(ap.valor_original) filter (where ap.grupo_dre = 'custo_imovel') as custo_imovel_total,
+    sum(ap.valor_original) filter (where ap.custo_percentual) as custo_percentual_total,
     min(ap.competencia) as primeiro_mes,
     min(ap.competencia) filter (where ap.categoria_codigo is null) as primeiro_mes_sem_categoria,
     bool_or(ap.data_competencia is null) as tem_sem_competencia
   from apropriacao ap
   group by ap.tenant_id, ap.centro_custo_id
 ), custo_mes as (
-  select ap.tenant_id, ap.centro_custo_id, ap.competencia, sum(ap.valor_original) as custo_imovel_mes
+  select ap.tenant_id, ap.centro_custo_id, ap.competencia,
+    sum(ap.valor_original) filter (where ap.grupo_dre = 'custo_imovel') as custo_imovel_mes,
+    sum(ap.valor_original) filter (where ap.custo_percentual) as custo_percentual_mes,
+    sum(ap.valor_original) filter (where ap.categoria_codigo is not null) as com_categoria_mes,
+    sum(ap.valor_original) as lancado_mes
   from apropriacao ap
-  where ap.grupo_dre = 'custo_imovel' and ap.competencia is not null
+  where ap.competencia is not null
   group by ap.tenant_id, ap.centro_custo_id, ap.competencia
 ), orcamento as (
-  select io.tenant_id, io.centro_custo_id, sum(io.valor_total) as orcamento_vigente
+  select io.tenant_id, io.centro_custo_id,
+    sum(io.valor_total) as orcamento_vigente,
+    sum(io.valor_total) filter (where o.incluir_terreno or m.categoria_codigo is distinct from 'terreno') as orcamento_percentual
   from staging.item_orcamento io
+  join obra o on o.tenant_id = io.tenant_id and o.centro_custo_id = io.centro_custo_id
+  left join app.mapa_conta_origem m
+    on m.tenant_id = io.tenant_id and m.tipo_origem = 'orcamento' and m.conta_origem = io.codigo
   group by io.tenant_id, io.centro_custo_id
-), unidades as (
-  select u.tenant_id, u.centro_custo_id, count(*) as unidades_obra
+), valor_tabela as (
+  -- preço de hoje de cada unidade, só nas obras que medem a fração vendida pelo valor de tabela
+  select mu.tenant_id, mu.unidade_id, coalesce(mu.valor_tabela, mu.valor_sugerido) as valor
+  from marts.mapa_unidades mu
+  where mu.centro_custo_id in (select o.centro_custo_id from obra o where o.base_fracao_vendida = 'valor_tabela')
+), peso_unidade as (
+  select u.tenant_id, u.centro_custo_id, u.id_origem,
+         case o.base_fracao_vendida when 'area_privativa' then u.area_privativa
+                                    when 'valor_tabela' then vt.valor end as peso
   from staging.unidade u
-  group by u.tenant_id, u.centro_custo_id
+  join obra o on o.tenant_id = u.tenant_id and o.centro_custo_id = u.centro_custo_id
+  left join valor_tabela vt on vt.tenant_id = u.tenant_id and vt.unidade_id = u.id_origem
+), unidades as (
+  select pu.tenant_id, pu.centro_custo_id, count(*) as unidades_obra, sum(pu.peso) as peso_obra,
+         bool_and(coalesce(pu.peso > 0, false)) as peso_completo
+  from peso_unidade pu
+  group by pu.tenant_id, pu.centro_custo_id
 ), contrato as (
-  select c.tenant_id, c.centro_custo_id, c.id_origem, c.valor, c.situacao, c.data_venda, c.data_distrato
+  select c.tenant_id, c.centro_custo_id, c.id_origem, c.valor, c.situacao_normalizada, c.data_venda, c.data_distrato
   from staging.contrato_venda c
   join obra o on o.tenant_id = c.tenant_id and o.centro_custo_id = c.centro_custo_id
   where c.data_venda is not null
@@ -589,30 +745,43 @@ with referencia as (
   from calendario k
   join contrato c
     on c.tenant_id = k.tenant_id and c.centro_custo_id = k.centro_custo_id and c.data_venda <= k.fim_mes
-   and (c.situacao = '1' or (c.situacao = '3' and c.data_distrato > k.fim_mes))
+   and (c.situacao_normalizada = 'ativo' or (c.situacao_normalizada = 'distratado' and c.data_distrato > k.fim_mes))
 ), vgv as (
   select ca.tenant_id, ca.centro_custo_id, ca.competencia, sum(ca.valor) as vgv_ativo_fim_mes
   from contrato_ativo ca
   group by ca.tenant_id, ca.centro_custo_id, ca.competencia
 ), vendidas as (
-  select ca.tenant_id, ca.centro_custo_id, ca.competencia, count(distinct cu.unidade_id_origem) as unidades_vendidas
-  from contrato_ativo ca
-  join staging.contrato_unidade cu on cu.tenant_id = ca.tenant_id and cu.contrato_id_origem = ca.id_origem
-  group by ca.tenant_id, ca.centro_custo_id, ca.competencia
+  select x.tenant_id, x.centro_custo_id, x.competencia, count(x.unidade_id_origem) as unidades_vendidas,
+         sum(pu.peso) as peso_vendido
+  from (
+    select distinct ca.tenant_id, ca.centro_custo_id, ca.competencia, cu.unidade_id_origem
+    from contrato_ativo ca
+    join staging.contrato_unidade cu on cu.tenant_id = ca.tenant_id and cu.contrato_id_origem = ca.id_origem
+  ) x
+  left join peso_unidade pu on pu.tenant_id = x.tenant_id and pu.id_origem = x.unidade_id_origem
+  group by x.tenant_id, x.centro_custo_id, x.competencia
 ), base as (
-  select k.tenant_id, k.centro_custo_id, k.competencia, cr.metodo,
-    sum(coalesce(cm.custo_imovel_mes, 0))
-      over (partition by k.tenant_id, k.centro_custo_id order by k.competencia) as custo_incorrido_acumulado,
-    case when o.orcamento_vigente is not null
-         then greatest(o.orcamento_vigente, coalesce(co.custo_imovel_total, 0)) end as custo_total_estimado,
-    o.orcamento_vigente,
+  select k.tenant_id, k.centro_custo_id, k.competencia, ob.metodo, ob.motivo as motivo_criterio,
+    ob.base_fracao_vendida, ob.cobertura_minima,
+    sum(coalesce(cm.custo_percentual_mes, 0)) over w as custo_incorrido_acumulado,
+    sum(coalesce(cm.custo_imovel_mes, 0)) over w as custo_imovel_acumulado,
+    sum(coalesce(cm.com_categoria_mes, 0)) over w as com_categoria_acumulado,
+    sum(coalesce(cm.lancado_mes, 0)) over w as lancado_acumulado,
+    case when o.orcamento_percentual is not null
+         then greatest(o.orcamento_percentual, coalesce(co.custo_percentual_total, 0)) end as custo_total_estimado,
+    o.orcamento_percentual,
     coalesce(v.vgv_ativo_fim_mes, 0) as vgv_ativo_fim_mes,
     coalesce(u.unidades_obra, 0) as unidades_obra,
     coalesce(vd.unidades_vendidas, 0) as unidades_vendidas_fim_mes,
+    -- fração vendida pela base da obra; em unidades, contagem sobre contagem como antes do parâmetro
+    case when ob.base_fracao_vendida = 'unidades' then coalesce(vd.unidades_vendidas, 0)
+         else coalesce(vd.peso_vendido, 0) end as vendido_base,
+    case when ob.base_fracao_vendida = 'unidades' then u.unidades_obra else u.peso_obra end as total_base,
+    ob.base_fracao_vendida = 'unidades' or coalesce(u.peso_completo, false) as base_completa,
     co.primeiro_mes_sem_categoria <= k.competencia as tem_sem_categoria,
     coalesce(co.tem_sem_competencia, false) as tem_sem_competencia
   from calendario k
-  join criterio cr on cr.tenant_id = k.tenant_id and cr.centro_custo_id = k.centro_custo_id
+  join obra ob on ob.tenant_id = k.tenant_id and ob.centro_custo_id = k.centro_custo_id
   left join custo_obra co on co.tenant_id = k.tenant_id and co.centro_custo_id = k.centro_custo_id
   left join custo_mes cm on cm.tenant_id = k.tenant_id and cm.centro_custo_id = k.centro_custo_id
                         and cm.competencia = k.competencia
@@ -621,13 +790,20 @@ with referencia as (
   left join vgv v on v.tenant_id = k.tenant_id and v.centro_custo_id = k.centro_custo_id and v.competencia = k.competencia
   left join vendidas vd on vd.tenant_id = k.tenant_id and vd.centro_custo_id = k.centro_custo_id
                        and vd.competencia = k.competencia
+  window w as (partition by k.tenant_id, k.centro_custo_id order by k.competencia)
 ), motivo as (
+  -- com cobertura mínima 1, qualquer lançamento sem categoria bloqueia, como antes do parâmetro
   select b.*,
+    (b.com_categoria_acumulado / nullif(b.lancado_acumulado, 0)) as cobertura_custo,
     case
-      when b.metodo <> 'percentual_conclusao' then 'criterio_nao_validado'
-      when b.orcamento_vigente is null or b.custo_total_estimado <= 0 then 'orcamento_ausente'
+      when b.metodo <> 'percentual_conclusao' then b.motivo_criterio
+      when b.orcamento_percentual is null or b.custo_total_estimado <= 0 then 'orcamento_ausente'
       when b.unidades_obra = 0 then 'unidades_ausentes'
-      when b.tem_sem_categoria then 'custo_sem_categoria'
+      when not b.base_completa and b.base_fracao_vendida = 'area_privativa' then 'area_privativa_ausente'
+      when not b.base_completa then 'valor_tabela_ausente'
+      when b.tem_sem_categoria
+           and (b.cobertura_minima >= 1 or b.com_categoria_acumulado / nullif(b.lancado_acumulado, 0) < b.cobertura_minima)
+        then 'custo_sem_categoria'
       when b.tem_sem_competencia then 'custo_sem_competencia'
     end as motivo
   from base b
@@ -637,8 +813,8 @@ with referencia as (
     case when mo.custo_total_estimado > 0
          then round(least(mo.vgv_ativo_fim_mes * mo.custo_incorrido_acumulado / mo.custo_total_estimado,
                           mo.vgv_ativo_fim_mes), 2) end as receita_acumulada,
-    case when mo.unidades_obra > 0
-         then round(mo.custo_incorrido_acumulado * mo.unidades_vendidas_fim_mes / mo.unidades_obra, 2) end
+    case when mo.total_base > 0
+         then round(mo.custo_imovel_acumulado * mo.vendido_base / mo.total_base, 2) end
       as custo_acumulado
   from motivo mo
 ), mensal as (
@@ -657,17 +833,19 @@ select m.tenant_id, m.centro_custo_id, m.competencia, m.metodo,
   m.vgv_ativo_fim_mes::numeric(18,2) as vgv_ativo_fim_mes,
   m.unidades_obra::integer as unidades_obra,
   m.unidades_vendidas_fim_mes::integer as unidades_vendidas_fim_mes,
-  case when m.motivo is null then m.unidades_vendidas_fim_mes::numeric / m.unidades_obra end::numeric(9,6) as fracao_vendida,
+  case when m.motivo is null then m.vendido_base::numeric / m.total_base end::numeric(9,6) as fracao_vendida,
   case when m.motivo is null then m.receita_acumulada end::numeric(18,2) as receita_reconhecida_acumulada,
   case when m.motivo is null then m.custo_acumulado end::numeric(18,2) as custo_reconhecido_acumulado,
   case when m.motivo is null then m.receita_mes end::numeric(18,2) as receita_reconhecida_mes,
-  case when m.motivo is null then m.custo_mes end::numeric(18,2) as custo_reconhecido_mes
+  case when m.motivo is null then m.custo_mes end::numeric(18,2) as custo_reconhecido_mes,
+  m.base_fracao_vendida,
+  m.cobertura_custo::numeric(9,6) as cobertura_custo
 from mensal m;
 
 -- DRE em formato longo por centro e mês. Custo de obra fica na linha informativa 100 e nunca entra
 -- nas somas: vai para o estoque e sai pelo custo reconhecido. Não existe linha de lucro líquido.
 create view marts.dre_mensal with (security_invoker = true) as
-with referencia as (
+with referencia as materialized (
   select date_trunc('month', app.data_referencia())::date as mes_ref
 ), titulo as (
   select a.tenant_id, a.centro_custo_id, date_trunc('month', a.data_competencia)::date as competencia,
@@ -696,11 +874,8 @@ with referencia as (
 ), reconhecimento as (
   select * from marts.reconhecimento_obra_mensal
 ), criterio as (
-  select cc.tenant_id, cc.id as centro_custo_id, coalesce(co.metodo, ct.metodo, 'nao_definido') as metodo
-  from app.centro_custo cc
-  left join app.criterio_reconhecimento co on co.tenant_id = cc.tenant_id and co.centro_custo_id = cc.id
-  left join app.criterio_reconhecimento ct on ct.tenant_id = cc.tenant_id and ct.centro_custo_id is null
-  where cc.tipo = 'obra'
+  select ce.tenant_id, ce.centro_custo_id, ce.metodo, ce.motivo
+  from app.criterio_reconhecimento_efetivo ce
 ), evento as (
   select t.tenant_id, t.centro_custo_id, t.competencia from titulo t
   union all
@@ -726,7 +901,7 @@ with referencia as (
     case when cc.tipo = 'empresa' then null
          when rc.centro_custo_id is not null then rc.motivo
          when cr.metodo = 'percentual_conclusao' then null
-         else 'criterio_nao_validado' end as reconhecido_motivo,
+         else coalesce(cr.motivo, 'criterio_nao_validado') end as reconhecido_motivo,
     case when cc.tipo = 'empresa' then 0
          when rc.centro_custo_id is not null then rc.receita_reconhecida_mes
          when cr.metodo = 'percentual_conclusao' then 0 end as receita,

@@ -6,7 +6,9 @@ import { SeletorCenario } from "@/componentes/SeletorCenario";
 import { cenariosAtraso, listarFluxoCenario, listarFluxoMensal, type MesesAtraso } from "@/lib/consultas/fluxo";
 import { buscarPosicaoObra } from "@/lib/consultas/posicao";
 import { listarResumoProjecao } from "@/lib/consultas/fluxo";
-import { mensagens } from "@/lib/mensagens";
+import { janelaDoHorizonte } from "@/lib/configuracao";
+import { buscarPreferenciasTenant } from "@/lib/consultas/configuracao";
+import { mensagens, textoSemMovimentoObra } from "@/lib/mensagens";
 import { mesCorrente, montarSerieFluxo } from "@/lib/serie-fluxo";
 
 export const metadata: Metadata = { title: "Obra" };
@@ -62,7 +64,7 @@ export default async function PaginaObra({ params, searchParams }: PageProps<"/o
   const mesesAtraso = lerCenario((await searchParams).cenario);
   if (!formatoUuid.test(id)) return <ObraNaoEncontrada />;
 
-  const obra = await carregarObra(id, mesesAtraso);
+  const [obra, preferencias] = await Promise.all([carregarObra(id, mesesAtraso), buscarPreferenciasTenant()]);
   if (obra === null) {
     return (
       <>
@@ -77,7 +79,9 @@ export default async function PaginaObra({ params, searchParams }: PageProps<"/o
 
   const { posicao, aporte } = obra;
   const mesAtual = mesCorrente();
-  const serie = montarSerieFluxo(obra.fluxoMensal, obra.fluxoCenario, mesAtual);
+  // exibicao.meses_grafico: um terço para trás, o resto para frente; 36 meses dão os 12 e 24 de antes.
+  const janela = janelaDoHorizonte(preferencias.mesesGrafico);
+  const serie = montarSerieFluxo(obra.fluxoMensal, obra.fluxoCenario, mesAtual, janela);
 
   return (
     <>
@@ -103,11 +107,13 @@ export default async function PaginaObra({ params, searchParams }: PageProps<"/o
           <h2 id="titulo-fluxo" className="font-serif text-2xl font-semibold">
             Fluxo de caixa por mês
           </h2>
-          <p className="text-sm text-suave">12 meses para trás e 24 para frente, a partir do mês atual.</p>
+          <p className="text-sm text-suave">
+            {janela.antes} meses para trás e {janela.depois} para frente, a partir do mês atual.
+          </p>
         </div>
         <SeletorCenario mesesAtraso={mesesAtraso} />
         {serie.length === 0 ? (
-          <p>{mensagens.obra.semMovimento}</p>
+          <p>{textoSemMovimentoObra(preferencias.mesesGrafico)}</p>
         ) : (
           <GraficoFluxo serie={serie} comAtraso={mesesAtraso > 0} mesAtual={mesAtual} />
         )}

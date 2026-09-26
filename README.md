@@ -61,8 +61,9 @@ O diretor vê as três obras; a gerente vê só o Residencial Aurora.
 | `/fluxo/<obra>/simular` | Simulação de novas vendas, desconto, forma de pagamento, atraso de liberação e cronograma de gastos, sem mexer no realizado |
 | `/planejamento` | Visão gerencial mensal, metas e versões, comparativo entre projeções, desvios e pendências depois da entrega |
 | `/planejamento/financiamento` | Etapas de financiamento por contrato, crédito à produção, medições e liberações, com complemento manual auditado |
+| `/configuracoes` | Regras e preferências de cada construtora e de cada obra (reconhecimento, competência, caixa, financiamento, metas, simulação, exibição), códigos do ERP, subcategorias e rótulos, com histórico |
 
-Definições, fórmulas e premissas estão em `docs/financeiro/contrato_dados.md`; os casos com resultado conhecido, em `docs/financeiro/casos_teste.md`; a revisão independente, em `docs/financeiro/revisao.md`.
+Definições, fórmulas e premissas estão em `docs/financeiro/contrato_dados.md`; o que cada cliente pode configurar, em `docs/financeiro/configuracao.md`; os casos com resultado conhecido, em `docs/financeiro/casos_teste.md`; a revisão independente, em `docs/financeiro/revisao.md`.
 
 ## Testes
 

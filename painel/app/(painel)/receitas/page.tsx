@@ -43,6 +43,7 @@ import {
   proximoMes,
   somarMeses,
 } from "@/lib/periodo";
+import { buscarPreferenciasTenant } from "@/lib/consultas/configuracao";
 
 export const metadata: Metadata = { title: "Receitas" };
 
@@ -164,11 +165,12 @@ export default async function PaginaReceitas({ searchParams }: PageProps<"/recei
   await exigirIdentidade();
   const filtrosUrl = await searchParams;
   const centrosPedido = tentarConsulta(listarCentrosCusto());
+  const preferenciasPedido = buscarPreferenciasTenant();
   const referencia = await carregarReferencia();
   const centros = await centrosPedido;
 
   const dataReferencia = referencia.dataReferencia;
-  const periodo = lerPeriodo(filtrosUrl, dataReferencia);
+  const periodo = lerPeriodo(filtrosUrl, dataReferencia, (await preferenciasPedido).periodoPadrao);
   const centroPedido = lerIdCentro(filtrosUrl.obra);
   const centro = centros?.find((item) => item.id === centroPedido && item.tipo === "obra") ?? null;
   const centroNaoEncontrado = centroPedido !== null && centros !== null && centro === null;
