@@ -12,9 +12,15 @@ export function idObraValido(id: string): boolean {
   return formatoUuid.test(id);
 }
 
+// O centro "Despesas sem obra" (tipo empresa) fica fora das listas e páginas de obra; aparece só no consolidado.
 export async function listarObras(): Promise<ObraResumo[]> {
   const supabase = await criarClienteServidor();
-  const { data, error } = await supabase.schema("app").from("centro_custo").select("id, nome").order("nome");
+  const { data, error } = await supabase
+    .schema("app")
+    .from("centro_custo")
+    .select("id, nome")
+    .eq("tipo", "obra")
+    .order("nome");
   if (error) throw new ErroConsulta(error.code);
   return data as ObraResumo[];
 }
@@ -26,6 +32,7 @@ export async function buscarObra(centroCustoId: string): Promise<ObraResumo | nu
     .from("centro_custo")
     .select("id, nome")
     .eq("id", centroCustoId)
+    .eq("tipo", "obra")
     .maybeSingle<ObraResumo>();
   if (error) throw new ErroConsulta(error.code);
   return data;

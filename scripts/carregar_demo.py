@@ -15,6 +15,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 PASTA_DADOS = Path(__file__).resolve().parent.parent / "dados"
+# mapeamento das contas sintéticas para as categorias do DRE; roda depois da carga e não desfaz reclassificação manual
+MAPA_CONTAS_DEMO = Path(__file__).resolve().parent.parent / "supabase" / "demo" / "mapa_contas_demo.sql"
+TABELAS_STAGING = ["unidade", "contrato_venda", "contrato_unidade", "parcela_receber", "recebimento", "titulo_pagar",
+                   "titulo_pagar_apropriacao", "pagamento", "item_orcamento"]
 ARQUIVOS = {
     "cost-centers": "cost-centers.json",
     "units": "units.json",
@@ -47,8 +51,17 @@ def main():
                 print(f"{endpoint}: {len(registros)} registros")
             cur.execute("select staging.recarregar(%s)", (tenant,))
             cur.execute("select staging.recarregar_precos(%s)", (tenant,))
+            cur.execute(MAPA_CONTAS_DEMO.read_text(encoding="utf-8"))
+            # uma consulta para todas as contagens; rodar a carga duas vezes deve repetir os mesmos números
+            cur.execute(
+                " union all ".join(
+                    f"select '{tabela}', count(*) from staging.{tabela} where tenant_id = %s" for tabela in TABELAS_STAGING
+                ),
+                [tenant] * len(TABELAS_STAGING),
+            )
+            contagens = cur.fetchall()
         conexao.commit()
-    print("staging recarregado")
+    print("staging recarregado: " + ", ".join(f"{tabela} {total}" for tabela, total in contagens))
 
 
 if __name__ == "__main__":

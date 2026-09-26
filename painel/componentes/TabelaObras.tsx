@@ -7,12 +7,24 @@ import type { PosicaoObra } from "@/lib/consultas/posicao";
 import type { ChaveExplicacao } from "@/lib/explicacoes";
 import { formatarReal } from "@/lib/formatar";
 
-type ColunaValor = Extract<keyof PosicaoObra, ChaveExplicacao>;
+type ColunaValor = Extract<keyof PosicaoObra, ChaveExplicacao> | "aporte_projetado";
 type ColunaOrdem = ColunaValor | "obra";
 type Direcao = "asc" | "desc";
+type Coluna = { chave: ColunaValor; rotulo: string; explicacao: ChaveExplicacao };
 
-// Todas as colunas de valor da view, na ordem: entra, sai, resultado.
-const colunas: { chave: ColunaValor; rotulo: string }[] = [
+// Maior aporte da projeção por obra (marts.resumo_projecao_obra), já juntado pela página. Objeto simples
+// porque atravessa a fronteira do componente de cliente.
+export type AportesPorObra = Record<string, { valor: number; parcial: boolean }>;
+
+const colunaAporte: Coluna = {
+  chave: "aporte_projetado",
+  rotulo: "Maior aporte necessário",
+  explicacao: "exposicao_maxima_projetada",
+};
+
+// Todas as colunas de valor, na ordem: entra, sai, resultado. O aporte vem da projeção, a mesma fonte da
+// tela de fluxo e do assistente.
+const colunasPosicao: { chave: Exclude<ColunaValor, "aporte_projetado">; rotulo: string }[] = [
   { chave: "recebido_direto", rotulo: "Recebido do comprador" },
   { chave: "recebido_repasse", rotulo: "Recebido do banco" },
   { chave: "a_receber_direto", rotulo: "A receber do comprador" },
@@ -25,10 +37,17 @@ const colunas: { chave: ColunaValor; rotulo: string }[] = [
   { chave: "custo_orcado", rotulo: "Custo orçado" },
   { chave: "custo_a_incorrer", rotulo: "Orçamento sem título" },
   { chave: "estouro_orcamento", rotulo: "Estouro do orçamento" },
-  { chave: "caixa_atual", rotulo: "Caixa atual" },
+  { chave: "caixa_atual", rotulo: "Caixa gerado acumulado" },
   { chave: "exposicao_maxima", rotulo: "Exposição máxima" },
   { chave: "resultado_contratado", rotulo: "Resultado contratado" },
   { chave: "resultado_projetado", rotulo: "Resultado projetado" },
+];
+
+const posicaoCaixa = colunasPosicao.findIndex((coluna) => coluna.chave === "caixa_atual");
+const colunas: Coluna[] = [
+  ...colunasPosicao.slice(0, posicaoCaixa + 1).map((coluna) => ({ ...coluna, explicacao: coluna.chave })),
+  colunaAporte,
+  ...colunasPosicao.slice(posicaoCaixa + 1).map((coluna) => ({ ...coluna, explicacao: coluna.chave })),
 ];
 
 const rotulosOrdem: Record<ColunaOrdem, string> = {
@@ -36,28 +55,51 @@ const rotulosOrdem: Record<ColunaOrdem, string> = {
   ...Object.fromEntries(colunas.map((coluna) => [coluna.chave, coluna.rotulo])),
 } as Record<ColunaOrdem, string>;
 
-function ordenar(obras: PosicaoObra[], coluna: ColunaOrdem, direcao: Direcao): PosicaoObra[] {
+function valorColuna(obra: PosicaoObra, coluna: ColunaValor, aportes: AportesPorObra): number | null {
+  if (coluna === "aporte_projetado") return aportes[obra.centro_custo_id]?.valor ?? null;
+  return Number(obra[coluna]);
+}
+
+// Sem valor (projeção não carregada) fica sempre no fim, nos dois sentidos.
+function ordenar(obras: PosicaoObra[], coluna: ColunaOrdem, direcao: Direcao, aportes: AportesPorObra): PosicaoObra[] {
   const sinal = direcao === "asc" ? 1 : -1;
-  return [...obras].sort((a, b) =>
-    coluna === "obra"
-      ? sinal * a.obra.localeCompare(b.obra, "pt-BR")
-      : sinal * (Number(a[coluna]) - Number(b[coluna])),
+  return [...obras].sort((a, b) => {
+    if (coluna === "obra") return sinal * a.obra.localeCompare(b.obra, "pt-BR");
+    const valorA = valorColuna(a, coluna, aportes);
+    const valorB = valorColuna(b, coluna, aportes);
+    if (valorA === null || valorB === null) return valorA === null ? (valorB === null ? 0 : 1) : -1;
+    return sinal * (valorA - valorB);
+  });
+}
+
+function Celula({ obra, coluna, aportes }: { obra: PosicaoObra; coluna: ColunaValor; aportes: AportesPorObra }) {
+  const valor = valorColuna(obra, coluna, aportes);
+  if (valor === null) return <span className="text-suave">Não carregado</span>;
+  const parcial = coluna === "aporte_projetado" && aportes[obra.centro_custo_id]?.parcial;
+  return (
+    <>
+      {formatarReal(valor)}
+      {parcial && <span className="block text-xs text-atencao">parcial</span>}
+    </>
   );
 }
 
 function LinkObra({ obra }: { obra: PosicaoObra }) {
   return (
-    <Link href={`/obras/${obra.centro_custo_id}`} className="font-semibold underline underline-offset-4 hover:text-menu">
+    <Link
+      href={`/obras/${obra.centro_custo_id}`}
+      className="font-semibold underline underline-offset-4 hover:text-menu"
+    >
       {obra.obra}
     </Link>
   );
 }
 
 // Tabela larga em tela grande; em tela estreita cada obra vira um cartão com as mesmas colunas.
-export function TabelaObras({ obras }: { obras: PosicaoObra[] }) {
+export function TabelaObras({ obras, aportes }: { obras: PosicaoObra[]; aportes: AportesPorObra }) {
   const [coluna, setColuna] = useState<ColunaOrdem>("obra");
   const [direcao, setDirecao] = useState<Direcao>("asc");
-  const ordenadas = ordenar(obras, coluna, direcao);
+  const ordenadas = ordenar(obras, coluna, direcao, aportes);
 
   function alternar(nova: ColunaOrdem) {
     if (nova === coluna) {
@@ -109,11 +151,15 @@ export function TabelaObras({ obras }: { obras: PosicaoObra[] }) {
                   className="sticky top-0 border-b border-borda bg-superficie px-4 py-3 text-right align-bottom font-medium"
                 >
                   <span className="inline-flex items-center justify-end gap-1.5">
-                    <button type="button" onClick={() => alternar(item.chave)} className="cursor-pointer text-right font-medium">
+                    <button
+                      type="button"
+                      onClick={() => alternar(item.chave)}
+                      className="cursor-pointer text-right font-medium"
+                    >
                       {item.rotulo}
                       {seta(item.chave)}
                     </button>
-                    <ExplicacaoIndicador chave={item.chave} rotulo={item.rotulo} alinhamento="direita" />
+                    <ExplicacaoIndicador chave={item.explicacao} rotulo={item.rotulo} alinhamento="direita" />
                   </span>
                 </th>
               ))}
@@ -127,7 +173,7 @@ export function TabelaObras({ obras }: { obras: PosicaoObra[] }) {
                 </th>
                 {colunas.map((item) => (
                   <td key={item.chave} className="px-4 py-3 text-right whitespace-nowrap">
-                    {formatarReal(Number(obra[item.chave]))}
+                    <Celula obra={obra} coluna={item.chave} aportes={aportes} />
                   </td>
                 ))}
               </tr>
@@ -171,7 +217,9 @@ export function TabelaObras({ obras }: { obras: PosicaoObra[] }) {
                 {colunas.map((item) => (
                   <div key={item.chave} className="flex flex-wrap justify-between gap-x-3">
                     <dt className="text-suave">{item.rotulo}</dt>
-                    <dd className="font-medium tabular-nums">{formatarReal(Number(obra[item.chave]))}</dd>
+                    <dd className="text-right font-medium tabular-nums">
+                      <Celula obra={obra} coluna={item.chave} aportes={aportes} />
+                    </dd>
                   </div>
                 ))}
               </dl>

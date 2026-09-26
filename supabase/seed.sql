@@ -11,6 +11,12 @@ insert into app.centro_custo (tenant_id, id_origem, nome, empresa_id) values
   ('11111111-1111-1111-1111-111111111111', 103, 'Torre Comercial Sul', 1)
 on conflict do nothing;
 
+-- Centro das despesas sem obra (migration 0007). A migration cria para os tenants que já existem;
+-- aqui cobre o tenant da demo quando o seed roda depois dela.
+insert into app.centro_custo (tenant_id, id_origem, nome, tipo)
+values ('11111111-1111-1111-1111-111111111111', null, 'Despesas sem obra', 'empresa')
+on conflict (tenant_id) where tipo = 'empresa' do nothing;
+
 -- Substituir pelos ids reais de auth.users
 -- insert into app.usuario_tenant values ('<uuid diretor>', '11111111-1111-1111-1111-111111111111', 'diretor');
 -- insert into app.usuario_tenant values ('<uuid gerente>', '11111111-1111-1111-1111-111111111111', 'gerente_obra');

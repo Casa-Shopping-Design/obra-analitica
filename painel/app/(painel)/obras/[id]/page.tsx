@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CartaoIndicador, IndicadoresObra } from "@/componentes/CartaoIndicador";
+import { CartaoIndicador, IndicadoresObra, type AporteProjetado } from "@/componentes/CartaoIndicador";
 import { GraficoFluxo } from "@/componentes/GraficoFluxo";
 import { SeletorCenario } from "@/componentes/SeletorCenario";
 import { cenariosAtraso, listarFluxoCenario, listarFluxoMensal, type MesesAtraso } from "@/lib/consultas/fluxo";
 import { buscarPosicaoObra } from "@/lib/consultas/posicao";
+import { listarResumoProjecao } from "@/lib/consultas/fluxo";
 import { mensagens } from "@/lib/mensagens";
 import { mesCorrente, montarSerieFluxo } from "@/lib/serie-fluxo";
 
@@ -17,15 +18,27 @@ function lerCenario(valor: string | string[] | undefined): MesesAtraso {
   return cenariosAtraso.find((opcao) => opcao === meses) ?? 0;
 }
 
-// Três consultas no máximo, em paralelo: posição da obra, fluxo mensal e, só com atraso, o cenário.
+// Aporte da projeção, a mesma fonte da visão geral, da tela de fluxo e do assistente. Se a projeção
+// falhar, o cartão mostra "não carregado" e o resto da tela continua.
+async function buscarAporte(centroCustoId: string): Promise<AporteProjetado> {
+  try {
+    const [linha] = await listarResumoProjecao(centroCustoId);
+    return linha ? { valor: linha.exposicao_maxima_projetada, parcial: linha.exposicao_parcial } : null;
+  } catch {
+    return null;
+  }
+}
+
+// Quatro consultas no máximo, em paralelo: posição, aporte projetado, fluxo mensal e, só com atraso, o cenário.
 async function carregarObra(centroCustoId: string, mesesAtraso: MesesAtraso) {
   try {
-    const [posicao, fluxoMensal, fluxoCenario] = await Promise.all([
+    const [posicao, aporte, fluxoMensal, fluxoCenario] = await Promise.all([
       buscarPosicaoObra(centroCustoId),
+      buscarAporte(centroCustoId),
       listarFluxoMensal(centroCustoId),
       mesesAtraso > 0 ? listarFluxoCenario(centroCustoId, mesesAtraso) : Promise.resolve(null),
     ]);
-    return { posicao, fluxoMensal, fluxoCenario };
+    return { posicao, aporte, fluxoMensal, fluxoCenario };
   } catch {
     return null;
   }
@@ -62,7 +75,7 @@ export default async function PaginaObra({ params, searchParams }: PageProps<"/o
   }
   if (!obra.posicao) return <ObraNaoEncontrada />;
 
-  const { posicao } = obra;
+  const { posicao, aporte } = obra;
   const mesAtual = mesCorrente();
   const serie = montarSerieFluxo(obra.fluxoMensal, obra.fluxoCenario, mesAtual);
 
@@ -82,7 +95,7 @@ export default async function PaginaObra({ params, searchParams }: PageProps<"/o
       </div>
 
       <section aria-label="Resumo da obra" className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <IndicadoresObra posicao={posicao} emCartao />
+        <IndicadoresObra posicao={posicao} aporte={aporte} emCartao />
       </section>
 
       <section aria-labelledby="titulo-fluxo" className="flex flex-col gap-5 rounded-xl border border-borda bg-superficie p-5">

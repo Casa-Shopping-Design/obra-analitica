@@ -11,6 +11,9 @@ from datetime import date, timedelta
 from pathlib import Path
 
 random.seed(2026)
+# Os casos de eventos financeiros sorteiam numa sequência própria, para não mudar vendas, parcelas e
+# títulos que já existiam na demo.
+SORTEIO_CASOS = random.Random(2027)
 
 PASTA_SAIDA = Path(__file__).resolve().parent.parent / "dados"
 HOJE = date(2026, 9, 22)
@@ -225,6 +228,7 @@ def gerar_parcelas(obra, contratos, unidades_por_id):
                     "defaulterSituation": "S" if inadimplente else "N",
                     "mainUnit": contrato["units"][0]["name"],
                     "paymentTerm": {"id": cond["conditionType"]},
+                    "receiptsCategories": categorias(CONTA_VENDA),
                     "receipts": [] if saldo else [{"paymentDate": vencimento.isoformat(), "amount": round(corrigido, 2)}],
                 })
                 seq += 1
@@ -288,6 +292,151 @@ def gerar_desembolso(obra, itens):
                 "payments": [{"paymentDate": vencimento.isoformat(), "amount": round(valor, 2)}] if pago else [],
             })
             seq += 1
+    return titulos
+
+
+# Códigos sintéticos de conta (docs/financeiro/contrato_dados.md, seção 5.2). 2.99.001 fica sem mapeamento.
+CONTA_VENDA = "1.01.001"
+CONTAS_OBRA = [("2.01.001", 40), ("2.01.002", 25), ("2.01.003", 25), ("2.01.004", 6), ("2.02.001", 2),
+               ("2.03.001", 1), ("2.05.001", 1)]
+CONTA_ADMINISTRATIVA = "2.04.001"
+CONTA_DEVOLUCAO = "2.09.001"
+CONTA_SEM_MAPEAMENTO = "2.99.001"
+
+
+def categorias(conta):
+    return [{"financialCategoryId": conta, "financialCategoryRate": 100}]
+
+
+def dividir_recebimentos(parcelas):
+    """Recebe em duas vezes (40% e 60%) uma em cada dez parcelas mensais já quitadas."""
+    for parcela in parcelas:
+        if parcela["paymentTerm"]["id"] != "PM" or len(parcela["receipts"]) != 1:
+            continue
+        if SORTEIO_CASOS.random() >= 0.10:
+            continue
+        unico = parcela["receipts"][0]
+        vencimento = date.fromisoformat(unico["paymentDate"])
+        primeira = round(unico["amount"] * 0.4, 2)
+        segunda_data = min(vencimento + timedelta(days=SORTEIO_CASOS.randint(20, 45)), HOJE)
+        parcela["receipts"] = [
+            {"paymentDate": vencimento.isoformat(), "amount": primeira},
+            {"paymentDate": segunda_data.isoformat(), "amount": round(unico["amount"] - primeira, 2)},
+        ]
+
+
+def estornar_recebimento(parcelas):
+    """Um recebimento seguido do estorno de mesmo valor: a parcela volta a ficar em aberto."""
+    candidatas = [p for p in parcelas if p["paymentTerm"]["id"] == "PM" and len(p["receipts"]) == 1
+                  and date.fromisoformat(p["dueDate"]) < somar_meses(HOJE, -2)]
+    parcela = SORTEIO_CASOS.choice(candidatas)
+    recebido = parcela["receipts"][0]
+    data_estorno = date.fromisoformat(recebido["paymentDate"]) + timedelta(days=10)
+    parcela["receipts"].append({"paymentDate": data_estorno.isoformat(), "amount": -recebido["amount"]})
+    parcela["balanceAmount"] = recebido["amount"]
+    parcela["correctedBalanceAmount"] = recebido["amount"]
+
+
+def renegociar(obra, parcelas, contratos):
+    """Parcela vencida de contrato ativo zerada sem recebimento e trocada por duas novas no mesmo contrato."""
+    ativos = {c["id"] for c in contratos if c["situation"] == "1"}
+    candidatas = [p for p in parcelas if p["projectId"] == obra["id"] and p["billId"] in ativos
+                  and p["paymentTerm"]["id"] == "PM" and p["balanceAmount"] > 0
+                  and not p["receipts"] and date.fromisoformat(p["dueDate"]) < HOJE]
+    if not candidatas:
+        return []
+    original = SORTEIO_CASOS.choice(candidatas)
+    saldo = original["correctedBalanceAmount"]
+    original["balanceAmount"] = 0
+    original["correctedBalanceAmount"] = 0
+    original["defaulterSituation"] = "N"
+    original["receipts"] = []
+    proximo_id = max(p["installmentId"] for p in parcelas) + 1
+    primeira = round(saldo / 2, 2)
+    novas = []
+    for ordem, valor in enumerate([primeira, round(saldo - primeira, 2)]):
+        novas.append({**original, "installmentId": proximo_id + ordem, "installmentNumber": f"{ordem + 1}/2",
+                      "dueDate": somar_meses(HOJE, ordem + 1).isoformat(), "issueDate": HOJE.isoformat(),
+                      "originalAmount": valor, "balanceAmount": valor, "correctedBalanceAmount": valor,
+                      "receipts": []})
+    return novas
+
+
+def completar_titulos(titulos, ids_obras):
+    """Emissão, conta, pagamento em duas vezes e rateio entre duas obras nos títulos de obra."""
+    for titulo in titulos:
+        vencimento = date.fromisoformat(titulo["dueDate"])
+        titulo["issueDate"] = (vencimento - timedelta(days=SORTEIO_CASOS.randint(5, 40))).isoformat()
+        conta = SORTEIO_CASOS.choices([c for c, _ in CONTAS_OBRA], weights=[p for _, p in CONTAS_OBRA])[0]
+        if SORTEIO_CASOS.random() < 0.01:
+            conta = CONTA_SEM_MAPEAMENTO
+        titulo["paymentsCategories"] = categorias(conta)
+        if titulo["payments"] and SORTEIO_CASOS.random() < 0.05:
+            valor = titulo["originalAmount"]
+            primeira = round(valor / 2, 2)
+            segunda_data = vencimento + timedelta(days=SORTEIO_CASOS.randint(10, 30))
+            titulo["payments"] = [{"paymentDate": vencimento.isoformat(), "amount": primeira}]
+            if segunda_data <= HOJE:
+                titulo["payments"].append({"paymentDate": segunda_data.isoformat(), "amount": round(valor - primeira, 2)})
+            else:
+                titulo["balanceAmount"] = round(valor - primeira, 2)
+        if SORTEIO_CASOS.random() < 0.05:
+            valor = titulo["originalAmount"]
+            obra = titulo["buildingsCosts"][0]["buildingId"]
+            outra = SORTEIO_CASOS.choice([i for i in ids_obras if i != obra])
+            titulo["buildingsCosts"] = [{"buildingId": obra, "amount": round(valor * 0.6, 2)},
+                                        {"buildingId": outra, "amount": round(valor - round(valor * 0.6, 2), 2)}]
+
+
+def pagar_em_parte(titulos):
+    """Um título vencido há pouco com metade paga e metade em aberto."""
+    candidatos = [t for t in titulos if len(t["payments"]) == 1
+                  and somar_meses(HOJE, -2) <= date.fromisoformat(t["dueDate"]) <= HOJE]
+    titulo = SORTEIO_CASOS.choice(candidatos)
+    metade = round(titulo["originalAmount"] / 2, 2)
+    titulo["payments"][0]["amount"] = metade
+    titulo["balanceAmount"] = round(titulo["originalAmount"] - metade, 2)
+
+
+def titulo_empresa(bill_id, vencimento, valor, conta, credor):
+    pago = vencimento <= HOJE
+    return {
+        "companyId": EMPRESA["id"],
+        "creditorName": credor,
+        "billId": bill_id,
+        "dueDate": vencimento.isoformat(),
+        "issueDate": (vencimento - timedelta(days=SORTEIO_CASOS.randint(5, 40))).isoformat(),
+        "originalAmount": valor,
+        "balanceAmount": 0 if pago else valor,
+        "paymentsCategories": categorias(conta),
+        "payments": [{"paymentDate": vencimento.isoformat(), "amount": valor}] if pago else [],
+    }
+
+
+def gerar_titulos_sem_obra(obras, contratos, parcelas):
+    """Dois títulos administrativos por obra e uma devolução por contrato distratado, todos sem rateio."""
+    titulos = []
+    seq = 1
+    for _ in obras:
+        for _ in range(2):
+            vencimento = INICIO_HISTORICO + timedelta(days=SORTEIO_CASOS.randint(0, (HOJE - INICIO_HISTORICO).days + 60))
+            valor = round(SORTEIO_CASOS.uniform(3_000, 15_000), 2)
+            titulos.append(titulo_empresa(900_000 + seq, vencimento, valor, CONTA_ADMINISTRATIVA, "Escritorio Contabil"))
+            seq += 1
+    recebido_por_contrato = {}
+    for parcela in parcelas:
+        recebido_por_contrato[parcela["billId"]] = (recebido_por_contrato.get(parcela["billId"], 0)
+                                                    + sum(r["amount"] for r in parcela["receipts"]))
+    for contrato in contratos:
+        if contrato["situation"] != "3":
+            continue
+        # devolve 90% do que o comprador pagou; o resto fica como multa retida
+        valor = round(recebido_por_contrato.get(contrato["id"], 0) * 0.9, 2)
+        if valor <= 0:
+            continue
+        vencimento = date.fromisoformat(contrato["cancellationDate"]) + timedelta(days=30)
+        titulos.append(titulo_empresa(950_000 + seq, vencimento, valor, CONTA_DEVOLUCAO, "Devolucao a comprador"))
+        seq += 1
     return titulos
 
 
@@ -376,6 +525,15 @@ def main():
         todo_orcamento += orcamento
         todo_desembolso += desembolso
         print(f"{obra['name']}: {len(vendas)} contratos, {sum(1 for c in vendas if c['situation'] == '3')} distratos")
+
+    ids_obras = [o["id"] for o in OBRAS]
+    dividir_recebimentos(todas_parcelas)
+    estornar_recebimento(todas_parcelas)
+    for obra in OBRAS:
+        todas_parcelas += renegociar(obra, todas_parcelas, todas_vendas)
+    completar_titulos(todo_desembolso, ids_obras)
+    pagar_em_parte(todo_desembolso)
+    todo_desembolso += gerar_titulos_sem_obra(OBRAS, todas_vendas, todas_parcelas)
 
     salvar("units.json", todas_unidades)
     salvar("sales.json", todas_vendas)

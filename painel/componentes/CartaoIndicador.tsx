@@ -41,17 +41,39 @@ export function CartaoIndicador({
   );
 }
 
-// Os quatro números que resumem uma obra, na visão geral e no cabeçalho da tela da obra.
-export function IndicadoresObra({ posicao, emCartao = false }: { posicao: PosicaoObra; emCartao?: boolean }) {
+// Maior aporte da projeção (marts.resumo_projecao_obra), a mesma fonte da tela de fluxo e do assistente.
+// Nulo quando a projeção não carregou para a obra.
+export type AporteProjetado = { valor: number; parcial: boolean } | null;
+
+// Os quatro números que resumem uma obra, na visão geral e no cabeçalho da tela da obra. Com aporte
+// informado, o aporte vem da projeção; sem ele (tela da obra ainda não migrada), da posição.
+export function IndicadoresObra({
+  posicao,
+  aporte,
+  emCartao = false,
+}: {
+  posicao: PosicaoObra;
+  aporte?: AporteProjetado;
+  emCartao?: boolean;
+}) {
   return (
     <>
-      <CartaoIndicador rotulo="Caixa atual" chave="caixa_atual" emCartao={emCartao} valores={[{ valor: Number(posicao.caixa_atual) }]} />
       <CartaoIndicador
-        rotulo="Exposição máxima"
-        chave="exposicao_maxima"
+        rotulo="Caixa realizado acumulado"
+        chave="caixa_atual"
         emCartao={emCartao}
-        valores={[{ valor: Number(posicao.exposicao_maxima) }]}
+        valores={[{ valor: Number(posicao.caixa_atual) }]}
       />
+      {aporte === undefined ? (
+        <CartaoIndicador
+          rotulo="Exposição máxima"
+          chave="exposicao_maxima"
+          emCartao={emCartao}
+          valores={[{ valor: Number(posicao.exposicao_maxima) }]}
+        />
+      ) : (
+        <CartaoAporte aporte={aporte} emCartao={emCartao} />
+      )}
       <CartaoIndicador
         rotulo="Resultado projetado"
         chave="resultado_projetado"
@@ -68,5 +90,30 @@ export function IndicadoresObra({ posicao, emCartao = false }: { posicao: Posica
         ]}
       />
     </>
+  );
+}
+
+function CartaoAporte({ aporte, emCartao }: { aporte: AporteProjetado; emCartao: boolean }) {
+  const rotulo = "Maior aporte necessário";
+  const moldura = emCartao ? "rounded-xl border border-borda bg-superficie p-5" : "";
+  return (
+    <div className={`flex min-w-0 flex-col gap-1.5 ${moldura}`}>
+      <p className="flex items-center gap-1.5 text-sm text-suave">
+        {rotulo}
+        <ExplicacaoIndicador chave="exposicao_maxima_projetada" rotulo={rotulo} />
+      </p>
+      {aporte ? (
+        <>
+          <p className="text-2xl font-semibold break-words">{formatarReal(aporte.valor)}</p>
+          {aporte.parcial && (
+            <p className="text-sm text-atencao">
+              <span aria-hidden="true">! </span>Parcial: há custo sem título sem meses definidos.
+            </p>
+          )}
+        </>
+      ) : (
+        <p className="text-lg text-suave">Não carregado</p>
+      )}
+    </div>
   );
 }

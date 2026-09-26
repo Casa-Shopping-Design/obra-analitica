@@ -29,6 +29,8 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 - Situação da unidade no ERP: D disponível, C reservada, P proposta, V/O/G vendida, R reserva técnica e demais fora de venda.
 - Visual: paleta tijolo (menu vinho, fundo rosado), nada de creme ou azul de IA. Verde entra, grafite sai, vermelho vivo só em alerta.
 - Entradas e saídas por obra (migration 0005): `marts.posicao_financeira_obra` separa direto do comprador e repasse do banco (recebido, a receber, vencido), estoque a preço de hoje, pago, a pagar, orçamento sem título, estouro, caixa atual, exposição máxima (dinheiro próprio no pior mês) e resultado. `marts.fluxo_caixa_mensal` foi recriada com realizado pela data do pagamento e saldo acumulado; o cenário desloca só o repasse pendente. Saldo projetado conservador: a receber vencido fica fora, a pagar vencido entra.
+- DRE gerencial, receitas, despesas, financiamento e planejamento (26/09/2026, implementado por multiagentes, sem commit): migrations 0007 (eventos financeiros: recebimentos e pagamentos um por linha, rateio entre obras com resíduo de centavo, centro "Despesas sem obra", data de referência no fuso de São Paulo), 0011 (categorias gerenciais, mapeamento de contas por tenant com auditoria, critério de reconhecimento, DRE, receitas, despesas), 0012 (financiamento por contrato, crédito à produção, medições e liberações como complemento manual auditado), 0013 (fluxo projetado, aporte, versões imutáveis de meta e projeção, simulação determinística, visão gerencial, pendências pós-entrega) e 0014 (políticas antigas com `(select app.tenant_atual())`). Contrato em `docs/financeiro/contrato_dados.md`. Receita e custo reconhecidos ficam indisponíveis até o financeiro validar o critério (padrão `nao_definido`; POC implementado e desligado). "Caixa gerado acumulado" é a projeção e "caixa realizado acumulado" só o realizado; nenhum dos dois é saldo bancário.
+- O pedido de 26/09 ampliou o escopo: crédito associativo e medição do banco entram, como complemento manual, porque não há API de banco.
 - Premissas do repositório em `CLAUDE.md` (nomes em português, humanizer, PAA, ISO 25010, segurança Supabase/Vercel). Claude não faz commit.
 
 ## ERP de origem: o que foi verificado
@@ -53,6 +55,7 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 
 ## Em aberto
 
+- Decisões financeiras do DRE e do planejamento (lista completa em `docs/financeiro/contrato_dados.md`, seção 10): critério de reconhecimento e base da fração vendida; plano de contas do piloto; terreno no POC; tratamento de distrato; retenção; se o caixa consolidado soma obras; números 0011 a 0014 (o plano reservava 0011 em diante para o PT-09, que passa a começar na 0015).
 - Conversa com Braga no sábado 26/09 sobre porcentagens; antes disso enviar o documento e a planilha (compartilhar o documento, que é privado).
 - Conferir o spread do cartão na fatura e ajustar na aba Premissas.
 - Conversa com Lucas sobre a divisão.

@@ -1,7 +1,7 @@
 import "server-only";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
 
-// Colunas de marts.posicao_financeira_obra (migration 0005). Tipo escrito à mão até a geração automática.
+// Colunas de marts.posicao_financeira_obra (migrations 0005 e 0007). Tipo escrito à mão até a geração automática.
 export type PosicaoObra = {
   tenant_id: string;
   centro_custo_id: string;
@@ -22,6 +22,9 @@ export type PosicaoObra = {
   exposicao_maxima: number;
   resultado_contratado: number;
   resultado_projetado: number;
+  custo_lancado: number;
+  ajuste_baixa: number;
+  orcamento_carregado: boolean;
 };
 
 export class ErroConsulta extends Error {}

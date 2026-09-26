@@ -1,9 +1,45 @@
 import "server-only";
-import { criarClienteServidor } from "@/lib/supabase/servidor";
-import { ErroConsulta } from "@/lib/consultas/posicao";
-import type { IdPerguntaPronta } from "@/lib/perguntas-prontas";
+// Imports relativos: o teste troca estes módulos por espiões e confere que cada pergunta nova
+// chama a mesma função de consulta da tela correspondente.
+import { criarClienteServidor } from "../supabase/servidor";
+import { ErroConsulta } from "./posicao";
+import { carregarReferencia, listarCentrosCusto, type CentroCusto } from "./referencia";
+import { listarDrePeriodo, listarPendenciasClassificacao } from "./dre";
+import { listarCustoPorCategoria } from "./despesas";
+import { listarResumoReceitas } from "./receitas";
+import { contarEstoqueSimulacao, listarFluxoProjetado, listarResumoProjecao, simularFluxo } from "./fluxo";
+import {
+  listarComparativo,
+  listarExplicacaoDesvio,
+  listarPendenciasPosEntrega,
+  listarVisaoGerencial,
+} from "./planejamento";
+import { listarLiberacoes, listarSaldoOperacoes } from "./financiamento";
+import {
+  montarAporteDesteMes,
+  montarAporteNecessario,
+  montarCustoPorCategoria,
+  montarExposicaoMaxima,
+  montarFinanciamentosPendentes,
+  montarLiberadoEPendente,
+  montarMetaDoMes,
+  montarMudouDesdeProjecao,
+  montarPendenciasClassificacao,
+  montarPosEntrega,
+  montarPrevistoProximoMes,
+  montarQuandoFaltaCaixa,
+  montarRespostaSimples,
+  montarResultadoGerencial,
+  montarSimularVendas,
+  type LinhaResposta,
+  type NomesObras,
+  type RespostaMontada,
+} from "../../componentes/planejamento/respostas-perguntas";
+import { buscarPerguntaPronta, type IdPerguntaPronta, type PerguntaPronta } from "../perguntas-prontas";
+import { mesDaData, mesPorExtenso, somarMeses } from "../periodo";
+import { formularioPadrao, validarPremissas } from "../simulacao";
 
-export type LinhaResposta = Record<string, string | number | null>;
+export type { LinhaResposta };
 
 // Mesmo teto de linhas que o PT-07 vai impor ao SQL gerado.
 export const limiteLinhas = 500;
@@ -52,11 +88,11 @@ async function incluirNomeObra(supabase: Cliente, linhas: LinhaResposta[]): Prom
 
 const porObra = (a: LinhaResposta, b: LinhaResposta) => String(a.obra).localeCompare(String(b.obra), "pt-BR");
 
-type ConsultaPergunta = (supabase: Cliente) => Promise<LinhaResposta[]>;
+type ConsultaSimples = (supabase: Cliente) => Promise<LinhaResposta[]>;
 
-// Uma função por pergunta, com filtros do cliente Supabase: nada de SQL em texto nem de entrada do usuário.
-// O RLS de quem está logado decide quais obras aparecem.
-const consultas: Record<IdPerguntaPronta, ConsultaPergunta> = {
+// Perguntas da demo: uma função por pergunta, com filtros do cliente Supabase; nada de SQL em texto nem de
+// entrada do usuário. O RLS de quem está logado decide quais obras aparecem.
+const consultasSimples = {
   async "repasse-parque-6-meses"(supabase) {
     const ids = await idsObrasPorNome(supabase, "%parque%");
     if (ids.length === 0) return [];
@@ -97,17 +133,6 @@ const consultas: Record<IdPerguntaPronta, ConsultaPergunta> = {
         .from("posicao_financeira_obra")
         .select("obra, a_receber_repasse, repasse_atrasado, a_receber_direto, vencido_direto")
         .ilike("obra", "%aurora%")
-        .limit(limiteLinhas),
-    );
-  },
-
-  async "exposicao-maxima"(supabase) {
-    return lerLinhas(
-      await supabase
-        .schema("marts")
-        .from("posicao_financeira_obra")
-        .select("obra, exposicao_maxima")
-        .order("exposicao_maxima", { ascending: false })
         .limit(limiteLinhas),
     );
   },
@@ -228,13 +253,175 @@ const consultas: Record<IdPerguntaPronta, ConsultaPergunta> = {
         .limit(limiteLinhas),
     );
   },
+} satisfies Record<string, ConsultaSimples>;
+
+// Premissas fixas da pergunta de simulação, validadas pela mesma função do formulário da tela.
+export function premissasCincoUnidades(dataReferencia: string) {
+  return {
+    ...formularioPadrao(dataReferencia),
+    vendas_por_mes: "5",
+    meses_vendas: "1",
+    mes_inicio_vendas: somarMeses(dataReferencia, 1).slice(0, 7),
+  };
+}
+
+export type ContextoPergunta = {
+  dataReferencia: string;
+  obra: CentroCusto | null;
+  nomes: NomesObras;
 };
 
-export type RespostaPerguntaPronta = { linhas: LinhaResposta[]; consultadoEm: string };
+type ConsultaNova = (pergunta: PerguntaPronta, contexto: ContextoPergunta) => Promise<RespostaMontada>;
 
-export async function responderPerguntaPronta(id: IdPerguntaPronta): Promise<RespostaPerguntaPronta> {
-  const supabase = await criarClienteServidor();
-  const linhas = await consultas[id](supabase);
+function exigirObra(contexto: ContextoPergunta): CentroCusto {
+  if (!contexto.obra) throw new ErroConsulta("obra_obrigatoria");
+  return contexto.obra;
+}
+
+// Perguntas novas: chamam as mesmas funções de lib/consultas que as telas usam (tela.consultas no catálogo)
+// e só montam a resposta. Cada chamada independente vai em paralelo.
+const consultasNovas = {
+  async "resultado-gerencial-ano"(pergunta, contexto) {
+    const mesReferencia = mesDaData(contexto.dataReferencia);
+    const inicioAno = `${mesReferencia.slice(0, 4)}-01-01`;
+    const [consolidado, daObra] = await Promise.all([
+      listarDrePeriodo(inicioAno, mesReferencia, null),
+      contexto.obra ? listarDrePeriodo(inicioAno, mesReferencia, contexto.obra.id) : Promise.resolve(null),
+    ]);
+    const rotuloPeriodo =
+      inicioAno === mesReferencia ? mesPorExtenso(mesReferencia) : `janeiro a ${mesPorExtenso(mesReferencia)}`;
+    const soResultado = (linhas: typeof consolidado) => linhas.filter((linha) => linha.linha_ordem < 100);
+    return montarResultadoGerencial(pergunta, {
+      consolidado: soResultado(consolidado),
+      obra: daObra ? soResultado(daObra) : null,
+      nomeObra: contexto.obra?.nome ?? null,
+      rotuloPeriodo,
+    });
+  },
+
+  async "previsto-proximo-mes"(pergunta, contexto) {
+    const mes = somarMeses(contexto.dataReferencia, 1);
+    const [parcelas, fontes] = await Promise.all([
+      listarResumoReceitas(null),
+      listarFluxoProjetado({ centroCustoId: null, inicio: mes, fim: mes }),
+    ]);
+    return montarPrevistoProximoMes(pergunta, { parcelas, fontes, nomes: contexto.nomes, mes });
+  },
+
+  async "custo-por-categoria"(pergunta, contexto) {
+    const obra = exigirObra(contexto);
+    const categorias = await listarCustoPorCategoria(obra.id);
+    return montarCustoPorCategoria(pergunta, { categorias, nomeObra: obra.nome });
+  },
+
+  // Mesma fonte do cartão e da tabela da tela de fluxo: um número só para o aporte.
+  async "exposicao-maxima"(pergunta) {
+    return montarExposicaoMaxima(pergunta, { resumos: await listarResumoProjecao(null) });
+  },
+
+  async "aporte-necessario"(pergunta) {
+    return montarAporteNecessario(pergunta, { resumos: await listarResumoProjecao(null) });
+  },
+
+  async "financiamentos-pendentes"(pergunta, contexto) {
+    const [resumos, operacoes] = await Promise.all([listarResumoProjecao(null), listarSaldoOperacoes(null)]);
+    return montarFinanciamentosPendentes(pergunta, { resumos, operacoes, nomes: contexto.nomes });
+  },
+
+  async "pendencias-classificacao"(pergunta) {
+    return montarPendenciasClassificacao(pergunta, { pendencias: await listarPendenciasClassificacao() });
+  },
+
+  async "simular-vendas"(pergunta, contexto) {
+    const obra = exigirObra(contexto);
+    const [base, estoque] = await Promise.all([
+      listarFluxoProjetado({ centroCustoId: obra.id }),
+      contarEstoqueSimulacao(obra.id),
+    ]);
+    const validacao = validarPremissas(premissasCincoUnidades(contexto.dataReferencia), {
+      dataReferencia: contexto.dataReferencia,
+      estoque,
+    });
+    const simulacao = validacao.ok ? await simularFluxo(obra.id, validacao.premissas) : null;
+    return montarSimularVendas(pergunta, { nomeObra: obra.nome, base, simulacao, validacao });
+  },
+
+  async "quando-falta-caixa"(pergunta, contexto) {
+    const mesReferencia = mesDaData(contexto.dataReferencia);
+    const [fluxo, resumos] = await Promise.all([
+      listarFluxoProjetado({ centroCustoId: null, inicio: mesReferencia }),
+      listarResumoProjecao(null),
+    ]);
+    return montarQuandoFaltaCaixa(pergunta, { fluxo, resumos, nomes: contexto.nomes, mesReferencia });
+  },
+
+  async "meta-do-mes"(pergunta, contexto) {
+    const mes = mesDaData(contexto.dataReferencia);
+    const janela = { centroCustoId: null, inicio: mes, fim: mes };
+    const [visao, desvios] = await Promise.all([listarVisaoGerencial(janela), listarExplicacaoDesvio(janela)]);
+    return montarMetaDoMes(pergunta, { visao, desvios, nomes: contexto.nomes, mes });
+  },
+
+  async "aporte-deste-mes"(pergunta, contexto) {
+    const mes = mesDaData(contexto.dataReferencia);
+    const [fluxo, resumos] = await Promise.all([
+      listarFluxoProjetado({ centroCustoId: null, inicio: mes, fim: mes }),
+      listarResumoProjecao(null),
+    ]);
+    return montarAporteDesteMes(pergunta, { fluxo, resumos, nomes: contexto.nomes, mes });
+  },
+
+  async "mudou-desde-projecao"(pergunta, contexto) {
+    const obra = exigirObra(contexto);
+    const mesReferencia = mesDaData(contexto.dataReferencia);
+    const [comparativo, desvios] = await Promise.all([
+      listarComparativo({ centroCustoId: obra.id, inicio: somarMeses(mesReferencia, -1), fim: somarMeses(mesReferencia, 12) }),
+      listarExplicacaoDesvio({ centroCustoId: obra.id, inicio: somarMeses(mesReferencia, -1), fim: mesReferencia }),
+    ]);
+    return montarMudouDesdeProjecao(pergunta, { comparativo, desvios, nomeObra: obra.nome, mesReferencia });
+  },
+
+  async "liberado-e-pendente"(pergunta, contexto) {
+    const [operacoes, liberacoes] = await Promise.all([
+      listarSaldoOperacoes(null),
+      listarLiberacoes({ centroCustoId: null, situacoesEfetivas: ["pendente", "atrasada"] }),
+    ]);
+    return montarLiberadoEPendente(pergunta, { operacoes, liberacoes, nomes: contexto.nomes });
+  },
+
+  async "pos-entrega"(pergunta) {
+    return montarPosEntrega(pergunta, { pendencias: await listarPendenciasPosEntrega(null) });
+  },
+} satisfies Record<string, ConsultaNova>;
+
+export type RespostaPerguntaPronta = {
+  resposta: RespostaMontada;
+  dataReferencia: string;
+  consultadoEm: string;
+  obra: CentroCusto | null;
+};
+
+// obraId já validado como UUID pela página; obra fora da lista do RLS é tratada como não escolhida.
+export async function responderPerguntaPronta(
+  id: IdPerguntaPronta,
+  obraId: string | null = null,
+): Promise<RespostaPerguntaPronta> {
+  const pergunta = buscarPerguntaPronta(id) as PerguntaPronta;
   const hoje = hojeEmBrasilia();
-  return { linhas, consultadoEm: dataIso(hoje.ano, hoje.mes, hoje.dia) };
+  const consultadoEm = dataIso(hoje.ano, hoje.mes, hoje.dia);
+
+  if (id in consultasSimples) {
+    const supabase = await criarClienteServidor();
+    const linhas = await consultasSimples[id as keyof typeof consultasSimples](supabase);
+    return { resposta: montarRespostaSimples(pergunta, linhas), dataReferencia: consultadoEm, consultadoEm, obra: null };
+  }
+
+  const [referencia, centros] = await Promise.all([carregarReferencia(), listarCentrosCusto()]);
+  const obras = centros.filter((centro) => centro.tipo === "obra");
+  const nomes = Object.fromEntries(obras.map((centro) => [centro.id, centro.nome]));
+  const escolhida = obras.find((centro) => centro.id === obraId) ?? null;
+  const obra = escolhida ?? (pergunta.obra === "obrigatoria" ? (obras[0] ?? null) : null);
+  const contexto: ContextoPergunta = { dataReferencia: referencia.dataReferencia, obra, nomes };
+  const resposta = await consultasNovas[id as keyof typeof consultasNovas](pergunta, contexto);
+  return { resposta, dataReferencia: referencia.dataReferencia, consultadoEm, obra };
 }

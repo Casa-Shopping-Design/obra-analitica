@@ -1,0 +1,7 @@
+# 0002 Eventos financeiros por linha e centro "Despesas sem obra"
+
+**Contexto.** O staging lia só o primeiro recebimento, o primeiro pagamento e a primeira obra do rateio de cada título. Parcela paga em duas vezes, título rateado entre obras e título sem obra davam totais diferentes da origem, e título sem obra sumia.
+
+**Decisão.** A migration 0007 grava um evento por linha: `staging.recebimento` (um por recebimento, estorno negativo), `staging.titulo_pagar_apropriacao` (uma por obra e conta do título) e `staging.pagamento` (um por pagamento e apropriação). O rateio arredonda cada parte e manda o resíduo de centavo para a apropriação de maior percentual; pagamentos são rateados pelo acumulado, então título quitado fecha centavo a centavo em cada obra. Título sem obra, ou com obra não cadastrada, vai para um centro de custo `tipo = 'empresa'` por tenant, chamado "Despesas sem obra", que diretor e financeiro enxergam e gerente não. Competência do título é a data de emissão; sem ela, fica nula e nunca cai no vencimento. `app.data_referencia()` substitui `current_date` nas views novas.
+
+**Consequência.** Soma por obra bate com a origem e o consolidado inclui as despesas da empresa. `fluxo_caixa_mensal` e `posicao_financeira_obra` mantêm nomes e colunas; custo a incorrer e estouro passam a usar o custo lançado, que difere de pago mais a pagar só quando há desconto ou juros. Listas de obras do painel precisam filtrar `tipo = 'obra'`. Detalhe em `docs/financeiro/contrato_dados.md`, seção 3.1.

@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
 
@@ -12,8 +13,9 @@ const nomesPerfil: Record<string, string> = {
   leitura: "Leitura",
 };
 
-// getUser valida o token no servidor do Auth; getSession só leria o cookie.
-export async function exigirIdentidade(): Promise<Identidade> {
+// getUser valida o token no servidor do Auth; getSession só leria o cookie. O cache vale por requisição:
+// layout e página chamam, mas o Auth é consultado uma vez.
+export const exigirIdentidade = cache(async function exigirIdentidade(): Promise<Identidade> {
   const supabase = await criarClienteServidor();
   const { data: dadosUsuario } = await supabase.auth.getUser();
   if (!dadosUsuario.user) redirect("/entrar");
@@ -30,4 +32,4 @@ export async function exigirIdentidade(): Promise<Identidade> {
     perfil: vinculo ? (nomesPerfil[vinculo.perfil] ?? vinculo.perfil) : "Sem perfil",
     construtora: vinculo?.tenant?.razao_social ?? "",
   };
-}
+});

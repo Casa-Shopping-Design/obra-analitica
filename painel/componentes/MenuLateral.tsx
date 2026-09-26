@@ -3,9 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+// Uma entrada por visão, sem repetir número: DRE é competência, Receitas e Despesas são carteira e caixa,
+// Fluxo de caixa é o mês a mês de entradas e saídas, Planejamento compara metas com o realizado.
 const itens = [
   { rotulo: "Visão geral", destino: "/" },
   { rotulo: "Obras", destino: "/obras" },
+  { rotulo: "DRE gerencial", destino: "/dre" },
+  { rotulo: "Receitas", destino: "/receitas" },
+  { rotulo: "Despesas", destino: "/despesas" },
+  { rotulo: "Fluxo de caixa", destino: "/fluxo" },
+  { rotulo: "Planejamento", destino: "/planejamento" },
   { rotulo: "Mapa de unidades", destino: "/unidades" },
   { rotulo: "Assistente", destino: "/assistente" },
 ];

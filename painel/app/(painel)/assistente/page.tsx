@@ -1,70 +1,110 @@
 import type { Metadata } from "next";
+import { exigirIdentidade } from "@/lib/consultas/identidade";
 import { RespostaPergunta } from "@/componentes/RespostaPergunta";
-import {
-  limiteLinhas,
-  responderPerguntaPronta,
-  type RespostaPerguntaPronta,
-} from "@/lib/consultas/perguntas-prontas";
+import { limiteLinhas, responderPerguntaPronta, type RespostaPerguntaPronta } from "@/lib/consultas/perguntas-prontas";
+import { listarCentrosCusto, tentarConsulta } from "@/lib/consultas/referencia";
 import { mensagens } from "@/lib/mensagens";
-import { buscarPerguntaPronta, perguntasProntas, type IdPerguntaPronta } from "@/lib/perguntas-prontas";
+import { lerIdCentro } from "@/lib/periodo";
+import {
+  buscarPerguntaPronta,
+  perguntasProntas,
+  type IdPerguntaPronta,
+  type PerguntaPronta,
+} from "@/lib/perguntas-prontas";
 
 export const metadata: Metadata = { title: "Assistente" };
 
-async function responder(id: IdPerguntaPronta): Promise<RespostaPerguntaPronta | null> {
+async function responder(id: IdPerguntaPronta, obraId: string | null): Promise<RespostaPerguntaPronta | null> {
   try {
-    return await responderPerguntaPronta(id);
+    return await responderPerguntaPronta(id, obraId);
   } catch {
     return null;
   }
 }
 
-// A pergunta escolhida vem na URL só como id; qualquer valor fora da lista é ignorado
-// e nunca chega a uma consulta.
-export default async function PaginaAssistente({
-  searchParams,
-}: {
-  searchParams: Promise<{ [chave: string]: string | string[] | undefined }>;
-}) {
-  const { pergunta: idPedido } = await searchParams;
+const grupos: { titulo: string; filtro: (pergunta: PerguntaPronta) => boolean }[] = [
+  { titulo: "Caixa, planejamento e financiamento", filtro: (pergunta) => pergunta.tela !== undefined },
+  { titulo: "Obras, vendas e unidades", filtro: (pergunta) => pergunta.tela === undefined },
+];
+
+// A pergunta e a obra vêm na URL só como id; valor fora da lista é ignorado e nunca chega a uma consulta.
+export default async function PaginaAssistente({ searchParams }: PageProps<"/assistente">) {
+  // A rota confere a sessão por conta própria; o proxy e o layout sozinhos não bastam.
+  await exigirIdentidade();
+  const { pergunta: idPedido, obra: obraPedida } = await searchParams;
   const idTexto = typeof idPedido === "string" ? idPedido : undefined;
   const pergunta = buscarPerguntaPronta(idTexto);
-  const resposta = pergunta ? await responder(pergunta.id) : null;
+  const obraId = lerIdCentro(obraPedida);
+  const [resposta, centros] = await Promise.all([
+    pergunta ? responder(pergunta.id, obraId) : Promise.resolve(null),
+    tentarConsulta(listarCentrosCusto()),
+  ]);
+  const obras = (centros ?? []).filter((centro) => centro.tipo === "obra");
+  const obraMarcada = resposta?.obra?.id ?? obraId ?? "";
 
   return (
     <>
       <header className="flex flex-col gap-2">
         <h1 className="font-serif text-[34px] font-semibold">Assistente</h1>
         <p className="max-w-2xl text-suave">
-          Escolha uma pergunta. A resposta sai direto das tabelas do painel, só com as obras liberadas para o seu
-          perfil.
+          Escolha uma pergunta. A resposta sai das mesmas consultas das telas do painel, só com as obras liberadas para
+          o seu perfil, e separa o que já aconteceu, o que está previsto nos contratos e o que é simulação.
         </p>
       </header>
 
-      <form action="/assistente" method="get" className="flex flex-col gap-3">
-        <fieldset className="flex flex-col gap-2">
-          <legend className="mb-2 font-semibold">Perguntas prontas</legend>
-          <div className="grid gap-2 md:grid-cols-2">
-            {perguntasProntas.map((opcao) => {
-              const escolhida = opcao.id === pergunta?.id;
-              return (
-                <button
-                  key={opcao.id}
-                  type="submit"
-                  name="pergunta"
-                  value={opcao.id}
-                  aria-pressed={escolhida}
-                  className={`min-h-12 cursor-pointer rounded-xl border px-4 py-2.5 text-left text-[15px] ${
-                    escolhida
-                      ? "border-menu bg-menu font-semibold text-menu-texto"
-                      : "border-borda bg-superficie hover:border-texto"
-                  }`}
-                >
-                  {opcao.pergunta}
-                </button>
-              );
-            })}
+      <form action="/assistente" method="get" className="flex flex-col gap-5">
+        {obras.length > 0 && (
+          <div className="flex max-w-md flex-col gap-1.5">
+            <label htmlFor="assistente-obra" className="text-sm font-medium">
+              Obra, para as perguntas marcadas com &quot;escolha a obra&quot;
+            </label>
+            <select
+              id="assistente-obra"
+              name="obra"
+              defaultValue={obraMarcada}
+              className="min-h-11 w-full rounded-lg border border-borda bg-superficie px-3"
+            >
+              <option value="">Primeira obra da lista</option>
+              {obras.map((obra) => (
+                <option key={obra.id} value={obra.id}>
+                  {obra.nome}
+                </option>
+              ))}
+            </select>
           </div>
-        </fieldset>
+        )}
+        {grupos.map((grupo) => (
+          <fieldset key={grupo.titulo} className="flex flex-col gap-2">
+            <legend className="mb-2 font-semibold">{grupo.titulo}</legend>
+            <div className="grid gap-2 md:grid-cols-2">
+              {perguntasProntas.filter(grupo.filtro).map((opcao) => {
+                const escolhida = opcao.id === pergunta?.id;
+                const comObra = "obra" in opcao && opcao.obra !== undefined;
+                return (
+                  <button
+                    key={opcao.id}
+                    type="submit"
+                    name="pergunta"
+                    value={opcao.id}
+                    aria-pressed={escolhida}
+                    className={`min-h-12 cursor-pointer rounded-xl border px-4 py-2.5 text-left text-[15px] ${
+                      escolhida
+                        ? "border-menu bg-menu font-semibold text-menu-texto"
+                        : "border-borda bg-superficie hover:border-texto"
+                    }`}
+                  >
+                    {opcao.pergunta}
+                    {comObra && (
+                      <span className={`block text-xs ${escolhida ? "text-menu-suave" : "text-suave"}`}>
+                        {opcao.obra === "obrigatoria" ? "Escolha a obra" : "Consolidado e, se escolher, a obra"}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </fieldset>
+        ))}
       </form>
 
       {idTexto !== undefined && !pergunta && <p role="alert">{mensagens.assistente.perguntaDesconhecida}</p>}
@@ -78,8 +118,10 @@ export default async function PaginaAssistente({
       {pergunta && resposta && (
         <RespostaPergunta
           pergunta={pergunta}
-          linhas={resposta.linhas}
+          resposta={resposta.resposta}
+          dataReferencia={resposta.dataReferencia}
           consultadoEm={resposta.consultadoEm}
+          nomeObra={resposta.obra?.nome ?? null}
           limiteLinhas={limiteLinhas}
         />
       )}

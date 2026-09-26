@@ -9,3 +9,13 @@ Os três documentos completos estão no Claude Docs. Abra pelo link, edite lá e
 | Plano de construção da demo | https://claude.ai/code/artifact/5829b754-3e9e-4f5a-bbcd-cb23f99a7d37 |
 
 Referência externa consultada para os campos do ERP de origem: https://docs.nekt.com/sources/sienge
+
+## Documentos do repositório
+
+| Documento | Conteúdo |
+| --- | --- |
+| `docs/plano_implementacao.md` | pacotes de trabalho, premissas e orçamento |
+| `docs/financeiro/contrato_dados.md` | contrato de dados do DRE, receitas, despesas, financiamento e planejamento: tabelas, views, fórmulas, rótulos e perguntas pendentes |
+| `docs/financeiro/casos_teste.md` | casos financeiros pequenos com resultado conhecido |
+| `docs/financeiro/revisao.md` | revisão independente: achados, tempos no volume do piloto e o que ficou sem verificar |
+| `docs/decisoes/` | decisões de arquitetura (0001 cobertura do orçamento, 0002 eventos financeiros, 0005 DRE gerencial, 0006 financiamento e medições, 0007 planejamento e versões) |

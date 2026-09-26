@@ -49,6 +49,35 @@ python scripts/vincular_usuarios_demo.py --diretor <uuid do diretor> --gerente <
 
 O diretor vê as três obras; a gerente vê só o Residencial Aurora.
 
+## Telas financeiras
+
+| Rota | O que mostra |
+| --- | --- |
+| `/` | Visão geral: posição por obra, resultado gerencial do ano, contas sem categoria, próximo mês e maior aporte da projeção |
+| `/dre` | DRE gerencial por competência, mensal e acumulado, por obra e consolidado; pendências de classificação e critério de reconhecimento |
+| `/receitas` | VGV contratado, recebido, vencido, a vencer e previsto no próximo mês, com entrada direta e financiamento separados, e a carteira por parcela |
+| `/despesas` | Custo lançado, pago, em aberto, orçamento, custo sem título, estimativa até a conclusão e desvio, com o grupo "Despesas sem obra" |
+| `/fluxo` e `/fluxo/<obra>` | Fluxo de caixa realizado e projetado, caixa gerado acumulado, necessidade de aporte e cenário de atraso |
+| `/fluxo/<obra>/simular` | Simulação de novas vendas, desconto, forma de pagamento, atraso de liberação e cronograma de gastos, sem mexer no realizado |
+| `/planejamento` | Visão gerencial mensal, metas e versões, comparativo entre projeções, desvios e pendências depois da entrega |
+| `/planejamento/financiamento` | Etapas de financiamento por contrato, crédito à produção, medições e liberações, com complemento manual auditado |
+
+Definições, fórmulas e premissas estão em `docs/financeiro/contrato_dados.md`; os casos com resultado conhecido, em `docs/financeiro/casos_teste.md`; a revisão independente, em `docs/financeiro/revisao.md`.
+
+## Testes
+
+```bash
+supabase test db                            # pgTAP em supabase/tests/ (banco local do Supabase)
+cd painel && npx next typegen && npx tsc --noEmit && npm run lint && npx vitest run
+```
+
+Medição de desempenho com o volume do piloto (banco local, tenant separado):
+
+```bash
+DATABASE_URL=<banco local> TENANT=<uuid de um tenant de teste> python scripts/gerar_volume_piloto.py
+psql <banco local> -f scripts/medir_volume_piloto.sql
+```
+
 ## Documentos
 
 | Documento | Uso |
