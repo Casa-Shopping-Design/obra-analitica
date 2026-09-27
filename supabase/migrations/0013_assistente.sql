@@ -19,6 +19,9 @@ alter table app.chave_assinatura_consulta enable row level security;
 alter table app.chave_assinatura_consulta force row level security;
 revoke all on app.chave_assinatura_consulta from public, anon, authenticated;
 
+-- O Supabase já traz o pgcrypto em extensions; a linha só garante a função hmac num banco novo.
+create extension if not exists pgcrypto with schema extensions;
+
 create function app.assinatura_consulta_valida(p_sql text, p_assinatura text) returns boolean
 language sql stable security definer set search_path = '' as $$
   select exists (
