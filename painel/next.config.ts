@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs/config";
 
 // A Content-Security-Policy sai do proxy.ts, porque leva um nonce novo a cada requisição.
 const cabecalhosSeguranca = [
@@ -19,4 +20,11 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// O envio dos mapas de código só acontece com SENTRY_AUTH_TOKEN (CI e Vercel); sem ele o build segue normal.
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+});
