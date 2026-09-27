@@ -11,7 +11,7 @@ export type ViewCatalogo = {
 export const catalogoViews: ViewCatalogo[] = [
   {
     nome: "marts.fluxo_caixa_mensal",
-    descricao: "Entradas e saidas de cada obra por mes. Realizado cai no mes em que o dinheiro entrou ou saiu; previsto e vencido caem no mes do vencimento. Entrada direta e o que o comprador paga a construtora; repasse e o que o banco paga pelo financiamento. saldo_acumulado soma realizado, previsto e saidas vencidas; entrada vencida fica fora.",
+    descricao: "Entradas e saidas de cada obra por mes. Realizado cai no mes de cada recebimento ou pagamento (parcela ou titulo pago em duas vezes aparece nos dois meses); previsto e vencido caem no mes do vencimento. Titulo rateado entre obras entra em cada obra pela fracao do rateio; despesa sem obra nao entra em obra nenhuma. Entrada direta e o que o comprador paga a construtora; repasse e o que o banco paga pelo financiamento. saldo_acumulado soma realizado, previsto e saidas vencidas; entrada vencida fica fora.",
     colunas: ["centro_custo_id", "competencia", "entrada_direta_realizada", "repasse_realizado", "entrada_direta_prevista", "repasse_previsto", "entrada_direta_vencida", "repasse_vencido", "saida_realizada", "saida_prevista", "saida_vencida", "saldo_mes", "saldo_acumulado"],
     exemplos: [
       { pergunta: "Quanto entra de repasse na Parque das Aguas nos proximos 6 meses?", sql: "select sum(f.repasse_previsto) from marts.fluxo_caixa_mensal f join app.centro_custo c on c.id = f.centro_custo_id where c.nome ilike '%parque%' and f.competencia between date_trunc('month', current_date) and current_date + interval '6 months'" },
