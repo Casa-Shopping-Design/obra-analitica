@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CartaoIndicador, IndicadoresObra } from "@/componentes/CartaoIndicador";
 import { GraficoFluxo } from "@/componentes/GraficoFluxo";
+import { IndicadorVgv } from "@/componentes/IndicadorVgv";
 import { SeletorCenario } from "@/componentes/SeletorCenario";
 import { cenariosAtraso, listarFluxoCenario, listarFluxoMensal, type MesesAtraso } from "@/lib/consultas/fluxo";
 import { buscarPosicaoObra } from "@/lib/consultas/posicao";
@@ -82,6 +83,9 @@ export default async function PaginaObra({ params, searchParams }: PageProps<"/o
       </div>
 
       <section aria-label="Resumo da obra" className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="sm:col-span-2 xl:col-span-4">
+          <IndicadorVgv valores={posicao} emCartao />
+        </div>
         <IndicadoresObra posicao={posicao} emCartao />
       </section>
 

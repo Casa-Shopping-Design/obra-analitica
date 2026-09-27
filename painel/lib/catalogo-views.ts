@@ -20,11 +20,12 @@ export const catalogoViews: ViewCatalogo[] = [
   },
   {
     nome: "marts.posicao_financeira_obra",
-    descricao: "Uma linha por obra com tudo que entrou e vai entrar (direto do comprador, repasse do banco, vencido e estoque a preco de hoje), tudo que saiu e vai sair (pago, a pagar, orcamento ainda sem titulo, estouro), caixa atual, exposicao maxima (dinheiro proprio que a obra exige no pior mes) e resultado contratado e projetado.",
-    colunas: ["centro_custo_id", "obra", "recebido_direto", "recebido_repasse", "a_receber_direto", "a_receber_repasse", "vencido_direto", "repasse_atrasado", "estoque_a_vender", "pago", "a_pagar", "custo_orcado", "custo_a_incorrer", "estouro_orcamento", "caixa_atual", "exposicao_maxima", "resultado_contratado", "resultado_projetado"],
+    descricao: "Uma linha por obra com tudo que entrou e vai entrar (direto do comprador, repasse do banco, vencido e estoque a preco de hoje), tudo que saiu e vai sair (pago, a pagar, orcamento ainda sem titulo, estouro), caixa atual, exposicao maxima (dinheiro proprio que a obra exige no pior mes), resultado contratado e projetado e VGV. vgv_total e vgv_vendido (contratos ativos) mais estoque_a_vender; unidade fora de venda nao entra. pct_vgv_vendido e fracao (0,5 = metade do VGV vendido).",
+    colunas: ["centro_custo_id", "obra", "recebido_direto", "recebido_repasse", "a_receber_direto", "a_receber_repasse", "vencido_direto", "repasse_atrasado", "estoque_a_vender", "pago", "a_pagar", "custo_orcado", "custo_a_incorrer", "estouro_orcamento", "caixa_atual", "exposicao_maxima", "resultado_contratado", "resultado_projetado", "vgv_vendido", "vgv_total", "pct_vgv_vendido"],
     exemplos: [
       { pergunta: "Quanto a Aurora ainda vai receber do banco e quanto dos compradores?", sql: "select obra, a_receber_repasse + repasse_atrasado as do_banco, a_receber_direto + vencido_direto as dos_compradores from marts.posicao_financeira_obra where obra ilike '%aurora%'" },
       { pergunta: "Quanto dinheiro proprio cada obra precisa no pior momento?", sql: "select obra, exposicao_maxima from marts.posicao_financeira_obra order by exposicao_maxima desc" },
+      { pergunta: "Qual o VGV de cada obra e quanto dele ja foi vendido?", sql: "select obra, vgv_total, vgv_vendido, pct_vgv_vendido from marts.posicao_financeira_obra order by vgv_total desc" },
       { pergunta: "Alguma obra estourou o orcamento?", sql: "select obra, custo_orcado, pago + a_pagar as custo_lancado, estouro_orcamento from marts.posicao_financeira_obra where estouro_orcamento > 0" },
     ],
   },

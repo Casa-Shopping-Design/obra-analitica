@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { IndicadorVgv } from "@/componentes/IndicadorVgv";
+import type { ValoresVgv } from "@/lib/consultas/posicao";
 import { formatarData, formatarReal } from "@/lib/formatar";
 import {
   montarGrade,
@@ -135,110 +137,111 @@ function Legenda() {
   );
 }
 
-export function MapaUnidades({
-  unidades,
-  estoqueAPrecoDeHoje,
-}: {
-  unidades: UnidadeMapa[];
-  estoqueAPrecoDeHoje: number | null;
-}) {
+function TotaisObra({ totais, vgv }: { totais: Record<SituacaoUnidade, number>; vgv: ValoresVgv | null }) {
+  return (
+    <section
+      aria-labelledby="titulo-totais"
+      className="flex flex-col gap-4 rounded-xl border border-borda bg-superficie p-4 md:p-5 xl:sticky xl:top-6"
+    >
+      <h2 id="titulo-totais" className="font-serif text-xl font-semibold">
+        Totais da obra
+      </h2>
+      {vgv ? <IndicadorVgv valores={vgv} /> : <p className="text-sm text-suave">VGV sem valor para esta obra.</p>}
+      <dl className="grid grid-cols-1 gap-x-8 gap-y-1.5 border-t border-borda pt-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-1">
+        {situacoesUnidade.map((situacao) => (
+          <div key={situacao} className="flex items-center justify-between gap-3">
+            <dt className="flex items-center gap-1.5 text-sm text-suave">
+              <IconeSituacao situacao={situacao} />
+              {rotulosSituacao[situacao].nome}
+            </dt>
+            <dd className="font-mono text-lg tabular-nums">{totais[situacao]}</dd>
+          </div>
+        ))}
+      </dl>
+      <p className="text-sm text-suave">
+        O VGV soma as vendidas pelo valor do contrato e o estoque (disponíveis, reservadas e em proposta) pelo valor
+        de hoje. Fora de venda não entra.
+      </p>
+    </section>
+  );
+}
+
+export function MapaUnidades({ unidades, vgv }: { unidades: UnidadeMapa[]; vgv: ValoresVgv | null }) {
   const grade = montarGrade(unidades);
 
+  // Em tela larga os totais ficam ao lado da grade e acompanham a rolagem, no lugar da faixa vazia à direita.
   return (
-    <div className="flex flex-col gap-6">
-      <Legenda />
-      <p className="text-sm text-suave">
-        Passe o mouse ou use a tecla Tab sobre uma unidade para ver o valor de hoje e de onde ele vem.
-      </p>
-
-      {grade.blocos.map((bloco) => (
-        <section key={bloco.tipologia} className="flex flex-col gap-2">
-          <h2 className="font-serif text-xl font-semibold">Tipologia {bloco.tipologia}</h2>
-          <table className="w-full max-w-3xl table-fixed border-separate border-spacing-0 text-left">
-            <caption className="sr-only">
-              Unidades da tipologia {bloco.tipologia} por andar e posição, com a situação de cada uma
-            </caption>
-            <thead>
-              <tr>
-                <th scope="col" className="w-[4.5rem] text-xs font-medium text-suave">
-                  <span className="sr-only">Andar</span>
-                </th>
-                {bloco.posicoes.map((posicao) => (
-                  <th key={posicao} scope="col" className="px-0.5 pb-1 text-xs font-medium text-suave">
-                    <span className="sr-only">Posição </span>
-                    {String(posicao).padStart(2, "0")}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {bloco.andares.map((linha) => (
-                <tr key={linha.andar}>
-                  <th scope="row" className="pr-1 text-xs font-medium whitespace-nowrap text-suave">
-                    {rotuloAndar(linha.andar)}
-                  </th>
-                  {linha.celulas.map((unidade, indice) =>
-                    unidade ? (
-                      <td key={unidade.unidade_id} className="p-0.5">
-                        <CelulaUnidade
-                          unidade={unidade}
-                          rotuloVisivel={`${String(linha.andar).padStart(2, "0")}${String(bloco.posicoes[indice]).padStart(2, "0")}`}
-                          alinharDireita={indice >= linha.celulas.length / 2}
-                        />
-                      </td>
-                    ) : (
-                      <td key={`vazio-${bloco.posicoes[indice]}`} className="p-0.5">
-                        <span className="sr-only">Sem unidade</span>
-                      </td>
-                    ),
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
-      ))}
-
-      {grade.foraDoPadrao.length > 0 && (
-        <section className="flex flex-col gap-2">
-          <h2 className="font-serif text-xl font-semibold">Outras unidades</h2>
-          <p className="text-sm text-suave">Unidades cujo nome não segue o padrão tipologia, andar e posição.</p>
-          <ul className="grid max-w-3xl grid-cols-3 gap-1 sm:grid-cols-4">
-            {grade.foraDoPadrao.map((unidade, indice) => (
-              <li key={unidade.unidade_id}>
-                <CelulaUnidade unidade={unidade} rotuloVisivel={unidade.unidade} alinharDireita={indice % 3 === 2} />
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      <section aria-labelledby="titulo-totais" className="flex flex-col gap-3 rounded-xl border border-borda bg-superficie p-4 md:p-5">
-        <h2 id="titulo-totais" className="font-serif text-xl font-semibold">
-          Totais da obra
-        </h2>
-        <dl className="grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-3 lg:grid-cols-6">
-          {situacoesUnidade.map((situacao) => (
-            <div key={situacao} className="flex flex-col">
-              <dt className="flex items-center gap-1.5 text-sm text-suave">
-                <IconeSituacao situacao={situacao} />
-                {rotulosSituacao[situacao].nome}
-              </dt>
-              <dd className="font-mono text-lg tabular-nums">{grade.totais[situacao]}</dd>
-            </div>
-          ))}
-          <div className="col-span-2 flex flex-col sm:col-span-3 lg:col-span-1">
-            <dt className="text-sm text-suave">Estoque a preço de hoje</dt>
-            <dd className="font-mono text-lg tabular-nums">
-              {estoqueAPrecoDeHoje === null ? "sem valor" : formatarReal(estoqueAPrecoDeHoje)}
-            </dd>
-          </div>
-        </dl>
+    <div className="grid grid-cols-1 gap-8 xl:grid-cols-[minmax(0,56rem)_minmax(20rem,26rem)] xl:items-start">
+      <div className="flex min-w-0 flex-col gap-6">
+        <Legenda />
         <p className="text-sm text-suave">
-          O estoque soma as unidades disponíveis, reservadas e em proposta pelo valor de hoje. Vendida vale o contrato
-          e não entra no estoque.
+          Passe o mouse ou use a tecla Tab sobre uma unidade para ver o valor de hoje e de onde ele vem.
         </p>
-      </section>
+
+        {grade.blocos.map((bloco) => (
+          <section key={bloco.tipologia} className="flex flex-col gap-2">
+            <h2 className="font-serif text-xl font-semibold">Tipologia {bloco.tipologia}</h2>
+            <table className="w-full max-w-3xl table-fixed border-separate border-spacing-0 text-left xl:max-w-none">
+              <caption className="sr-only">
+                Unidades da tipologia {bloco.tipologia} por andar e posição, com a situação de cada uma
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col" className="w-[4.5rem] text-xs font-medium text-suave">
+                    <span className="sr-only">Andar</span>
+                  </th>
+                  {bloco.posicoes.map((posicao) => (
+                    <th key={posicao} scope="col" className="px-0.5 pb-1 text-xs font-medium text-suave">
+                      <span className="sr-only">Posição </span>
+                      {String(posicao).padStart(2, "0")}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {bloco.andares.map((linha) => (
+                  <tr key={linha.andar}>
+                    <th scope="row" className="pr-1 text-xs font-medium whitespace-nowrap text-suave">
+                      {rotuloAndar(linha.andar)}
+                    </th>
+                    {linha.celulas.map((unidade, indice) =>
+                      unidade ? (
+                        <td key={unidade.unidade_id} className="p-0.5">
+                          <CelulaUnidade
+                            unidade={unidade}
+                            rotuloVisivel={`${String(linha.andar).padStart(2, "0")}${String(bloco.posicoes[indice]).padStart(2, "0")}`}
+                            alinharDireita={indice >= linha.celulas.length / 2}
+                          />
+                        </td>
+                      ) : (
+                        <td key={`vazio-${bloco.posicoes[indice]}`} className="p-0.5">
+                          <span className="sr-only">Sem unidade</span>
+                        </td>
+                      ),
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+        ))}
+
+        {grade.foraDoPadrao.length > 0 && (
+          <section className="flex flex-col gap-2">
+            <h2 className="font-serif text-xl font-semibold">Outras unidades</h2>
+            <p className="text-sm text-suave">Unidades cujo nome não segue o padrão tipologia, andar e posição.</p>
+            <ul className="grid max-w-3xl grid-cols-3 gap-1 sm:grid-cols-4 xl:max-w-none">
+              {grade.foraDoPadrao.map((unidade, indice) => (
+                <li key={unidade.unidade_id}>
+                  <CelulaUnidade unidade={unidade} rotuloVisivel={unidade.unidade} alinharDireita={indice % 3 === 2} />
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </div>
+
+      <TotaisObra totais={grade.totais} vgv={vgv} />
     </div>
   );
 }
