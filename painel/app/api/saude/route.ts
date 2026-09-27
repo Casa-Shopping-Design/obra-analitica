@@ -1,26 +1,39 @@
-import { NextResponse } from "next/server";
-import { lerConfiguracaoSupabase } from "@/lib/supabase/configuracao";
+import * as Sentry from "@sentry/nextjs";
+import { NextResponse, type NextRequest } from "next/server";
+import { buscarSaudeCarga } from "@/lib/consultas/carga";
+import { avaliarIdadeCarga } from "@/lib/idade-carga";
+import { registrar } from "@/lib/log";
 
-// Versão mínima: confere se o Supabase responde. O anônimo não lê nenhuma tabela, então o
-// teste do banco e a idade da última carga entram no PT-08, com uma função própria para isso.
-export async function GET() {
+const rota = "/api/saude";
+
+// Pública de propósito: o monitor de disponibilidade chama sem login. Devolve só o commit e datas,
+// nada que identifique tenant ou obra. 503 quando o banco não responde ou a carga está atrasada.
+export async function GET(request: NextRequest) {
+  const inicio = performance.now();
+  const idRequisicao = request.headers.get("x-id-requisicao");
   const commit = process.env.VERCEL_GIT_COMMIT_SHA ?? "local";
-  const { url, chavePublica } = lerConfiguracaoSupabase();
 
-  let supabaseResponde = false;
+  let ultimaCargaEm: string | null = null;
+  let bancoResponde = true;
   try {
-    const resposta = await fetch(`${url}/auth/v1/health`, {
-      headers: { apikey: chavePublica },
-      cache: "no-store",
-      signal: AbortSignal.timeout(5000),
-    });
-    supabaseResponde = resposta.ok;
-  } catch {
-    supabaseResponde = false;
+    ultimaCargaEm = await buscarSaudeCarga(5000);
+  } catch (erro) {
+    bancoResponde = false;
+    Sentry.captureException(erro, { tags: { id_requisicao: idRequisicao ?? "ausente", rota } });
   }
 
+  const { idadeHoras, atrasada } = avaliarIdadeCarga(ultimaCargaEm, new Date());
+  const ok = bancoResponde && !atrasada;
+
+  registrar(ok ? "info" : "error", ok ? "saude ok" : bancoResponde ? "carga atrasada" : "banco sem resposta", {
+    id_requisicao: idRequisicao,
+    rota,
+    resultado: ok ? "ok" : "indisponivel",
+    duracao_ms: Math.round(performance.now() - inicio),
+  });
+
   return NextResponse.json(
-    { ok: supabaseResponde, commit },
-    { status: supabaseResponde ? 200 : 503, headers: { "cache-control": "no-store" } },
+    { ok, commit, ultima_carga_em: ultimaCargaEm, idade_horas: idadeHoras },
+    { status: ok ? 200 : 503, headers: { "cache-control": "no-store" } },
   );
 }
