@@ -73,7 +73,7 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 
 - Telas da demo (canvas): https://claude.ai/artifact/SBVWLWvyW4FLDfg5kFZXqz (visão geral, obra, mapa de disponibilidade, assistente, login, paletas)
 - Documento para o Braga: https://claude.ai/code/artifact/db85bf45-161e-434c-a663-a25b04b7b3bd
-- Repositório: https://github.com/joaocss/obra-analitica
+- Repositório: https://github.com/Casa-Shopping-Design/obra-analitica
 
 ## Plano de implementação
 
@@ -87,7 +87,7 @@ A demo passou para o projeto Supabase da conta Casa Design (ref `rxbhxtbjxqlisbr
 
 Falta:
 - Entrar no painel com `gerente.aurora@demo.com` e ver uma obra só.
-- Vercel da Casa Design: importar `joaocss/obra-analitica` pela conta pessoal do GitHub (o plano Hobby não importa repositório privado de organização), Root Directory `painel`, com `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Hobby é só para uso não comercial; o piloto vai precisar de Pro.
+- Vercel da Casa Design, com Root Directory `painel` e as variáveis `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY`. O repositório passou para a organização `Casa-Shopping-Design/obra-analitica`, e o plano Hobby não importa repositório privado de organização. Caminhos: devolver o repositório para `joaocss`, publicar com `npx vercel` de dentro de `painel/` ou assinar o Pro. Hobby é só para uso não comercial; o piloto vai precisar de Pro de qualquer jeito.
 - Depois do deploy, Site URL e Redirect URLs em Authentication, URL Configuration.
 - Trocar a senha do banco do projeto antigo, que apareceu em print.
 - Integrar o PT-07 e seguir com PT-05 e PT-08. Demo em 16/10/2026.
