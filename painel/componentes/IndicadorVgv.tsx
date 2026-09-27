@@ -13,6 +13,12 @@ function BarraVendido({ fracao }: { fracao: number }) {
   );
 }
 
+// Coluna ausente na resposta (cache de esquema da API desatualizado) chega como undefined; mostra aviso, não NaN.
+function valorOuAviso(valor: number | null | undefined): string {
+  const numero = Number(valor);
+  return valor === null || valor === undefined || !Number.isFinite(numero) ? "sem valor" : formatarReal(numero);
+}
+
 function Amostra({ classe }: { classe: string }) {
   return <span aria-hidden="true" className={`inline-block size-2.5 shrink-0 rounded-sm ${classe}`} />;
 }
@@ -21,7 +27,8 @@ function Amostra({ classe }: { classe: string }) {
 // Nada é somado aqui: os três valores vêm prontos de marts.posicao_financeira_obra.
 export function IndicadorVgv({ valores, emCartao = false }: { valores: ValoresVgv; emCartao?: boolean }) {
   const moldura = emCartao ? "rounded-xl border border-borda bg-superficie p-5" : "";
-  const fracao = valores.pct_vgv_vendido === null ? null : Number(valores.pct_vgv_vendido);
+  const fracaoLida = Number(valores.pct_vgv_vendido);
+  const fracao = valores.pct_vgv_vendido === null || !Number.isFinite(fracaoLida) ? null : fracaoLida;
 
   return (
     <div className={`flex min-w-0 flex-col gap-2.5 ${moldura}`}>
@@ -31,7 +38,7 @@ export function IndicadorVgv({ valores, emCartao = false }: { valores: ValoresVg
             VGV
             <ExplicacaoIndicador chave="vgv_total" rotulo="VGV" />
           </p>
-          <p className="text-2xl font-semibold break-words">{formatarReal(Number(valores.vgv_total))}</p>
+          <p className="text-2xl font-semibold break-words">{valorOuAviso(valores.vgv_total)}</p>
         </div>
         <p className="text-sm text-suave">
           {fracao === null ? "Sem unidade com preço" : `${formatarPercentual(fracao)} vendido`}
@@ -42,12 +49,12 @@ export function IndicadorVgv({ valores, emCartao = false }: { valores: ValoresVg
         <div className="flex items-center gap-1.5">
           <Amostra classe="bg-saida" />
           <dt className="text-suave">Vendido</dt>
-          <dd className="font-medium tabular-nums">{formatarReal(Number(valores.vgv_vendido))}</dd>
+          <dd className="font-medium tabular-nums">{valorOuAviso(valores.vgv_vendido)}</dd>
         </div>
         <div className="flex items-center gap-1.5">
           <Amostra classe="border border-entrada bg-[#dcebe1]" />
           <dt className="text-suave">Em estoque</dt>
-          <dd className="font-medium tabular-nums">{formatarReal(Number(valores.estoque_a_vender))}</dd>
+          <dd className="font-medium tabular-nums">{valorOuAviso(valores.estoque_a_vender)}</dd>
         </div>
       </dl>
     </div>

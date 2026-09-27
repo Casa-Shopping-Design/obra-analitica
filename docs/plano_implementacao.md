@@ -239,13 +239,15 @@ Regras aplicadas em todo pacote:
 | PT-02 | Telas de visão geral e obra, com cenário | PT-01 | nenhuma | 20 a 30 |
 | PT-03 | Mapa de unidades e assistente com perguntas prontas | PT-01 | nenhuma | 10 a 15 |
 | PT-04 | Ajustes de banco antes da demo | PT-00 | 0006 | 4 a 6 |
-| PT-05 | Eventos financeiros (recebimentos, pagamentos, rateios) | PT-04 | 0007 | 12 a 20 |
-| PT-06 | VSO com calendário e cobertura do orçamento | PT-05 | 0008 | 6 a 10 |
-| PT-07 | Validador com parser, execução blindada e auditoria | PT-04 | 0009 | 10 a 16 |
-| PT-08 | Observabilidade, CI e carga agendada | PT-01 | 0010 | 10 a 16 |
-| PT-09 | Integração real com o ERP de origem | PT-05, acesso à API do piloto | 0011 em diante, atribuídas por João na hora | 30 a 60 |
+| PT-05 | Eventos financeiros (recebimentos, pagamentos, rateios) | PT-04 | 0012 | 12 a 20 |
+| PT-06 | VSO com calendário e cobertura do orçamento | PT-05 | 0015 | 6 a 10 |
+| PT-07 | Validador com parser, execução blindada e auditoria | PT-04 | 0013 | 10 a 16 |
+| PT-08 | Observabilidade, CI e carga agendada | PT-01 | 0014 | 10 a 16 |
+| PT-09 | Integração real com o ERP de origem | PT-05, acesso à API do piloto | 0016 em diante, atribuídas por João na hora | 30 a 60 |
 | PT-10 | Assistente com texto livre | PT-07, PT-03 | nenhuma | 12 a 20 |
 | PT-11 | Piloto acompanhado | PT-09, PT-02 com dados reais | nenhuma | 4 a 6 por semana |
+
+A 0011 (VGV na posição financeira) foi aplicada antes dos pacotes PT-05 a PT-08; por isso os números reservados passaram de 0007 a 0010 para 0012 a 0015, e o `supabase db push` não recusa migration fora de ordem. Pacote que recriar `marts.posicao_financeira_obra` mantém as colunas `vgv_vendido`, `vgv_total` e `pct_vgv_vendido` no fim.
 
 Paralelismo permitido (três agentes no máximo): PT-01 com PT-04; depois PT-02 com PT-03 e PT-08; depois PT-05 com PT-07; depois PT-06 com PT-09; depois PT-10 com PT-11.
 
@@ -439,11 +441,11 @@ Objetivo: staging por evento, para que parcela com dois recebimentos, título co
 
 Depende de: PT-04.
 
-Arquivos exclusivos: `supabase/migrations/0007_eventos_financeiros.sql` (novo), `supabase/tests/fluxo_caixa.sql` (novo), `scripts/gerar_dados_demo.py` (funções `gerar_parcelas` e `gerar_desembolso`), `painel/lib/catalogo-views.ts` (só a descrição de `fluxo_caixa_mensal`, se mudar), `docs/decisoes/0002-eventos-financeiros.md` (novo).
+Arquivos exclusivos: `supabase/migrations/0012_eventos_financeiros.sql` (novo), `supabase/tests/fluxo_caixa.sql` (novo), `scripts/gerar_dados_demo.py` (funções `gerar_parcelas` e `gerar_desembolso`), `painel/lib/catalogo-views.ts` (só a descrição de `fluxo_caixa_mensal`, se mudar), `docs/decisoes/0002-eventos-financeiros.md` (novo).
 
 Passos:
 
-1. Migration 0007:
+1. Migration 0012:
    a. Tabelas novas com RLS forçado, política única e índices:
       - `staging.recebimento (tenant_id, centro_custo_id, contrato_id_origem, parcela_id_origem, sequencia, data, valor)`, chave primária nas cinco primeiras colunas mais `sequencia`; índice `(tenant_id, centro_custo_id, data)`.
       - `staging.pagamento (tenant_id, centro_custo_id, titulo_id_origem, sequencia, data, valor)`; índice `(tenant_id, centro_custo_id, data)`.
@@ -466,11 +468,11 @@ Objetivo: `marts.vso_mensal` com calendário contínuo, distrato pela data de ca
 
 Depende de: PT-05.
 
-Arquivos exclusivos: `supabase/migrations/0008_vso.sql`, `supabase/tests/vso.sql`, `painel/lib/catalogo-views.ts` (entradas de `vso_mensal` e `cobertura_orcamento_obra`), `docs/decisoes/0003-vso.md`.
+Arquivos exclusivos: `supabase/migrations/0015_vso.sql`, `supabase/tests/vso.sql`, `painel/lib/catalogo-views.ts` (entradas de `vso_mensal` e `cobertura_orcamento_obra`), `docs/decisoes/0003-vso.md`.
 
 Passos:
 
-1. Migration 0008: `create or replace view marts.vso_mensal` como `generate_series` mensal por obra desde o primeiro contrato até o mês atual, `left join` das vendas por `date_trunc('month', data_venda)` e dos distratos por `date_trunc('month', data_distrato)`, colunas `vendas`, `distratos`, `vendas_liquidas`, `vgv_vendido`, `estoque_inicio_mes` (unidades não vendidas no início do mês, calculado a partir dos contratos ativos até o mês anterior) e `vso_pct = vendas_liquidas / nullif(estoque_inicio_mes + vendas_liquidas, 0)`. Em `cobertura_orcamento_obra`, acrescentar `vendas_media_6m` (média sobre os seis meses do calendário, incluindo zeros) e `meses_para_cobrir`.
+1. Migration 0015: `create or replace view marts.vso_mensal` como `generate_series` mensal por obra desde o primeiro contrato até o mês atual, `left join` das vendas por `date_trunc('month', data_venda)` e dos distratos por `date_trunc('month', data_distrato)`, colunas `vendas`, `distratos`, `vendas_liquidas`, `vgv_vendido`, `estoque_inicio_mes` (unidades não vendidas no início do mês, calculado a partir dos contratos ativos até o mês anterior) e `vso_pct = vendas_liquidas / nullif(estoque_inicio_mes + vendas_liquidas, 0)`. Em `cobertura_orcamento_obra`, acrescentar `vendas_media_6m` (média sobre os seis meses do calendário, incluindo zeros) e `meses_para_cobrir`.
 2. Teste pgTAP: obra com vendas em janeiro e março e nada em fevereiro tem três linhas, média de vendas dois terços do total; distrato em abril de contrato vendido em janeiro conta venda em janeiro e distrato em abril.
 3. Catálogo com a descrição nova e um exemplo com `vso_pct`.
 
@@ -484,14 +486,14 @@ Objetivo: substituir o validador por expressão regular por um validador de árv
 
 Depende de: PT-04.
 
-Arquivos exclusivos: `painel/lib/validador-sql.ts` (reescrito), `painel/testes/validador-sql.test.ts`, `painel/lib/assistente/executar.ts`, `painel/lib/assistente/limite.ts`, `supabase/migrations/0009_assistente.sql`, `supabase/tests/assistente.sql`, `docs/decisoes/0004-validador-parser.md`.
+Arquivos exclusivos: `painel/lib/validador-sql.ts` (reescrito), `painel/testes/validador-sql.test.ts`, `painel/lib/assistente/executar.ts`, `painel/lib/assistente/limite.ts`, `supabase/migrations/0013_assistente.sql`, `supabase/tests/assistente.sql`, `docs/decisoes/0004-validador-parser.md`.
 
 Passos:
 
 1. Instalar `pgsql-ast-parser` (parser em TypeScript puro, sem binário). Escrever `validarSql(sql)` que: faz o parse; recusa se houver mais de uma instrução; recusa se a instrução não for `select` (ou `with ... select`); percorre a árvore recolhendo toda referência a tabela (`from`, `join`, subconsulta, CTE) e recusa qualquer uma cujo `schema.nome` não esteja no catálogo, exceto nomes definidos por CTE na própria consulta e `app.centro_custo`; recusa `limit` maior que 500 e acrescenta `limit 500` quando ausente; recusa qualquer chamada de função cujo nome comece com `pg_` ou que pertença ao schema `auth` ou `app`; devolve o SQL reserializado pela própria biblioteca, não o texto original.
 2. Se o parser rejeitar alguma consulta legítima do catálogo (por exemplo, por não suportar `filter (where ...)`), registrar o caso e trocar pelo parser wasm do `libpg-query`, mantendo a mesma interface. A decisão vai para o ADR.
 3. Testes Vitest com, no mínimo, os dez casos abaixo, com o resultado esperado: legítima (aceita); tabela após vírgula fora do catálogo (recusa); nome entre aspas de schema fora do catálogo (recusa); `staging . tabela` com espaços (recusa); CTE sobre `raw` (recusa); `limit 99999999` (recusa); duas instruções (recusa); `select app.tenant_atual()` (recusa); comentário com palavra proibida em consulta legítima (aceita); subconsulta no `select` sobre tabela fora do catálogo (recusa). Mais: todas as consultas de exemplo do catálogo (aceitas).
-4. Migration 0009:
+4. Migration 0013:
    a. `alter role authenticated set statement_timeout = '8s'` e `notify pgrst, 'reload config'`.
    b. Função `marts.executar_consulta(p_sql text) returns jsonb`, `language plpgsql security invoker set search_path = ''`, que exige `auth.uid() is not null`, executa `set local transaction_read_only = on`, e devolve `coalesce(jsonb_agg(l), '[]')` de `select * from (<p_sql>) l`. Comentário de uma linha explicando que a segurança vem do RLS, do papel `authenticated` sem grant de escrita e do validador na aplicação; a função é só o ponto de execução.
    c. Tabela `app.pergunta_assistente` com as colunas da seção 4.2, item 10, RLS forçado, política de `insert` com `user_id = auth.uid() and tenant_id = app.tenant_atual()`, política de `select` com `user_id = auth.uid() or app.perfil_atual() = 'diretor'` (uma política por ação), índice `(user_id, criado_em desc)` e `(tenant_id, criado_em desc)`.
@@ -509,11 +511,11 @@ Objetivo: logs estruturados, Sentry, rota de saúde completa, monitor de disponi
 
 Depende de: PT-01.
 
-Arquivos exclusivos: `painel/lib/log.ts`, `painel/sentry.client.config.ts`, `painel/sentry.server.config.ts`, `painel/instrumentation.ts`, `painel/app/api/saude/route.ts` (substitui a versão do PT-01), `painel/componentes/CarimboCarga.tsx` (substitui), `painel/lib/consultas/carga.ts`, `supabase/migrations/0010_carga_execucao.sql`, `scripts/carregar_demo.py` (só o registro em `carga_execucao`), `.github/workflows/ci.yml`, `.github/workflows/carga_noturna.yml`, `painel/testes/e2e/login.spec.ts`, `docs/operacao.md`.
+Arquivos exclusivos: `painel/lib/log.ts`, `painel/sentry.client.config.ts`, `painel/sentry.server.config.ts`, `painel/instrumentation.ts`, `painel/app/api/saude/route.ts` (substitui a versão do PT-01), `painel/componentes/CarimboCarga.tsx` (substitui), `painel/lib/consultas/carga.ts`, `supabase/migrations/0014_carga_execucao.sql`, `scripts/carregar_demo.py` (só o registro em `carga_execucao`), `.github/workflows/ci.yml`, `.github/workflows/carga_noturna.yml`, `painel/testes/e2e/login.spec.ts`, `docs/operacao.md`.
 
 Passos:
 
-1. Migration 0010: tabela `app.carga_execucao (id bigserial, tenant_id, endpoint, iniciado_em, terminado_em, registros_lidos, registros_novos, situacao text check in ('executando','ok','falha'), erro_resumo text, duracao_ms)`, RLS forçado com política de `select` por tenant, índice `(tenant_id, terminado_em desc)`. View `marts.ultima_carga` com `security_invoker` devolvendo, por tenant, o `terminado_em` da última execução com situação `ok`, e `grant select` para `authenticated`.
+1. Migration 0014: tabela `app.carga_execucao (id bigserial, tenant_id, endpoint, iniciado_em, terminado_em, registros_lidos, registros_novos, situacao text check in ('executando','ok','falha'), erro_resumo text, duracao_ms)`, RLS forçado com política de `select` por tenant, índice `(tenant_id, terminado_em desc)`. View `marts.ultima_carga` com `security_invoker` devolvendo, por tenant, o `terminado_em` da última execução com situação `ok`, e `grant select` para `authenticated`.
 2. `carregar_demo.py`: abre um registro `executando` por endpoint antes de gravar e fecha com `ok` ou `falha` (com o resumo do erro, sem dado pessoal). Usa a mesma transação por endpoint.
 3. `painel/lib/log.ts`: instância única de `pino` com os campos fixos da seção 4.2; função `registrar(nivel, mensagem, campos)`. O middleware e as Route Handlers usam só ela.
 4. Sentry conforme a documentação oficial para Next.js (`npx @sentry/wizard@latest -i nextjs`, com revisão dos arquivos gerados para remover exemplos), com `beforeSend` que apaga `user.email` e `request.cookies`.
@@ -533,7 +535,7 @@ Objetivo: carga real de uma obra do piloto, conciliada com o relatório do contr
 
 Depende de: PT-05 e de João obter usuário de API do piloto com permissão para carga em massa, numa base de teste. Não usa credencial de outra empresa.
 
-Arquivos exclusivos: `scripts/sondar_origem.py` (ajustes), `scripts/sanitizar_amostras.py` (ajustes), `scripts/carregar_origem.py` (novo), `dados/amostras/` (sanitizadas), migrations a partir de 0011 (João atribui o número na hora, uma por necessidade), `docs/esquema_origem.md`, `docs/decisoes/0005-carga-incremental.md`.
+Arquivos exclusivos: `scripts/sondar_origem.py` (ajustes), `scripts/sanitizar_amostras.py` (ajustes), `scripts/carregar_origem.py` (novo), `dados/amostras/` (sanitizadas), migrations a partir de 0016 (João atribui o número na hora, uma por necessidade), `docs/esquema_origem.md`, `docs/decisoes/0005-carga-incremental.md`.
 
 Passos:
 
