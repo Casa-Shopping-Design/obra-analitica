@@ -7,7 +7,7 @@
 --   Obra Vazia: sem contrato.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(21);
+select plan(23);
 
 create temporary table referencia on commit drop as
 select m::date as mes_0,
@@ -189,6 +189,12 @@ select ok(
   (select 'security_invoker=true' = any(reloptions) from pg_class where oid = 'marts.cobertura_orcamento_obra'::regclass),
   'cobertura_orcamento_obra respeita o RLS de quem consulta'
 );
+
+select has_index('staging', 'contrato_venda', 'contrato_venda_obra_data_venda_idx',
+  array['tenant_id', 'centro_custo_id', 'data_venda'], 'contratos têm índice pela obra, usado pela política e pela VSO');
+
+select has_index('staging', 'unidade', 'unidade_obra_idx',
+  array['tenant_id', 'centro_custo_id'], 'unidades têm índice pela obra, usado pela política e pela oferta');
 
 select * from finish();
 rollback;

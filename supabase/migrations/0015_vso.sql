@@ -1,6 +1,11 @@
 -- VSO sobre calendário contínuo: mês sem venda aparece com zero, distrato cai no mês do cancelamento
 -- e a taxa divide as vendas líquidas pelo estoque que havia no início do mês (ver docs/decisoes/0003).
 
+-- A política leitura_por_obra e as junções abaixo filtram por centro_custo_id, que nessas duas
+-- tabelas não tinha índice: a chave começa por tenant_id e segue por id_origem.
+create index contrato_venda_obra_data_venda_idx on staging.contrato_venda (tenant_id, centro_custo_id, data_venda);
+create index unidade_obra_idx on staging.unidade (tenant_id, centro_custo_id);
+
 -- create or replace só aceita coluna nova no fim; as seis da 0003 ficam na mesma ordem e tipo.
 -- O(c + m) por obra, com c contratos e m meses do calendário: uma agregação por mês e uma janela.
 create or replace view marts.vso_mensal with (security_invoker = true) as
