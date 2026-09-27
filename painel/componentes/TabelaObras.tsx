@@ -11,8 +11,10 @@ type ColunaValor = Extract<keyof PosicaoObra, ChaveExplicacao>;
 type ColunaOrdem = ColunaValor | "obra";
 type Direcao = "asc" | "desc";
 
-// Todas as colunas de valor da view, na ordem: entra, sai, resultado.
+// Todas as colunas em reais da view, na ordem: VGV, entra, sai, resultado.
 const colunas: { chave: ColunaValor; rotulo: string }[] = [
+  { chave: "vgv_total", rotulo: "VGV" },
+  { chave: "vgv_vendido", rotulo: "VGV vendido" },
   { chave: "recebido_direto", rotulo: "Recebido do comprador" },
   { chave: "recebido_repasse", rotulo: "Recebido do banco" },
   { chave: "a_receber_direto", rotulo: "A receber do comprador" },

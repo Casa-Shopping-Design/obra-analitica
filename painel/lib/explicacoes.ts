@@ -1,5 +1,5 @@
 // Uma frase por indicador, dizendo o que soma e o que fica de fora. As regras seguem as views
-// marts.posicao_financeira_obra e marts.fluxo_caixa_mensal (migration 0005).
+// marts.posicao_financeira_obra e marts.fluxo_caixa_mensal (migrations 0005 e 0007).
 export const explicacoes = {
   recebido_direto: "O que os compradores já pagaram direto à construtora, pela data do pagamento.",
   recebido_repasse: "O que o banco já pagou de repasse do financiamento dos compradores.",
@@ -23,6 +23,9 @@ export const explicacoes = {
     "Maior saldo negativo acumulado no fluxo da obra: o dinheiro próprio que ela exige no pior mês. Entrada vencida não conta; saída vencida conta.",
   resultado_contratado:
     "Tudo que entrou e vai entrar dos contratos, inclusive o vencido, menos o maior valor entre o orçamento e o custo lançado. Estoque não entra.",
+  vgv_total:
+    "Valor geral de vendas: as unidades vendidas pelo valor do contrato mais o estoque pelo preço de tabela de hoje. Unidade fora de venda não entra.",
+  vgv_vendido: "Soma dos contratos de venda ativos das unidades vendidas. Contrato distratado não entra.",
   resultado_projetado:
     "O resultado contratado mais o estoque a preço de hoje, como se todas as unidades fossem vendidas pela tabela atual.",
 } as const;

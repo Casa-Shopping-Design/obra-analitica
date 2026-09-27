@@ -221,7 +221,8 @@ export function GraficoFluxo({
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={serie} syncId="fluxo-obra" accessibilityLayer={false} margin={{ top: 8, right: 8, bottom: 0, left: 8 }}>
                 <CartesianGrid vertical={false} stroke={cores.borda} strokeWidth={1} />
-                <XAxis dataKey="competencia" tickFormatter={formatarMes} minTickGap={16} {...eixoComum} />
+                {/* Escala em faixas, a mesma das barras, para o mês da linha cair embaixo da barra do mesmo mês. */}
+                <XAxis dataKey="competencia" scale="band" tickFormatter={formatarMes} minTickGap={16} {...eixoComum} />
                 <YAxis tickFormatter={formatarRealCompacto} width={72} {...eixoComum} />
                 <Tooltip formatter={formatarDica} labelFormatter={(rotulo) => formatarMes(String(rotulo))} />
                 <ReferenceLine y={0} stroke={cores.suave} strokeWidth={1} />

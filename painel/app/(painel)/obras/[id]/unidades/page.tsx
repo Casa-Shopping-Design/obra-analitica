@@ -2,29 +2,30 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { MapaUnidades } from "@/componentes/MapaUnidades";
 import {
-  buscarEstoqueAPrecoDeHoje,
   buscarObra,
+  buscarVgvObra,
   idObraValido,
   listarMapaUnidades,
   type ObraResumo,
 } from "@/lib/consultas/unidades";
+import type { ValoresVgv } from "@/lib/consultas/posicao";
 import type { UnidadeMapa } from "@/lib/grade-unidades";
 import { mensagens } from "@/lib/mensagens";
 
 export const metadata: Metadata = { title: "Mapa de unidades" };
 
-type DadosMapa = { obra: ObraResumo | null; unidades: UnidadeMapa[]; estoqueAPrecoDeHoje: number | null };
+type DadosMapa = { obra: ObraResumo | null; unidades: UnidadeMapa[]; vgv: ValoresVgv | null };
 
 async function carregarMapa(centroCustoId: string): Promise<DadosMapa | "erro"> {
-  if (!idObraValido(centroCustoId)) return { obra: null, unidades: [], estoqueAPrecoDeHoje: null };
+  if (!idObraValido(centroCustoId)) return { obra: null, unidades: [], vgv: null };
   try {
     // Três leituras independentes em paralelo; o RLS devolve vazio se a obra não é do usuário.
-    const [obra, unidades, estoqueAPrecoDeHoje] = await Promise.all([
+    const [obra, unidades, vgv] = await Promise.all([
       buscarObra(centroCustoId),
       listarMapaUnidades(centroCustoId),
-      buscarEstoqueAPrecoDeHoje(centroCustoId),
+      buscarVgvObra(centroCustoId),
     ]);
-    return { obra, unidades, estoqueAPrecoDeHoje };
+    return { obra, unidades, vgv };
   } catch {
     return "erro";
   }
@@ -73,7 +74,7 @@ export default async function PaginaMapaUnidades({ params }: { params: Promise<{
       {dados.unidades.length === 0 ? (
         <p>{mensagens.unidades.semUnidades}</p>
       ) : (
-        <MapaUnidades unidades={dados.unidades} estoqueAPrecoDeHoje={dados.estoqueAPrecoDeHoje} />
+        <MapaUnidades unidades={dados.unidades} vgv={dados.vgv} />
       )}
       <LinkListaObras />
     </>

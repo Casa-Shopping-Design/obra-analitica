@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { IndicadoresObra } from "@/componentes/CartaoIndicador";
+import { IndicadorVgv } from "@/componentes/IndicadorVgv";
 import { TabelaObras } from "@/componentes/TabelaObras";
 import { listarPosicaoObras, type PosicaoObra } from "@/lib/consultas/posicao";
 import { mensagens } from "@/lib/mensagens";
@@ -43,6 +44,9 @@ export default async function PaginaVisaoGeral() {
                     </Link>
                   </h2>
                   <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                    <div className="sm:col-span-2">
+                      <IndicadorVgv valores={obra} />
+                    </div>
                     <IndicadoresObra posicao={obra} />
                   </div>
                 </article>

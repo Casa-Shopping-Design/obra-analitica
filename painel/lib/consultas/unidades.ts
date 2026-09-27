@@ -1,6 +1,6 @@
 import "server-only";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
-import { ErroConsulta } from "@/lib/consultas/posicao";
+import { ErroConsulta, type ValoresVgv } from "@/lib/consultas/posicao";
 import { normalizarSituacao, type UnidadeMapa } from "@/lib/grade-unidades";
 
 export type ObraResumo = { id: string; nome: string };
@@ -52,16 +52,16 @@ export async function listarMapaUnidades(centroCustoId: string): Promise<Unidade
   return (data as LinhaMapa[]).map((linha) => ({ ...linha, situacao: normalizarSituacao(linha.situacao) }));
 }
 
-// Valor do estoque vem pronto da posição financeira, com a mesma regra da visão geral
-// (disponível, reservada e proposta a preço de hoje).
-export async function buscarEstoqueAPrecoDeHoje(centroCustoId: string): Promise<number | null> {
+// VGV e estoque vêm prontos da posição financeira, com a mesma regra da visão geral
+// (vendida pelo contrato; disponível, reservada e proposta a preço de hoje).
+export async function buscarVgvObra(centroCustoId: string): Promise<ValoresVgv | null> {
   const supabase = await criarClienteServidor();
   const { data, error } = await supabase
     .schema("marts")
     .from("posicao_financeira_obra")
-    .select("estoque_a_vender")
+    .select("vgv_total, vgv_vendido, estoque_a_vender, pct_vgv_vendido")
     .eq("centro_custo_id", centroCustoId)
-    .maybeSingle<{ estoque_a_vender: number }>();
+    .maybeSingle<ValoresVgv>();
   if (error) throw new ErroConsulta(error.code);
-  return data ? Number(data.estoque_a_vender) : null;
+  return data;
 }
