@@ -23,24 +23,24 @@ Ordem de integração: VGV, PT-05, PT-06, PT-07, PT-10, PT-08. PT-06 e PT-10 for
 
 Base `origin/main`. 15 arquivos, commits `8b7e2e1` e `afdcb88`. Migration 0011 já aplicada no remoto.
 
-- [ ] `supabase/migrations/0011_vgv.sql`: colunas novas no fim da view; fora de venda não entra no VGV.
-- [ ] `painel/componentes/MapaUnidades.tsx`: grade à esquerda e totais à direita em tela larga.
-- [ ] `docs/plano_implementacao.md`, seção 5.1: migrations reservadas renumeradas para 0012 a 0015.
-- [ ] `supabase test db`: vgv.sql 4/4.
-- [ ] Integrada na `main`.
+- [x] `supabase/migrations/0011_vgv.sql`: colunas novas no fim da view; fora de venda não entra no VGV.
+- [x] `painel/componentes/MapaUnidades.tsx`: grade à esquerda e totais à direita em tela larga.
+- [x] `docs/plano_implementacao.md`, seção 5.1: migrations reservadas renumeradas para 0012 a 0015.
+- [x] `supabase test db`: vgv.sql 4/4.
+- [x] Integrada na `main`.
 
 ## 2. `pt-05-eventos`: eventos financeiros
 
 Base `origin/claude/dreamy-clarke-am2xge`. 5 arquivos, commit `33f2646`. A revisão não achou defeito.
 
-- [ ] `0012_eventos_financeiros.sql` L32 a 40: `rateio_titulo` tem `fracao`, fora do plano, com check entre 0 e 1. Rateio negativo vindo do ERP pararia a carga do tenant; olhar de novo no PT-09.
-- [ ] L59 a 80: política nova de `titulo_pagar` e `pagamento`. O gerente vê o valor total de um título dividido com outra obra; só a fração dele entra nos números. **Decisão 1, aceita.**
-- [ ] L86 a 215: `staging.recarregar` mantém `search_path = ''` e o `revoke` da L215.
-- [ ] L238 e L243: saída realizada e prevista multiplicadas pela fração.
-- [ ] `scripts/gerar_dados_demo.py`: recebimento em duas vezes (40/60), rateio 60/40, `random.seed(2026)` mantido.
-- [ ] `docs/decisoes/0002-eventos-financeiros.md` lido.
-- [ ] `supabase test db`: fluxo_caixa 19, isolamento 12, vgv 4.
-- [ ] Integrada na `main`, `supabase db push`, depois `gerar_dados_demo.py` e `carregar_demo.py`. Os números por obra mudam um pouco, porque 5% dos títulos passam a ser rateados.
+- [x] `0012_eventos_financeiros.sql` L32 a 40: `rateio_titulo` tem `fracao`, fora do plano, com check entre 0 e 1. Rateio negativo vindo do ERP pararia a carga do tenant; olhar de novo no PT-09.
+- [x] L59 a 80: política nova de `titulo_pagar` e `pagamento`. O gerente vê o valor total de um título dividido com outra obra; só a fração dele entra nos números. **Decisão 1, aceita.**
+- [x] L86 a 215: `staging.recarregar` mantém `search_path = ''` e o `revoke` da L215.
+- [x] L238 e L243: saída realizada e prevista multiplicadas pela fração.
+- [x] `scripts/gerar_dados_demo.py`: recebimento em duas vezes (40/60), rateio 60/40, `random.seed(2026)` mantido.
+- [x] `docs/decisoes/0002-eventos-financeiros.md` lido.
+- [x] `supabase test db`: fluxo_caixa 19, isolamento 12, vgv 4.
+- [x] Integrada na `main`, `supabase db push`, depois `gerar_dados_demo.py` e `carregar_demo.py`. Os números por obra mudam um pouco, porque 5% dos títulos passam a ser rateados.
 
 Revisão de 27/09: pode integrar. Segurança, regra de negócio e eficiência conferidas contra a migration, o ADR e os 19 testes; a soma de `saida_realizada` de todas as obras bate com o pago antes da mudança. Decisão 1 aceita por João. Para o PT-09: com carga incremental, duas versões do mesmo título em `raw` dariam fração acima de 1 e parariam a carga (a 0002 já tinha o mesmo risco na chave de `titulo_pagar`); e o filtro `valor_recebido > 0` saiu, então estorno negativo vindo do ERP reduz a entrada do mês.
 
@@ -102,6 +102,17 @@ Base `origin/claude/dreamy-clarke-am2xge`. 23 arquivos, commits `4153fca` e `07c
 - [ ] `npx vitest run`: 64. `supabase test db`: carga_execucao 11.
 - [ ] Integrada na `main` por último, conflito do lockfile resolvido com `npm install`, `supabase db push`.
 - [ ] Sentry com DSN na Vercel e domínio de ingest na CSP; secrets `DATABASE_URL` e `TENANT_DEMO_ID` no GitHub; carga rodada uma vez por `workflow_dispatch`; monitor no UptimeRobot.
+
+## Andamento
+
+27/09: VGV e PT-05 integrados na `main` (merges `02d990b` e `18c27a0`, publicados em `6c0a93e`). `supabase test db` passou com 35 testes depois de `supabase db reset` no banco local; `supabase db push` aplicou a 0012 no remoto; `gerar_dados_demo.py` e `carregar_demo.py` rodaram contra o projeto da demo com a `DATABASE_URL` do Session pooler.
+
+Pendências de segurança do dia: a senha do banco e a chave secreta do Supabase apareceram no chat e precisam ser trocadas (Project Settings > Database > Reset database password; Project Settings > API Keys, apagar a chave secreta antiga). Depois da troca, atualizar a `DATABASE_URL` no `.env`, que fica fora do git.
+
+- [ ] Senha do banco trocada e `.env` atualizado.
+- [ ] Chave secreta antiga apagada.
+
+Próximo: confirmar a decisão 2 e integrar o PT-06; revisar PT-07, PT-10 e PT-08.
 
 ## Decisões pendentes
 
