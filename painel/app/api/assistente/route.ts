@@ -1,5 +1,10 @@
 import pino from "pino";
-import { executarConsultaValidada, type LinhaConsulta, type UsoModelo } from "@/lib/assistente/executar";
+import {
+  executarConsultaValidada,
+  lerChaveAssinatura,
+  type LinhaConsulta,
+  type UsoModelo,
+} from "@/lib/assistente/executar";
 import { criarClienteModelo, gerarSql, type ClienteModelo, type SqlGerado } from "@/lib/assistente/gerar-sql";
 import { verificarLimite } from "@/lib/assistente/limite";
 import { montarTabela, redigirResposta } from "@/lib/assistente/responder";
@@ -79,6 +84,17 @@ export async function POST(request: Request): Promise<Response> {
   campos.tenant_id = appMetadata?.tenant_id ?? null;
   const diretor = appMetadata?.perfil === "diretor";
 
+  // Sem tenant o registro da pergunta não grava, e pergunta sem registro não conta no limite:
+  // cada tentativa gastaria chamadas ao modelo sem teto. O banco é consultado só quando o claim falta.
+  if (!campos.tenant_id) {
+    const { data: tenantBanco } = await supabase.schema("app").rpc("tenant_atual");
+    campos.tenant_id = typeof tenantBanco === "string" ? tenantBanco : null;
+  }
+  if (!campos.tenant_id) {
+    registrar("sem_tenant");
+    return responderErro(403, mensagens.assistente.semAcesso, idRequisicao);
+  }
+
   const pergunta = await lerPergunta(request);
   if (!pergunta) {
     registrar("pergunta_invalida");
@@ -93,6 +109,12 @@ export async function POST(request: Request): Promise<Response> {
     }
   } catch {
     registrar("erro_limite");
+    return responderErro(503, mensagens.assistente.indisponivel, idRequisicao);
+  }
+
+  // Sem a chave de assinatura nada executa nem grava; conferir antes evita pagar o modelo à toa.
+  if (!lerChaveAssinatura()) {
+    log.error({ ...campos, resultado: "erro" }, "ASSISTENTE_CHAVE_ASSINATURA ausente ou curta");
     return responderErro(503, mensagens.assistente.indisponivel, idRequisicao);
   }
 

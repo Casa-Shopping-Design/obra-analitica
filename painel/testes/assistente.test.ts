@@ -27,6 +27,8 @@ type Registro = Record<string, unknown>;
 const banco = {
   usuarioLogado: true,
   perfil: "financeiro",
+  tenantNoClaim: "tenant-teste" as string | null,
+  tenantNoBanco: null as string | null,
   limite: { permitido: true, restante: 29 },
   linhas: [] as Registro[],
   registros: [] as Registro[],
@@ -39,7 +41,7 @@ function clienteBanco() {
       getUser: async () => ({ data: { user: banco.usuarioLogado ? { id: idUsuario } : null } }),
       getClaims: async () => ({
         data: banco.usuarioLogado
-          ? { claims: { sub: idUsuario, app_metadata: { tenant_id: "tenant-teste", perfil: banco.perfil } } }
+          ? { claims: { sub: idUsuario, app_metadata: { tenant_id: banco.tenantNoClaim ?? undefined, perfil: banco.perfil } } }
           : null,
       }),
     },
@@ -50,7 +52,8 @@ function clienteBanco() {
           return { error: null };
         },
       }),
-      rpc: async (_nome: string, argumentos: { p_sql: string; p_assinatura: string }) => {
+      rpc: async (nome: string, argumentos: { p_sql: string; p_assinatura: string }) => {
+        if (nome === "tenant_atual") return { data: banco.tenantNoBanco, error: null };
         banco.execucoes.push(argumentos);
         return { data: banco.linhas, error: null };
       },
@@ -105,6 +108,8 @@ beforeEach(() => {
   Object.assign(banco, {
     usuarioLogado: true,
     perfil: "financeiro",
+    tenantNoClaim: "tenant-teste",
+    tenantNoBanco: null,
     limite: { permitido: true, restante: 29 },
     linhas: [],
     registros: [],
@@ -216,6 +221,36 @@ describe("rota do assistente com texto livre", () => {
     const { status } = await perguntar("Quanto dinheiro próprio cada obra precisa no pior momento?");
 
     expect(status).toBe(401);
+    expect(modelo.chamadas).toHaveLength(0);
+  });
+
+  it("recusa com 403 quem não tem tenant, sem chamar o modelo", async () => {
+    banco.tenantNoClaim = null;
+
+    const { status, corpo } = await perguntar("Quanto dinheiro próprio cada obra precisa no pior momento?");
+
+    expect(status).toBe(403);
+    expect(corpo.erro).toMatch(/não está ligado a uma construtora/);
+    expect(modelo.chamadas).toHaveLength(0);
+  });
+
+  it("aceita o tenant lido do banco quando o claim ainda não existe", async () => {
+    banco.tenantNoClaim = null;
+    banco.tenantNoBanco = "tenant-teste";
+    modelo.respostas = [sqlGerado("")];
+
+    const { status } = await perguntar("Quanto dinheiro próprio cada obra precisa no pior momento?");
+
+    expect(status).toBe(422);
+    expect(modelo.chamadas).toHaveLength(1);
+  });
+
+  it("não chama o modelo sem a chave de assinatura das consultas", async () => {
+    delete process.env.ASSISTENTE_CHAVE_ASSINATURA;
+
+    const { status } = await perguntar("Quanto dinheiro próprio cada obra precisa no pior momento?");
+
+    expect(status).toBe(503);
     expect(modelo.chamadas).toHaveLength(0);
   });
 

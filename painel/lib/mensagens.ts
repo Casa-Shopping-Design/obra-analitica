@@ -24,6 +24,8 @@ export const mensagens = {
     indisponivel: "Não foi possível responder agora. Tente de novo em alguns minutos.",
     perguntaDesconhecida: "Essa pergunta não está na lista. Escolha uma das perguntas abaixo.",
     semUsuario: "Sua sessão expirou. Entre de novo para continuar.",
+    semAcesso: "Seu usuário ainda não está ligado a uma construtora. Peça acesso ao administrador.",
+    falhaRede: "Não foi possível falar com o servidor. Confira a conexão e tente de novo.",
     perguntaInvalida: "Escreva a pergunta com 3 a 500 caracteres.",
     limite: "Limite de 30 perguntas por hora atingido. Tente de novo mais tarde ou use as perguntas prontas.",
     consultaInsegura: "Não consegui montar uma consulta segura para essa pergunta. Tente perguntar de outro jeito.",

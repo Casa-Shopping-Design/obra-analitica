@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { RespostaPergunta } from "@/componentes/RespostaPergunta";
 import type { LinhaResposta } from "@/lib/consultas/perguntas-prontas";
+import { mensagens } from "@/lib/mensagens";
 import type { ColunaResposta } from "@/lib/perguntas-prontas";
 
 type RespostaLivre = {
@@ -14,7 +15,7 @@ type RespostaLivre = {
   sql?: string;
 };
 
-const falhaRede = "Não foi possível falar com o servidor. Confira a conexão e tente de novo.";
+const falhaRede = mensagens.assistente.falhaRede;
 
 export function PerguntaLivre({ limiteLinhas, semDados }: { limiteLinhas: number; semDados: string }) {
   const router = useRouter();

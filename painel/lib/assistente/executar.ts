@@ -40,7 +40,7 @@ type CamposLog = { id_requisicao: string; rota: string; user_id: string | null; 
 const log = pino({ base: null, messageKey: "mensagem" });
 
 // Sem a chave não há assinatura, e o banco recusa a consulta; melhor falhar aqui com o motivo no log.
-function lerChaveAssinatura(): string | null {
+export function lerChaveAssinatura(): string | null {
   const chave = process.env.ASSISTENTE_CHAVE_ASSINATURA;
   return chave && chave.length >= 32 ? chave : null;
 }
