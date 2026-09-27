@@ -51,8 +51,10 @@ language sql stable security definer set search_path = '' as $$
 $$;
 
 -- O anônimo passa a enxergar o schema app só para chamar a função acima. Toda função de app
--- já tem execute revogado de public; o default abaixo garante o mesmo para as que vierem depois.
-alter default privileges in schema app revoke execute on functions from public;
+-- já tem execute revogado de public. Função nova em app nasce executável por public e, daqui em
+-- diante, pelo anônimo: a migration que a criar revoga no mesmo arquivo. Um "alter default
+-- privileges in schema app revoke" não resolveria, porque o default por schema só soma ao global.
+-- O teste carga_execucao.sql falha se alguma função de app ficar aberta ao anônimo.
 grant usage on schema app to anon;
 revoke execute on function app.saude_carga() from public;
 grant execute on function app.saude_carga() to anon, authenticated;
