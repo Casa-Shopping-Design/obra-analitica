@@ -1,13 +1,14 @@
 -- VSO com casos conhecidos. As datas são relativas ao mês atual porque o calendário da view vai
 -- até hoje: "mes_0" é o mês corrente, "mes_2" é dois meses atrás.
---   Obra Leste: 10 unidades em oferta e uma fora de venda; uma venda em mes_2, nenhuma em mes_1, uma em mes_0.
+--   Obra Leste: 10 unidades em oferta e uma fora de venda; uma venda em mes_2, nenhuma em mes_1, uma em mes_0;
+--   em mes_1 há um contrato em situação que não é ativo nem distratado, que não conta.
 --   Obra Oeste: 5 unidades; duas vendas em mes_3, uma delas distratada em mes_0; uma venda em mes_1
 --   distratada sem data de cancelamento na origem.
 --   Obra Antiga: seis vendas oito meses atrás e nada depois.
 --   Obra Vazia: sem contrato.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(23);
+select plan(24);
 
 create temporary table referencia on commit drop as
 select m::date as mes_0,
@@ -46,7 +47,8 @@ from referencia, lateral (values
   ('0c000000-0000-4000-8000-0000000000d1', 2, mes_0, 200000, '1', null),
   ('0c000000-0000-4000-8000-0000000000d2', 3, mes_3 + 9, 300000, '3', mes_0),
   ('0c000000-0000-4000-8000-0000000000d2', 4, mes_3 + 19, 300000, '1', null),
-  ('0c000000-0000-4000-8000-0000000000d2', 5, mes_1 + 2, 300000, '3', null)
+  ('0c000000-0000-4000-8000-0000000000d2', 5, mes_1 + 2, 300000, '3', null),
+  ('0c000000-0000-4000-8000-0000000000d1', 6, mes_1 + 5, 200000, '0', null)
 ) as c (obra, id_origem, data_venda, valor, situacao, data_distrato)
 union all
 select '0e000000-0000-4000-8000-0000000000d1', '0c000000-0000-4000-8000-0000000000d3', 30 + n, mes_8 + n, 250000, '1', null
@@ -63,6 +65,12 @@ select is(
    where v.centro_custo_id = '0c000000-0000-4000-8000-0000000000d1' and v.competencia = r.mes_1),
   0::bigint,
   'mês sem venda tem zero vendas'
+);
+
+select is(
+  (select sum(vgv_vendido) from marts.vso_mensal where centro_custo_id = '0c000000-0000-4000-8000-0000000000d1'),
+  400000::numeric,
+  'contrato que não está ativo nem distratado fica fora da venda e do VGV do mês'
 );
 
 select is(

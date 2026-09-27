@@ -14,7 +14,8 @@ with contratos as (
     -- distrato sem data de cancelamento na origem cai no mês da venda, para não inflar a venda líquida
     case when situacao = '3' then coalesce(data_distrato, data_venda) end as data_cancelamento
   from staging.contrato_venda
-  where data_venda is not null
+  -- mesmo universo de contratos do VGV e da cobertura: ativo ou distratado, nada em outra situação
+  where data_venda is not null and situacao in ('1', '3')
 ), calendario as (
   select tenant_id, centro_custo_id, competencia::date as competencia
   from (
