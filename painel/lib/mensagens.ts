@@ -23,5 +23,15 @@ export const mensagens = {
   assistente: {
     indisponivel: "Não foi possível responder agora. Tente de novo em alguns minutos.",
     perguntaDesconhecida: "Essa pergunta não está na lista. Escolha uma das perguntas abaixo.",
+    semUsuario: "Sua sessão expirou. Entre de novo para continuar.",
+    perguntaInvalida: "Escreva a pergunta com 3 a 500 caracteres.",
+    limite: "Limite de 30 perguntas por hora atingido. Tente de novo mais tarde ou use as perguntas prontas.",
+    consultaInsegura: "Não consegui montar uma consulta segura para essa pergunta. Tente perguntar de outro jeito.",
+    foraDoCatalogo:
+      "Não encontrei nos dados do painel como responder a essa pergunta. Pergunte sobre caixa, recebimentos, pagamentos, vendas ou estoque das obras.",
+    execucao: "Não consegui executar essa pergunta. Tente reformular.",
+    semDados: "Não encontrei dados para essa pergunta nas obras liberadas para o seu perfil.",
+    historicoIndisponivel: "Não foi possível carregar suas últimas perguntas agora. Recarregue a página em alguns minutos.",
+    respostaSoTabela: "A resposta está na tabela abaixo, calculada direto dos dados do painel.",
   },
 } as const;

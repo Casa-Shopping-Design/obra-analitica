@@ -8,6 +8,10 @@ export type LinhaConsulta = Record<string, unknown>;
 
 export type UsoModelo = { tokensEntrada: number; tokensSaida: number; custoEstimado: number };
 
+// Roda com as linhas antes da gravação, para o registro trazer tokens e custo da resposta também:
+// a tabela não aceita update depois do insert.
+export type ComplementoUso = (linhas: LinhaConsulta[]) => Promise<UsoModelo>;
+
 // O código da falha é traduzido para texto na borda, por lib/mensagens.ts; SQL e erro do banco nunca saem daqui.
 export type FalhaExecucao = "sem_usuario" | "recusada" | "execucao" | "configuracao";
 
@@ -41,6 +45,23 @@ function lerChaveAssinatura(): string | null {
   return chave && chave.length >= 32 ? chave : null;
 }
 
+function somarUso(base: UsoModelo | undefined, extra: UsoModelo): UsoModelo {
+  if (!base) return extra;
+  return {
+    tokensEntrada: base.tokensEntrada + extra.tokensEntrada,
+    tokensSaida: base.tokensSaida + extra.tokensSaida,
+    custoEstimado: base.custoEstimado + extra.custoEstimado,
+  };
+}
+
+function camposUso(uso: UsoModelo | undefined) {
+  return {
+    tokens_entrada: uso?.tokensEntrada ?? null,
+    tokens_saida: uso?.tokensSaida ?? null,
+    custo_estimado: uso?.custoEstimado ?? null,
+  };
+}
+
 // user_id e tenant_id ficam a cargo do banco (default e política de insert), então ninguém grava em nome de outro.
 async function gravarPergunta(supabase: Cliente, registro: RegistroPergunta, campos: CamposLog): Promise<boolean> {
   const { error } = await supabase.schema("app").from("pergunta_assistente").insert(registro);
@@ -53,6 +74,7 @@ export async function executarConsultaValidada(
   idRequisicao: string,
   pergunta: string,
   uso?: UsoModelo,
+  complementarUso?: ComplementoUso,
 ): Promise<ResultadoExecucao> {
   const supabase = await criarClienteServidor();
   // getClaims valida o JWT; o tenant vem do claim que o hook do Auth grava, e não do registro do usuário.
@@ -74,9 +96,7 @@ export async function executarConsultaValidada(
     id_requisicao: idRequisicao,
     pergunta,
     sql_gerado: sqlGerado,
-    tokens_entrada: uso?.tokensEntrada ?? null,
-    tokens_saida: uso?.tokensSaida ?? null,
-    custo_estimado: uso?.custoEstimado ?? null,
+    ...camposUso(uso),
   };
 
   const validacao = validarSql(sqlGerado);
@@ -107,10 +127,11 @@ export async function executarConsultaValidada(
   }
 
   const linhas: LinhaConsulta[] = Array.isArray(data) ? data : [];
+  const usoTotal = complementarUso ? somarUso(uso, await complementarUso(linhas)) : uso;
   // Resposta sem registro não sai: a rastreabilidade de quem perguntou o quê vale mais que a resposta.
   const registrou = await gravarPergunta(
     supabase,
-    { ...execucao, resultado: "ok", linhas_devolvidas: linhas.length },
+    { ...execucao, ...camposUso(usoTotal), resultado: "ok", linhas_devolvidas: linhas.length },
     campos,
   );
   if (!registrou) return { ok: false, falha: "execucao", idRequisicao };

@@ -1,0 +1,7 @@
+# 0006 Assistente com texto livre
+
+**Contexto.** A pergunta em português precisa virar SQL sobre o catálogo sem que o modelo invente número nem execute algo fora das views, e a tabela `app.pergunta_assistente` não aceita update depois do insert.
+
+**Decisão.** Duas chamadas ao `claude-sonnet-5` (US$ 2 e US$ 10 por milhão de tokens de entrada e saída, conferidos na skill `claude-api`), com `effort` baixo. A primeira recebe o catálogo em bloco de sistema com cache e a pergunta dentro de `<pergunta_usuario>`, sem os sinais de menor e maior, e devolve `{ sql, formatos }` por saída estruturada. Se o validador recusar, há uma segunda geração com o motivo; recusou de novo, nada executa. A segunda chamada recebe até 50 linhas como dado na mensagem do usuário e escreve o texto sem algarismos, citando valores por `{{linha.coluna}}`; o servidor troca cada referência pelo valor formatado. Texto com algarismo solto ou referência inexistente é descartado e fica só a tabela. Consulta vazia não chama o modelo. `executarConsultaValidada` ganhou o parâmetro `complementarUso`, que roda a redação antes do insert para o registro levar tokens e custo das duas chamadas.
+
+**Consequência.** A frase da resposta nunca traz número que não veio do banco, ao custo de respostas mais secas. Só o diretor recebe o SQL executado. Sem `ANTHROPIC_API_KEY` a rota responde 503 e as perguntas prontas continuam funcionando.
