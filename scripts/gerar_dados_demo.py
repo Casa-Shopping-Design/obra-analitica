@@ -174,7 +174,13 @@ def aplicar_distratos(obra, contratos):
 
 
 def gerar_parcelas(obra, contratos, unidades_por_id):
-    """Uma linha por parcela, no formato do bulk income."""
+    """Uma linha por parcela, no formato do bulk income.
+
+    Uma em cada dez mensais quitadas e paga em dois recebimentos (40% e 60%) em meses diferentes,
+    para a demo exercitar o staging por evento.
+    """
+    # sorteio proprio: os dados sorteados pelo random global ficam iguais aos de antes dos eventos
+    sorteio_eventos = random.Random(obra["id"] * 31)
     parcelas = []
     seq = 1
     for contrato in contratos:
@@ -207,6 +213,18 @@ def gerar_parcelas(obra, contratos, unidades_por_id):
                 if cond["conditionType"] == "FI":
                     recebida = contrato["financialInstitutionDate"] is not None
                 saldo = 0 if (recebida and not inadimplente) else corrigido
+                recebimentos = []
+                if not saldo:
+                    valor_quitado = round(corrigido, 2)
+                    segunda_data = somar_meses(vencimento, 1)
+                    if cond["conditionType"] == "PM" and segunda_data <= HOJE and sorteio_eventos.random() < 0.10:
+                        primeira = round(valor_quitado * 0.4, 2)
+                        recebimentos = [
+                            {"paymentDate": vencimento.isoformat(), "amount": primeira},
+                            {"paymentDate": segunda_data.isoformat(), "amount": round(valor_quitado - primeira, 2)},
+                        ]
+                    else:
+                        recebimentos = [{"paymentDate": vencimento.isoformat(), "amount": valor_quitado}]
                 parcelas.append({
                     "companyId": EMPRESA["id"],
                     "projectId": obra["id"],
@@ -225,7 +243,7 @@ def gerar_parcelas(obra, contratos, unidades_por_id):
                     "defaulterSituation": "S" if inadimplente else "N",
                     "mainUnit": contrato["units"][0]["name"],
                     "paymentTerm": {"id": cond["conditionType"]},
-                    "receipts": [] if saldo else [{"paymentDate": vencimento.isoformat(), "amount": round(corrigido, 2)}],
+                    "receipts": recebimentos,
                 })
                 seq += 1
     return parcelas
@@ -262,7 +280,14 @@ def gerar_orcamento(obra):
 
 
 def gerar_desembolso(obra, itens):
-    """Titulos a pagar numa curva em S coerente com o avanco fisico."""
+    """Titulos a pagar numa curva em S coerente com o avanco fisico.
+
+    5% dos titulos pagos saem em dois pagamentos, 5% dos titulos sao rateados 60/40 com a obra
+    seguinte da lista e dois titulos por obra ficam sem obra apropriada (despesa da empresa).
+    """
+    sorteio_eventos = random.Random(obra["id"] * 37)
+    posicao = next(k for k, o in enumerate(OBRAS) if o["id"] == obra["id"])
+    outra_obra = OBRAS[(posicao + 1) % len(OBRAS)]["id"]
     titulos = []
     meses = list(meses_entre(INICIO_HISTORICO, somar_meses(obra["chaves"], 0)))
     total = sum(i["totalPrice"] for i in itens)
@@ -276,18 +301,51 @@ def gerar_desembolso(obra, itens):
             valor = valor_mes / 6 * random.uniform(0.7, 1.3)
             vencimento = mes + timedelta(days=random.randint(1, 27))
             pago = vencimento <= HOJE
+            valor_titulo = round(valor, 2)
+            pagamentos = []
+            if pago and sorteio_eventos.random() < 0.05:
+                primeiro = round(valor_titulo / 2, 2)
+                pagamentos = [
+                    {"paymentDate": vencimento.isoformat(), "amount": primeiro},
+                    {"paymentDate": min(vencimento + timedelta(days=20), HOJE).isoformat(),
+                     "amount": round(valor_titulo - primeiro, 2)},
+                ]
+            elif pago:
+                pagamentos = [{"paymentDate": vencimento.isoformat(), "amount": valor_titulo}]
+            if sorteio_eventos.random() < 0.05:
+                parte_obra = round(valor_titulo * 0.6, 2)
+                apropriacao = [{"buildingId": obra["id"], "amount": parte_obra},
+                               {"buildingId": outra_obra, "amount": round(valor_titulo - parte_obra, 2)}]
+            else:
+                apropriacao = [{"buildingId": obra["id"], "amount": valor_titulo}]
             titulos.append({
                 "companyId": EMPRESA["id"],
                 "creditorName": random.choice(["Cimento Norte", "Aco Forte", "Eletrica SA", "Ceramica Sul",
                                                "Mao de obra Silva", "Vidros Lux", "Hidraulica Total"]),
                 "billId": obra["id"] * 100000 + seq,
                 "dueDate": vencimento.isoformat(),
-                "originalAmount": round(valor, 2),
-                "balanceAmount": 0 if pago else round(valor, 2),
-                "buildingsCosts": [{"buildingId": obra["id"], "amount": round(valor, 2)}],
-                "payments": [{"paymentDate": vencimento.isoformat(), "amount": round(valor, 2)}] if pago else [],
+                "originalAmount": valor_titulo,
+                "balanceAmount": 0 if pago else valor_titulo,
+                "buildingsCosts": apropriacao,
+                "payments": pagamentos,
             })
             seq += 1
+
+    for credor, vencimento in [("Escritorio Contabil Centro", somar_meses(HOJE, -2)),
+                               ("Seguradora Horizonte", somar_meses(HOJE, 1))]:
+        valor_titulo = round(sorteio_eventos.uniform(8_000, 20_000), 2)
+        pago = vencimento <= HOJE
+        titulos.append({
+            "companyId": EMPRESA["id"],
+            "creditorName": credor,
+            "billId": obra["id"] * 100000 + seq,
+            "dueDate": vencimento.isoformat(),
+            "originalAmount": valor_titulo,
+            "balanceAmount": 0 if pago else valor_titulo,
+            "buildingsCosts": [],
+            "payments": [{"paymentDate": vencimento.isoformat(), "amount": valor_titulo}] if pago else [],
+        })
+        seq += 1
     return titulos
 
 
