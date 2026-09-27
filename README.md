@@ -35,11 +35,14 @@ supabase db push --include-seed             # grava o tenant e os três centros 
 python scripts/carregar_demo.py             # grava em raw e recarrega o staging
 ```
 
+Os scripts Python leem o `.env` da raiz e o `.venv`, que só existem na pasta principal do repositório, não nos worktrees. A `DATABASE_URL` é a do Session pooler (Connect, Direct, Session pooler), e caractere especial da senha vai codificado (`@` vira `%40`).
+
 No Dashboard do projeto:
 
 1. Authentication, Users, Add user: criar `diretor@demo.com` e `gerente.aurora@demo.com` com "Auto Confirm User" marcado.
-2. Authentication, Sign In / Providers, Email: desligar "Allow new users to sign up".
-3. Configurações da Data API: acrescentar `app` e `marts` aos schemas expostos. `raw` e `staging` ficam de fora.
+2. Authentication, Sign In / Providers, seção User Signups no topo da página: desligar "Allow new users to sign up" e salvar. O provedor Email continua ligado.
+3. Integrations, Data API, aba Settings, campo Exposed schemas: acrescentar `app` e `marts`. `raw` e `staging` ficam de fora. Não confundir com Extra search path, que fica em `public` e `extensions`, e não mexer em Exposed tables nem Exposed functions. Com a tradução do Chrome ligada, os nomes dos schemas aparecem traduzidos.
+4. Authentication, Hooks, Customize Access Token (JWT) Claims: Postgres, schema `app`, função `claims_jwt`. Sem o hook o painel mostra "Sem perfil" e nenhuma obra.
 
 Vínculo dos usuários ao tenant (os UUIDs estão em Authentication, Users, e não vão para arquivo versionado):
 

@@ -81,4 +81,13 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 
 ## Próxima sessão
 
-Projeto Supabase `obraanalitic` (ref `ndgwcunpnxhkzapmmvsq`, sa-east-1, Postgres 17) criado em 22/09/2026; CLI logado e linkado; migrations 0001 a 0005 e o seed aplicados; `supabase/config.toml` criado com `app` e `marts` expostos (só local); `.env` com a string do pooler e a senha ainda como `SENHA_DO_BANCO`; `.venv` com psycopg. Falta o PT-00 do plano: senha no `.env`, dois usuários no Dashboard, cadastro livre desligado, schemas `app` e `marts` expostos no Dashboard, `carregar_demo.py` e o script de vínculo dos usuários. Depois, PT-01 (painel em `painel/`) e PT-04 (migration 0006) em paralelo.
+Situação em 27/09/2026. PT-00 a PT-04 estão na `main`. O PT-07 está pronto em `claude/pt-07`, sem merge, e o relatório dele (`docs/relatorios/pt-07-noite.md`) lista o que falta com banco real. A branch `claude/sharp-knuth-96f5h3` tem dois commits só de `CONTEXTO.md` que também não entraram.
+
+A demo passou para o projeto Supabase da conta Casa Design (ref `rxbhxtbjxqlisbrfcbtt`, us-east-1). Migrations 0001 a 0006 e seed aplicados pelo SQL Editor, com o histórico gravado em `supabase_migrations.schema_migrations` para a CLI não reaplicar. Carga da demo feita (4.137 parcelas), dois usuários criados e vinculados, `app` e `marts` expostos, hook `app.claims_jwt` ligado, cadastro livre desligado. João entrou no painel local como diretor e passou por todas as telas sem erro. O projeto antigo (`obraanalitic`, ref `ndgwcunpnxhkzapmmvsq`, conta prof.joaosena) continua carregado, mas saiu de uso; a `DATABASE_URL` dele ficou comentada no `.env`.
+
+Falta:
+- Entrar no painel com `gerente.aurora@demo.com` e ver uma obra só.
+- Vercel da Casa Design: importar `joaocss/obra-analitica` pela conta pessoal do GitHub (o plano Hobby não importa repositório privado de organização), Root Directory `painel`, com `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Hobby é só para uso não comercial; o piloto vai precisar de Pro.
+- Depois do deploy, Site URL e Redirect URLs em Authentication, URL Configuration.
+- Trocar a senha do banco do projeto antigo, que apareceu em print.
+- Integrar o PT-07 e seguir com PT-05 e PT-08. Demo em 16/10/2026.
