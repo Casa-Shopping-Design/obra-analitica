@@ -55,16 +55,17 @@ export async function executarConsultaValidada(
   uso?: UsoModelo,
 ): Promise<ResultadoExecucao> {
   const supabase = await criarClienteServidor();
-  const { data: dadosUsuario } = await supabase.auth.getUser();
-  const usuario = dadosUsuario.user;
+  // getClaims valida o JWT; o tenant vem do claim que o hook do Auth grava, e não do registro do usuário.
+  const { data: dadosToken } = await supabase.auth.getClaims();
+  const claims = dadosToken?.claims;
   const campos: CamposLog = {
     id_requisicao: idRequisicao,
     rota: "assistente",
-    user_id: usuario?.id ?? null,
-    tenant_id: (usuario?.app_metadata?.tenant_id as string | undefined) ?? null,
+    user_id: claims?.sub ?? null,
+    tenant_id: (claims?.app_metadata?.tenant_id as string | undefined) ?? null,
   };
 
-  if (!usuario) {
+  if (!claims?.sub) {
     log.warn({ ...campos, resultado: "sem_usuario" }, "consulta do assistente sem usuário autenticado");
     return { ok: false, falha: "sem_usuario", idRequisicao };
   }
