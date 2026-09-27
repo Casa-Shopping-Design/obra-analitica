@@ -34,13 +34,15 @@ Base `origin/main`. 15 arquivos, commits `8b7e2e1` e `afdcb88`. Migration 0011 j
 Base `origin/claude/dreamy-clarke-am2xge`. 5 arquivos, commit `33f2646`. A revisão não achou defeito.
 
 - [ ] `0012_eventos_financeiros.sql` L32 a 40: `rateio_titulo` tem `fracao`, fora do plano, com check entre 0 e 1. Rateio negativo vindo do ERP pararia a carga do tenant; olhar de novo no PT-09.
-- [ ] L59 a 80: política nova de `titulo_pagar` e `pagamento`. O gerente vê o valor total de um título dividido com outra obra; só a fração dele entra nos números. **Decisão 1.**
+- [ ] L59 a 80: política nova de `titulo_pagar` e `pagamento`. O gerente vê o valor total de um título dividido com outra obra; só a fração dele entra nos números. **Decisão 1, aceita.**
 - [ ] L86 a 215: `staging.recarregar` mantém `search_path = ''` e o `revoke` da L215.
 - [ ] L238 e L243: saída realizada e prevista multiplicadas pela fração.
 - [ ] `scripts/gerar_dados_demo.py`: recebimento em duas vezes (40/60), rateio 60/40, `random.seed(2026)` mantido.
 - [ ] `docs/decisoes/0002-eventos-financeiros.md` lido.
 - [ ] `supabase test db`: fluxo_caixa 19, isolamento 12, vgv 4.
 - [ ] Integrada na `main`, `supabase db push`, depois `gerar_dados_demo.py` e `carregar_demo.py`. Os números por obra mudam um pouco, porque 5% dos títulos passam a ser rateados.
+
+Revisão de 27/09: pode integrar. Segurança, regra de negócio e eficiência conferidas contra a migration, o ADR e os 19 testes; a soma de `saida_realizada` de todas as obras bate com o pago antes da mudança. Decisão 1 aceita por João. Para o PT-09: com carga incremental, duas versões do mesmo título em `raw` dariam fração acima de 1 e parariam a carga (a 0002 já tinha o mesmo risco na chave de `titulo_pagar`); e o filtro `valor_recebido > 0` saiu, então estorno negativo vindo do ERP reduz a entrada do mês.
 
 ## 3. `pt-06-vso`: VSO com calendário
 
@@ -53,6 +55,8 @@ Base `origin/pt-05-eventos`. 4 arquivos, commits `97bbf96`, `bae4f9f` e `8929305
 - [ ] `painel/lib/catalogo-views.ts`: descrição de `vso_mensal` mostra o denominador.
 - [ ] `supabase test db`: vso 24.
 - [ ] Integrada na `main` depois do PT-05, `supabase db push`.
+
+Revisão de 27/09: pode integrar depois do PT-05. Recomendação para a decisão 2: aceitar. Vendas sobre estoque inicial é a definição de mercado e equivale a vendas sobre vendas mais estoque final; a fórmula do plano soma duas vezes a unidade vendida no mês. Pontos de atenção, sem bloqueio: `vgv_vendido` em `vso_mensal` passou a incluir contratos distratados depois, enquanto em `posicao_financeira_obra` a mesma coluna é só contrato ativo, o que pode confundir o assistente (renomear numa migration futura com `alter view ... rename column`); obra com menos de seis meses de contrato tem `vendas_media_6m` sobre os meses que existem, não sobre seis; unidade hoje fora de venda sai da oferta de todos os meses, porque o staging não guarda histórico de situação.
 
 ## 4. `pt-07-validador`: validador, execução e auditoria
 
@@ -103,8 +107,8 @@ Base `origin/claude/dreamy-clarke-am2xge`. 23 arquivos, commits `4153fca` e `07c
 
 | # | Branch | Decisão | Escolha |
 | --- | --- | --- | --- |
-| 1 | pt-05 | Gerente vê o valor total de um título rateado com outra obra | |
-| 2 | pt-06 | Denominador da VSO diferente do plano | |
+| 1 | pt-05 | Gerente vê o valor total de um título rateado com outra obra | Aceita em 27/09 |
+| 2 | pt-06 | Denominador da VSO diferente do plano | Recomendado aceitar; aguarda João |
 | 3 | pt-07 | `executar_consulta` com assinatura; `statement_timeout` de 8 s para todas as telas | |
 | 4 | pt-07 | Corrida no limite de 30 por hora e leitura do próprio SQL pela API no MVP | |
 | 5 | pt-08 | Anônimo no schema `app` ou rota de saúde pelo servidor | |
