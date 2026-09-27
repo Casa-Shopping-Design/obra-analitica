@@ -1,6 +1,6 @@
 # Contexto do projeto
 
-Atualizado em 22/09/2026. Este arquivo é o resumo para retomar o trabalho em outra sessão.
+Atualizado em 27/09/2026. Este arquivo é o resumo para retomar o trabalho em outra sessão.
 
 ## O que é
 
@@ -77,12 +77,23 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 
 - Telas da demo (canvas): https://claude.ai/artifact/SBVWLWvyW4FLDfg5kFZXqz (visão geral, obra, mapa de disponibilidade, assistente, login, paletas)
 - Documento para o Braga: https://claude.ai/code/artifact/db85bf45-161e-434c-a663-a25b04b7b3bd
-- Repositório: https://github.com/joaocss/obra-analitica
+- Repositório: https://github.com/Casa-Shopping-Design/obra-analitica (transferido de joaocss/obra-analitica em 27/09/2026; o endereço antigo redireciona)
 
 ## Plano de implementação
 
 `docs/plano_implementacao.md` (22/09/2026) é o plano em pacotes de trabalho PT-00 a PT-11 para execução por vários agentes, com números de migration reservados (0006 a 0010), premissas de segurança, observabilidade, engenharia, PAA, usabilidade e ISO 25010, cronograma até 19/02/2027, orçamento e conceitos a estudar. Foi escrito para um modelo executor menos capaz: qualquer agente lê `CLAUDE.md`, este arquivo e o plano antes de mexer em código.
 
+## Infraestrutura (27/09/2026)
+
+- GitHub: organização `Casa-Shopping-Design`, com o app do Claude instalado em todos os repositórios. Repositórios `obra-analitica` e `site-rag` (site, projeto à parte). Falta convidar os sócios, exigir 2FA e criar a regra da `main` (pull request obrigatório, sem force push).
+- E-mail da empresa: `admcasadesign@proton.me`, só para cobrança e contato das contas. Cada sócio entra nos serviços com a própria conta. Senhas, códigos de 2FA e frases de recuperação no cofre "Casa Design – Infra" do Proton Pass, compartilhado com os sócios.
+- Supabase: falta criar a organização Casa Shopping Design, transferir o projeto `obraanalitic` para ela e trocar a senha do banco.
+- Vercel: só antes da demo de 16/10 (Team provavelmente exige plano pago; conferir o preço na hora).
+- Sentry: `@sentry/nextjs` 11.0.0 no painel (commit ded705f), sem gravação de sessão e sem dado pessoal. O DSN vai em `painel/.env.local` e na Vercel (`NEXT_PUBLIC_SENTRY_DSN`), nunca no código. Conferir se o projeto do Sentry é da organização Casa Shopping Design e não da do Episteme.
+- No Mac, o projeto fica em `~/Projetos/casa-shopping-design/obra-analitica`. O trabalho segue no Claude Code local, que não tem o bloqueio de rede das sessões na nuvem (dá para rodar `scripts/atualizar_documentacao_apis.py` e `scripts/sondar_origem.py`).
+
 ## Próxima sessão
 
-Projeto Supabase `obraanalitic` (ref `ndgwcunpnxhkzapmmvsq`, sa-east-1, Postgres 17) criado em 22/09/2026; CLI logado e linkado; migrations 0001 a 0005 e o seed aplicados; `supabase/config.toml` criado com `app` e `marts` expostos (só local); `.env` com a string do pooler e a senha ainda como `SENHA_DO_BANCO`; `.venv` com psycopg. Falta o PT-00 do plano: senha no `.env`, dois usuários no Dashboard, cadastro livre desligado, schemas `app` e `marts` expostos no Dashboard, `carregar_demo.py` e o script de vínculo dos usuários. Depois, PT-01 (painel em `painel/`) e PT-04 (migration 0006) em paralelo.
+Estado em 27/09/2026: todo o trabalho está na branch `claude/vibrant-cerf-dor0x6` (DRE, receitas, despesas, fluxo, planejamento, financiamento, configuração por cliente e Sentry), com 915 testes pgTAP e 278 vitest passando. Nenhuma migration da 0007 em diante foi aplicada no Supabase remoto. Próximos passos, nesta ordem: CI no GitHub Actions (lint, tsc, vitest, `supabase test db`); modelo de pull request e ajuste no `CLAUDE.md` permitindo que o Claude commite em branches `claude/*` e abra PR, com merge só por João; PR da `claude/vibrant-cerf-dor0x6` para a `main`, depois da `claude/pt-07` (validador do assistente, migration 0009; conferir se aceita as views e funções novas do catálogo); trazer à mão as mudanças de `CONTEXTO.md` da `claude/sharp-knuth-96f5h3`; raspar a documentação das APIs pelo Mac. Decisões pendentes em `docs/financeiro/contrato_dados.md`, seção 10, e a confirmação dos números 0011 a 0014 contra a reserva do PT-09.
+
+Histórico do ambiente do Supabase (22/09/2026): Projeto Supabase `obraanalitic` (ref `ndgwcunpnxhkzapmmvsq`, sa-east-1, Postgres 17) criado em 22/09/2026; CLI logado e linkado; migrations 0001 a 0005 e o seed aplicados; `supabase/config.toml` criado com `app` e `marts` expostos (só local); `.env` com a string do pooler e a senha ainda como `SENHA_DO_BANCO`; `.venv` com psycopg. Falta o PT-00 do plano: senha no `.env`, dois usuários no Dashboard, cadastro livre desligado, schemas `app` e `marts` expostos no Dashboard, `carregar_demo.py` e o script de vínculo dos usuários. Depois, PT-01 (painel em `painel/`) e PT-04 (migration 0006) em paralelo.
