@@ -31,9 +31,10 @@ export const catalogoViews: ViewCatalogo[] = [
   },
   {
     nome: "marts.vso_mensal",
-    descricao: "Vendas, distratos e VGV vendido por obra e mes.",
-    colunas: ["centro_custo_id", "competencia", "vendas", "distratos", "vgv_vendido"],
+    descricao: "VSO (vendas sobre oferta) por obra e mes, em calendario continuo do primeiro contrato ate o mes atual; mes sem venda aparece com zero. vendas conta os contratos assinados no mes, inclusive os distratados depois; distratos conta os cancelamentos no mes do cancelamento; vendas_liquidas e vendas menos distratos. vgv_vendido soma o valor dos contratos assinados no mes. estoque_inicio_mes e o denominador: unidades em oferta (fora de venda nao conta) sem contrato ativo no primeiro dia do mes. vso_pct e fracao, vendas_liquidas dividido por estoque_inicio_mes (0,05 = 5% do estoque vendido no mes); fica nulo sem estoque e pode ser negativo quando o distrato supera a venda. Ao responder taxa, mostrar tambem vendas_liquidas e estoque_inicio_mes.",
+    colunas: ["centro_custo_id", "competencia", "vendas", "distratos", "vgv_vendido", "vendas_liquidas", "estoque_inicio_mes", "vso_pct"],
     exemplos: [
+      { pergunta: "Qual a VSO da Aurora nos ultimos 6 meses?", sql: "select v.competencia, v.vendas_liquidas, v.estoque_inicio_mes, v.vso_pct from marts.vso_mensal v join app.centro_custo c on c.id = v.centro_custo_id where c.nome ilike '%aurora%' and v.competencia >= date_trunc('month', current_date) - interval '5 months' order by v.competencia" },
       { pergunta: "Quantos distratos houve em 2026?", sql: "select sum(distratos) from marts.vso_mensal where competencia >= '2026-01-01'" },
     ],
   },
@@ -56,10 +57,11 @@ export const catalogoViews: ViewCatalogo[] = [
   },
   {
     nome: "marts.cobertura_orcamento_obra",
-    descricao: "Cobertura do orcamento pelo VGV contratado, por obra. Compara o valor dos contratos ativos com o custo orcado; nao e caixa nem ponto de equilibrio, porque ignora quando o dinheiro entra e sai. pct_cobertura e fracao (1,0 = VGV igual ao orcamento). unidades_para_cobrir e quantas vendas ao ticket medio faltam para o VGV alcancar o orcamento.",
-    colunas: ["centro_custo_id", "obra", "custo_orcado", "vgv_contratado", "pct_cobertura", "ticket_medio", "unidades_para_cobrir"],
+    descricao: "Cobertura do orcamento pelo VGV contratado, por obra. Compara o valor dos contratos ativos com o custo orcado; nao e caixa nem ponto de equilibrio, porque ignora quando o dinheiro entra e sai. pct_cobertura e fracao (1,0 = VGV igual ao orcamento). unidades_para_cobrir e quantas vendas ao ticket medio faltam para o VGV alcancar o orcamento. vendas_media_6m e a media de vendas liquidas por mes nos seis meses do calendario ate o mes atual (ou desde o primeiro contrato, se a obra tem menos historia), contando mes sem venda como zero. meses_para_cobrir e unidades_para_cobrir dividido por vendas_media_6m; e projecao no ritmo recente, nao prazo garantido, e fica nulo quando nao houve venda liquida no periodo.",
+    colunas: ["centro_custo_id", "obra", "custo_orcado", "vgv_contratado", "pct_cobertura", "ticket_medio", "unidades_para_cobrir", "vendas_media_6m", "meses_para_cobrir"],
     exemplos: [
       { pergunta: "Quantas vendas faltam para o VGV da Parque das Aguas cobrir o orcamento?", sql: "select obra, custo_orcado, vgv_contratado, pct_cobertura, unidades_para_cobrir from marts.cobertura_orcamento_obra where obra ilike '%parque%'" },
+      { pergunta: "No ritmo atual, em quantos meses as vendas cobrem o orcamento de cada obra?", sql: "select obra, unidades_para_cobrir, vendas_media_6m, meses_para_cobrir from marts.cobertura_orcamento_obra order by meses_para_cobrir desc nulls first" },
     ],
   },
 ];
