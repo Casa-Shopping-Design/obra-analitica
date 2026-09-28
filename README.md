@@ -23,6 +23,8 @@ Ambiente Python e dados sintéticos:
 python -m venv .venv && source .venv/bin/activate
 pip install psycopg[binary] python-dotenv
 python scripts/gerar_dados_demo.py          # escreve dados/*.json
+python scripts/gerar_dados_complementares.py  # dados/complementos: mapa, medições e inadimplência (usa dados/*.json)
+python scripts/gerar_dados_crm.py           # dados/crm: reservas, repasses e leads (usa dados/*.json)
 cp .env.example .env                        # preencher DATABASE_URL (pooler em modo sessão) e TENANT_DEMO_ID
 ```
 
@@ -34,6 +36,8 @@ supabase db push                            # aplica supabase/migrations na orde
 supabase db push --include-seed             # grava o tenant e os três centros de custo
 python scripts/carregar_demo.py             # grava em raw e recarrega o staging
 ```
+
+O `carregar_demo.py` grava também `dados/complementos` e `dados/crm` quando existem, depois das recargas do ERP. Sem essas pastas a demo carrega como antes, só sem as telas de conferência, execução física, inadimplência, repasse e funil.
 
 Os scripts Python leem o `.env` da raiz e o `.venv`, que só existem na pasta principal do repositório, não nos worktrees. A `DATABASE_URL` é a do Session pooler (Connect, Direct, Session pooler), e caractere especial da senha vai codificado (`@` vira `%40`).
 

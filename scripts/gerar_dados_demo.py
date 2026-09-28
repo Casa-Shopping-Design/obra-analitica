@@ -398,6 +398,18 @@ def gerar_tabela_preco(obra, unidades, indice):
     }
 
 
+def sem_nomes(vendas, parcelas, desembolso):
+    """Tira nome de comprador e de credor antes de gravar. O nome continua sorteado, para a sequência
+    aleatória e os valores da demo não mudarem; só não sai no arquivo."""
+    for contrato in vendas:
+        for cliente in contrato["customers"]:
+            cliente.pop("name", None)
+    for parcela in parcelas:
+        parcela.pop("clientName", None)
+    for titulo in desembolso:
+        titulo.pop("creditorName", None)
+
+
 def salvar(nome, conteudo):
     caminho = PASTA_SAIDA / nome
     caminho.write_text(json.dumps({"data": conteudo}, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -435,6 +447,7 @@ def main():
         todo_desembolso += desembolso
         print(f"{obra['name']}: {len(vendas)} contratos, {sum(1 for c in vendas if c['situation'] == '3')} distratos")
 
+    sem_nomes(todas_vendas, todas_parcelas, todo_desembolso)
     salvar("units.json", todas_unidades)
     salvar("sales.json", todas_vendas)
     salvar("income.json", todas_parcelas)
