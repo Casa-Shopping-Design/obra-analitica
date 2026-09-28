@@ -29,6 +29,8 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 - Situação da unidade no ERP: D disponível, C reservada, P proposta, V/O/G vendida, R reserva técnica e demais fora de venda.
 - Visual: paleta tijolo (menu vinho, fundo rosado), nada de creme ou azul de IA. Verde entra, grafite sai, vermelho vivo só em alerta.
 - Entradas e saídas por obra (migration 0005): `marts.posicao_financeira_obra` separa direto do comprador e repasse do banco (recebido, a receber, vencido), estoque a preço de hoje, pago, a pagar, orçamento sem título, estouro, caixa atual, exposição máxima (dinheiro próprio no pior mês) e resultado. `marts.fluxo_caixa_mensal` foi recriada com realizado pela data do pagamento e saldo acumulado; o cenário desloca só o repasse pendente. Saldo projetado conservador: a receber vencido fica fora, a pagar vencido entra.
+- CRM de vendas como segunda origem (28/09/2026): sem conflito de interesse. O projeto usa a API contratada pelo cliente para entregar análise que o CRM não oferece.
+- O mapa das telas do ERP foi levantado numa base de produto com login e não entra no repositório. Fica na skill pessoal `erp-origem-interface`, em `~/.claude/skills`.
 - Premissas do repositório em `CLAUDE.md` (nomes em português, humanizer, PAA, ISO 25010, segurança Supabase/Vercel). Claude não faz commit.
 
 ## ERP de origem: o que foi verificado
@@ -58,7 +60,6 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 - Conversa com Lucas sobre a divisão.
 - Construtora piloto com o ERP em nuvem e usuário de API.
 - As 20 perguntas do assistente (vêm do Braga e do piloto).
-- Conflito de interesse com o CVCRM: ler o contrato de trabalho antes de assinar sociedade.
 - CNPJ: a sociedade com Lucas ainda não tem; definir quem assina.
 
 - Rodar `scripts/sondar_origem.py` no terminal do Mac (a rede das sessões do Claude bloqueia a API do ERP) e depois `sanitizar_amostras.py`.
@@ -80,6 +81,9 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 `docs/plano_implementacao.md` (22/09/2026) é o plano em pacotes de trabalho PT-00 a PT-11 para execução por vários agentes, com números de migration reservados (0006 a 0010), premissas de segurança, observabilidade, engenharia, PAA, usabilidade e ISO 25010, cronograma até 19/02/2027, orçamento e conceitos a estudar. Foi escrito para um modelo executor menos capaz: qualquer agente lê `CLAUDE.md`, este arquivo e o plano antes de mexer em código.
 
 ## Próxima sessão
+
+Plano de 28/09/2026 para carga real do ERP, fila de webhooks e CRM como segunda origem: `docs/plano_origens.md` (grafo N1 a N8, migrations 0016 a 0019). As skills `erp-origem-api` e `crm-vendas-api` ficam em `.claude/skills/`.
+
 
 Situação em 27/09/2026. PT-00 a PT-04 estão na `main`. O PT-07 está pronto em `claude/pt-07`, sem merge, e o relatório dele (`docs/relatorios/pt-07-noite.md`) lista o que falta com banco real. A branch `claude/sharp-knuth-96f5h3` tem dois commits só de `CONTEXTO.md` que também não entraram.
 
