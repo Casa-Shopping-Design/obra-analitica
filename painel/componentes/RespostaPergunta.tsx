@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { formatarData, formatarReal } from "@/lib/formatar";
 import type { LinhaResposta } from "@/lib/consultas/perguntas-prontas";
 import type { ColunaResposta, PerguntaPronta } from "@/lib/perguntas-prontas";
@@ -37,11 +38,13 @@ export function RespostaPergunta({
   consultadoEm: string;
   limiteLinhas: number;
 }) {
+  // A tela do assistente pode mostrar a resposta pronta e a livre juntas; id fixo se repetiria.
+  const idTitulo = useId();
   const quantidade = linhas.length === 1 ? "1 linha" : `${linhas.length} linhas`;
 
   return (
-    <section aria-labelledby="titulo-resposta" className="flex flex-col gap-3 rounded-xl border border-borda bg-superficie p-4 md:p-5">
-      <h2 id="titulo-resposta" className="font-serif text-xl font-semibold">
+    <section aria-labelledby={idTitulo} className="flex flex-col gap-3 rounded-xl border border-borda bg-superficie p-4 md:p-5">
+      <h2 id={idTitulo} className="font-serif text-xl font-semibold">
         {pergunta.pergunta}
       </h2>
 

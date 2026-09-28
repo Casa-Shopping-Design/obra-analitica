@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { PerguntaLivre } from "@/componentes/PerguntaLivre";
 import { RespostaPergunta } from "@/componentes/RespostaPergunta";
+import { listarHistorico, type Historico } from "@/lib/consultas/historico-assistente";
 import {
   limiteLinhas,
   responderPerguntaPronta,
@@ -7,6 +9,7 @@ import {
 } from "@/lib/consultas/perguntas-prontas";
 import { mensagens } from "@/lib/mensagens";
 import { buscarPerguntaPronta, perguntasProntas, type IdPerguntaPronta } from "@/lib/perguntas-prontas";
+import { formatarData } from "@/lib/formatar";
 
 export const metadata: Metadata = { title: "Assistente" };
 
@@ -16,6 +19,54 @@ async function responder(id: IdPerguntaPronta): Promise<RespostaPerguntaPronta |
   } catch {
     return null;
   }
+}
+
+async function lerHistorico(): Promise<Historico | null> {
+  try {
+    return await listarHistorico();
+  } catch {
+    return null;
+  }
+}
+
+const situacaoPergunta: Record<string, string> = {
+  ok: "Respondida",
+  recusada: "Recusada",
+  erro: "Não executada",
+};
+
+function HistoricoPerguntas({ historico }: { historico: Historico | null }) {
+  return (
+    <section aria-labelledby="titulo-historico" className="flex flex-col gap-2">
+      <h2 id="titulo-historico" className="font-serif text-xl font-semibold">
+        Suas últimas perguntas
+      </h2>
+      {!historico && <p role="alert">{mensagens.assistente.historicoIndisponivel}</p>}
+      {historico && historico.perguntas.length === 0 && (
+        <p className="text-suave">Você ainda não fez perguntas com suas palavras.</p>
+      )}
+      {historico && historico.perguntas.length > 0 && (
+        <ul className="flex flex-col gap-2">
+          {historico.perguntas.map((registro) => (
+            <li key={registro.id} className="rounded-lg border border-borda bg-superficie p-3">
+              <p className="font-medium">{registro.pergunta}</p>
+              <p className="text-sm text-suave">
+                {formatarData(registro.criado_em)}, {situacaoPergunta[registro.resultado] ?? registro.resultado}
+                {registro.resultado === "ok" && registro.linhas_devolvidas !== null &&
+                  `, ${registro.linhas_devolvidas === 1 ? "1 linha" : `${registro.linhas_devolvidas} linhas`}`}
+              </p>
+              {historico.diretor && registro.sql_executado && (
+                <details className="mt-2">
+                  <summary className="cursor-pointer text-sm font-medium">Ver a consulta</summary>
+                  <pre className="mt-2 overflow-x-auto text-xs whitespace-pre-wrap">{registro.sql_executado}</pre>
+                </details>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
 }
 
 // A pergunta escolhida vem na URL só como id; qualquer valor fora da lista é ignorado
@@ -28,15 +79,15 @@ export default async function PaginaAssistente({
   const { pergunta: idPedido } = await searchParams;
   const idTexto = typeof idPedido === "string" ? idPedido : undefined;
   const pergunta = buscarPerguntaPronta(idTexto);
-  const resposta = pergunta ? await responder(pergunta.id) : null;
+  const [resposta, historico] = await Promise.all([pergunta ? responder(pergunta.id) : null, lerHistorico()]);
 
   return (
     <>
       <header className="flex flex-col gap-2">
         <h1 className="font-serif text-[34px] font-semibold">Assistente</h1>
         <p className="max-w-2xl text-suave">
-          Escolha uma pergunta. A resposta sai direto das tabelas do painel, só com as obras liberadas para o seu
-          perfil.
+          Escolha uma pergunta pronta ou escreva a sua. A resposta sai direto das tabelas do painel, só com as obras
+          liberadas para o seu perfil.
         </p>
       </header>
 
@@ -84,21 +135,9 @@ export default async function PaginaAssistente({
         />
       )}
 
-      <div className="flex max-w-2xl flex-col gap-1.5">
-        <label htmlFor="pergunta-livre" className="text-sm font-medium">
-          Pergunta com suas palavras
-        </label>
-        <input
-          id="pergunta-livre"
-          type="text"
-          disabled
-          aria-describedby="nota-pergunta-livre"
-          className="min-h-12 cursor-not-allowed rounded-lg border border-borda bg-trilho px-3.5 text-[15px]"
-        />
-        <p id="nota-pergunta-livre" className="text-sm text-suave">
-          Disponível na entrega 2.
-        </p>
-      </div>
+      <PerguntaLivre limiteLinhas={limiteLinhas} semDados={mensagens.assistente.semDados} />
+
+      <HistoricoPerguntas historico={historico} />
     </>
   );
 }
