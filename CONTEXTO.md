@@ -84,6 +84,8 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 
 Plano de 28/09/2026 para carga real do ERP, fila de webhooks e CRM como segunda origem: `docs/plano_origens.md` (grafo N1 a N8, migrations 0016 a 0019). As skills `erp-origem-api` e `crm-vendas-api` ficam em `.claude/skills/`.
 
+Em 28/09/2026 o plano foi implementado na branch `claude/cvcrm-sienge-webhooks-0dbaeb`, PR #1 aberto e sem merge. As migrations 0016 a 0019 só rodaram no banco local. Antes do merge, decidir as quatro questões listadas no PR. Para aplicar na demo: os projetos `rxbhxtbjxqlisbrfcbtt` e `xwqwjawlbzvqpkxtqfld` estão pausados, e o único ativo, `hpifgjsgvaniorrcqdbz`, é outro sistema, onde nada deste repositório entra. Escolher e restaurar o projeto da demo, conferir as migrations com `supabase migration list --linked` e aplicar em ordem o que faltar.
+
 
 Situação em 27/09/2026. PT-00 a PT-04 estão na `main`. O PT-07 está pronto em `claude/pt-07`, sem merge, e o relatório dele (`docs/relatorios/pt-07-noite.md`) lista o que falta com banco real. A branch `claude/sharp-knuth-96f5h3` tem dois commits só de `CONTEXTO.md` que também não entraram.
 
