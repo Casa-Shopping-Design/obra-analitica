@@ -186,7 +186,7 @@ select throws_ok(
 
 -- Diretor do mesmo tenant vê as perguntas do tenant e o SQL; não fecha reserva alheia
 reset role;
-select set_config('request.jwt.claims', '{"sub": "0a000000-0000-4000-8000-00000000d101", "role": "authenticated"}', true);
+select set_config('request.jwt.claims', '{"sub": "0a000000-0000-4000-8000-00000000d101", "role": "authenticated", "aal": "aal2"}', true);
 set local role authenticated;
 select throws_ok(
   format($$select app.concluir_pergunta(%s, 'x', null, 'erro', null, null, null, null, null)$$,
@@ -294,8 +294,8 @@ select throws_ok(
 -- set_config é função, passa pelo cursor e pela transação só de leitura: a função confere os claims depois do fetch.
 select throws_ok(
   format('select marts.executar_consulta(%L, %L)',
-    'select count(*) as total from staging.parcela_receber where (select set_config(''request.jwt.claims'', ''{"sub": "0a000000-0000-4000-8000-00000000d101", "role": "authenticated"}'', true)) is not null',
-    pg_temp.assinar('select count(*) as total from staging.parcela_receber where (select set_config(''request.jwt.claims'', ''{"sub": "0a000000-0000-4000-8000-00000000d101", "role": "authenticated"}'', true)) is not null')),
+    'select count(*) as total from staging.parcela_receber where (select set_config(''request.jwt.claims'', ''{"sub": "0a000000-0000-4000-8000-00000000d101", "role": "authenticated", "aal": "aal2"}'', true)) is not null',
+    pg_temp.assinar('select count(*) as total from staging.parcela_receber where (select set_config(''request.jwt.claims'', ''{"sub": "0a000000-0000-4000-8000-00000000d101", "role": "authenticated", "aal": "aal2"}'', true)) is not null')),
   '42501',
   null,
   'select assinado que troca os claims por set_config não devolve linha'

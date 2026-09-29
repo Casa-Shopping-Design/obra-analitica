@@ -226,9 +226,10 @@ select ok(
 );
 select is(
   (select count(*) from pg_policies where schemaname = 'staging'
-     and tablename in ('mapa_imobiliario_mensal', 'medicao_obra', 'inadimplencia')),
+     and tablename in ('mapa_imobiliario_mensal', 'medicao_obra', 'inadimplencia')
+     and permissive = 'PERMISSIVE'),
   3::bigint,
-  'uma política por tabela'
+  'uma política permissiva por tabela'
 );
 select ok(
   (select bool_and(c.reloptions @> array['security_invoker=true']) from pg_class c
@@ -254,7 +255,7 @@ select ok(
 );
 
 -- Diretor do tenant 1
-select set_config('request.jwt.claims', '{"sub": "0a000000-0000-4000-8000-00000000f0d1", "role": "authenticated"}', true);
+select set_config('request.jwt.claims', '{"sub": "0a000000-0000-4000-8000-00000000f0d1", "role": "authenticated", "aal": "aal2"}', true);
 set local role authenticated;
 
 select is((select count(*) from staging.mapa_imobiliario_mensal), 2::bigint, 'diretor não vê mapa de outro tenant');
@@ -307,7 +308,7 @@ select ok(
 
 -- Financeiro do tenant
 reset role;
-select set_config('request.jwt.claims', '{"sub": "0a000000-0000-4000-8000-00000000f0f1", "role": "authenticated"}', true);
+select set_config('request.jwt.claims', '{"sub": "0a000000-0000-4000-8000-00000000f0f1", "role": "authenticated", "aal": "aal2"}', true);
 set local role authenticated;
 select is(
   (select count(*) from marts.conferencia_origem where centro_custo_id = '0c000000-0000-4000-8000-0000000000f1'),
