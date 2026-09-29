@@ -24,7 +24,9 @@ test("senha errada mostra o que fazer, sem detalhe técnico", async ({ page }) =
   await page.getByLabel("E-mail").fill(diretor.email);
   await page.getByLabel("Senha").fill(`${diretor.senha}-errada`);
   await page.getByRole("button", { name: "Entrar" }).click();
-  await expect(page.getByRole("alert")).toHaveText("E-mail ou senha incorretos. Confira e tente de novo.");
+  // O anunciador de rota do Next também tem role="alert", então o seletor filtra pelo texto.
+  const aviso = page.getByRole("alert").filter({ hasText: "E-mail ou senha incorretos" });
+  await expect(aviso).toHaveText("E-mail ou senha incorretos. Confira e tente de novo.");
 });
 
 test("diretor vê as três obras e a data da carga", async ({ page }) => {
