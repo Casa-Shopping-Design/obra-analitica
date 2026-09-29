@@ -109,12 +109,12 @@ Base `origin/claude/dreamy-clarke-am2xge`. 23 arquivos, commits `4153fca` e `07c
 | --- | --- | --- | --- |
 | 1 | pt-05 | Gerente vê o valor total de um título rateado com outra obra | Aceita em 27/09 |
 | 2 | pt-06 | Denominador da VSO diferente do plano | Recomendado aceitar; aguarda João |
-| 3 | pt-07 | `executar_consulta` com assinatura; `statement_timeout` de 8 s para todas as telas | |
-| 4 | pt-07 | Corrida no limite de 30 por hora e leitura do próprio SQL pela API no MVP | |
-| 5 | pt-08 | Anônimo no schema `app` ou rota de saúde pelo servidor | |
-| 6 | pt-08 | Aviso "Dados da demo" volta ou não | |
+| 3 | pt-07 | `executar_consulta` com assinatura; `statement_timeout` de 8 s para todas as telas | Aceita em 28/09: teto no papel fica, função repete o limite e confere os claims (ADR 0008) |
+| 4 | pt-07 | Corrida no limite de 30 por hora e leitura do próprio SQL pela API no MVP | Aceita em 28/09: reserva atômica no banco e SQL só para o diretor (ADR 0008) |
+| 5 | pt-08 | Anônimo no schema `app` ou rota de saúde pelo servidor | Aceita em 28/09: função `public.ultima_carga()` para `anon`, sem `usage` novo em `app` (ADR 0008) |
+| 6 | pt-08 | Aviso "Dados da demo" volta ou não | Aceita em 28/09: volta, ligado por `NEXT_PUBLIC_MOSTRAR_AVISO_DEMO=1` (ADR 0008) |
 
-Fechar a 4 ou a 5 pede uma migration pequena, com o próximo número livre a partir de 0016.
+Na integração de 28/09 as migrations 0013 e 0014 das branches viraram 0020 e 0021; as referências acima a `0013_assistente.sql` e `0014_carga_execucao.sql` são dos arquivos como estavam nas branches.
 
 ## Ficou para depois
 

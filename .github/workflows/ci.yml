@@ -1,0 +1,128 @@
+name: CI
+
+on:
+  pull_request:
+
+# Só leitura do repositório: nenhum job comenta em PR, publica pacote ou grava token.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  painel:
+    name: Lint, tipos, Vitest e auditoria
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: painel
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: painel/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      # LayoutProps e PageProps são gerados pelo Next; sem o typegen o tsc não os encontra.
+      - run: npx next typegen
+      - run: npx tsc --noEmit
+      - run: npx vitest run
+      - run: npm audit --audit-level=moderate
+
+  banco_e_ponta_a_ponta:
+    name: pgTAP e Playwright no Supabase local
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TENANT_DEMO_ID: 11111111-1111-1111-1111-111111111111
+      NEXT_TELEMETRY_DISABLED: 1
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: supabase/setup-cli@1dedf2c611547ede7232d26866dd3c56ab903bbb # v1.7.3
+        with:
+          version: 2.118.0
+
+      - name: Sobe o Supabase local com migrations e seed
+        run: supabase start
+
+      - name: Testes pgTAP
+        run: supabase test db
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+
+      - name: Dependências da carga
+        run: pip install "psycopg[binary]==3.3.6" "python-dotenv==1.2.3"
+
+      # As chaves do Supabase local são as de desenvolvimento, iguais em toda máquina, e o banco some
+      # no fim do job. Mesmo assim ficam mascaradas no log. A senha dos usuários de teste é sorteada a cada execução.
+      - name: Variáveis do Supabase local e usuários de teste
+        run: |
+          eval "$(supabase status -o env)"
+          echo "::add-mask::$SERVICE_ROLE_KEY"
+          senha_diretor="$(openssl rand -hex 16)"
+          senha_gerente="$(openssl rand -hex 16)"
+          echo "::add-mask::$senha_diretor"
+          echo "::add-mask::$senha_gerente"
+
+          criar_usuario() {
+            curl -sSf -X POST "$API_URL/auth/v1/admin/users" \
+              -H "apikey: $SERVICE_ROLE_KEY" \
+              -H "Authorization: Bearer $SERVICE_ROLE_KEY" \
+              -H "Content-Type: application/json" \
+              -d "{\"email\": \"$1\", \"password\": \"$2\", \"email_confirm\": true}" \
+              | python -c 'import json, sys; print(json.load(sys.stdin)["id"])'
+          }
+          id_diretor="$(criar_usuario diretor.e2e@teste.invalid "$senha_diretor")"
+          id_gerente="$(criar_usuario gerente.e2e@teste.invalid "$senha_gerente")"
+
+          export DATABASE_URL="$DB_URL"
+          python scripts/vincular_usuarios_demo.py --diretor "$id_diretor" --gerente "$id_gerente"
+
+          {
+            echo "DATABASE_URL=$DB_URL"
+            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$ANON_KEY"
+            echo "E2E_EMAIL_DIRETOR=diretor.e2e@teste.invalid"
+            echo "E2E_SENHA_DIRETOR=$senha_diretor"
+            echo "E2E_EMAIL_GERENTE=gerente.e2e@teste.invalid"
+            echo "E2E_SENHA_GERENTE=$senha_gerente"
+          } >> "$GITHUB_ENV"
+
+      - name: Carga da demo no banco local
+        run: |
+          python scripts/gerar_dados_demo.py
+          python scripts/carregar_demo.py
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: painel/package-lock.json
+
+      - name: Build do painel
+        working-directory: painel
+        run: |
+          npm ci
+          npm run build
+
+      - name: Playwright
+        working-directory: painel
+        run: |
+          npx playwright install --with-deps chromium
+          npx playwright test
+
+      - name: Relatório do Playwright
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: relatorio-playwright
+          path: painel/playwright-report
+          retention-days: 7

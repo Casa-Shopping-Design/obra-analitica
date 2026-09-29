@@ -1,9 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { caminhosAcesso, decidirDestino } from "@/lib/supabase/nivel-acesso";
 import { aplicarSessao, renovarSessao } from "@/lib/supabase/sessao";
 import { montarPoliticaConteudo } from "@/lib/politica-conteudo";
 
-const rotasPublicas = new Set(["/entrar", "/api/saude"]);
-
+// O proxy só redireciona. A checagem de verdade se repete no layout do painel e em cada rota.
 export async function proxy(request: NextRequest) {
   const idRequisicao = crypto.randomUUID();
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
@@ -11,10 +11,11 @@ export async function proxy(request: NextRequest) {
   const caminho = request.nextUrl.pathname;
 
   const sessao = await renovarSessao(request);
+  const destino = decidirDestino({ ...sessao, caminho });
 
   let resposta: NextResponse;
-  if (!sessao.usuarioId && !rotasPublicas.has(caminho) && !caminho.startsWith("/api/")) {
-    resposta = NextResponse.redirect(new URL("/entrar", request.url));
+  if (destino !== "liberado") {
+    resposta = NextResponse.redirect(new URL(caminhosAcesso[destino], request.url));
   } else if (sessao.usuarioId && caminho === "/entrar") {
     resposta = NextResponse.redirect(new URL("/", request.url));
   } else {

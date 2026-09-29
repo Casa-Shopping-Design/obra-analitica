@@ -1,0 +1,41 @@
+name: Carga noturna
+
+on:
+  # 05:17 UTC são 02:17 em Brasília. Minuto quebrado porque o GitHub atrasa os agendamentos da hora cheia.
+  schedule:
+    - cron: "17 5 * * *"
+  workflow_dispatch:
+
+# Só leitura do repositório: a carga fala com o banco pela DATABASE_URL e não escreve no GitHub.
+permissions:
+  contents: read
+
+# Duas cargas do mesmo tenant ao mesmo tempo apagariam o raw uma da outra.
+concurrency:
+  group: carga-noturna
+  cancel-in-progress: false
+
+jobs:
+  carga:
+    name: Carga da demo
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+
+      - name: Dependências
+        run: pip install "psycopg[binary]==3.3.6" "python-dotenv==1.2.3"
+
+      # income.json e outcome.json ficam fora do git; o gerador tem semente fixa e refaz os mesmos arquivos.
+      - name: Dados da demo
+        run: python scripts/gerar_dados_demo.py
+
+      - name: Carga
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          TENANT_DEMO_ID: ${{ secrets.TENANT_DEMO_ID }}
+        run: python scripts/carregar_demo.py
