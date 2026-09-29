@@ -81,7 +81,7 @@ select lives_ok('select * from public.ultima_carga()', 'anônimo chama a funçã
 select throws_ok('select count(*) from app.carga_execucao', '42501', null, 'anônimo não lê execuções de carga');
 reset role;
 
-select set_config('request.jwt.claims', '{"sub": "0a000000-0000-4000-8000-0000000000e1", "role": "authenticated"}', true);
+select set_config('request.jwt.claims', '{"sub": "0a000000-0000-4000-8000-0000000000e1", "role": "authenticated", "aal": "aal2"}', true);
 set local role authenticated;
 
 select is(

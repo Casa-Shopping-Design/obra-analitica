@@ -2,7 +2,9 @@
 
 import { redirect } from "next/navigation";
 import { mensagens } from "@/lib/mensagens";
+import { caminhosAcesso, decidirDestino } from "@/lib/supabase/nivel-acesso";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
+import { lerNivelSessao } from "@/lib/supabase/sessao";
 
 export type EstadoEntrar = { erro: string | null; email: string };
 
@@ -25,5 +27,7 @@ export async function entrar(_estadoAnterior: EstadoEntrar, formulario: FormData
     return { erro, email };
   }
 
-  redirect("/");
+  // Mandar para "/" e deixar o layout redirecionar de novo mostra a tela certa com o endereço errado.
+  const destino = decidirDestino({ ...(await lerNivelSessao(supabase)), caminho: "/" });
+  redirect(destino === "liberado" ? "/" : caminhosAcesso[destino]);
 }

@@ -221,7 +221,7 @@ select ok(
 );
 
 -- Diretor do tenant
-select set_config('request.jwt.claims', '{"sub": "0a000000-0000-4000-8000-00000000d0d1", "role": "authenticated"}', true);
+select set_config('request.jwt.claims', '{"sub": "0a000000-0000-4000-8000-00000000d0d1", "role": "authenticated", "aal": "aal2"}', true);
 set local role authenticated;
 
 select is((select count(*) from marts.repasse_obra), 2::bigint, 'diretor vê o repasse das duas obras');

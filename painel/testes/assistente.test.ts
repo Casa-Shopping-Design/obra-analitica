@@ -23,6 +23,8 @@ vi.mock("@/lib/assistente/gerar-sql", async () => {
   const real = await import("../lib/assistente/gerar-sql");
   return { ...real, criarClienteModelo: () => modelo.cliente };
 });
+vi.mock("@/lib/supabase/nivel-acesso", async () => await import("../lib/supabase/nivel-acesso"));
+vi.mock("@/lib/supabase/sessao", async () => await import("../lib/supabase/sessao"));
 vi.mock("@/lib/supabase/servidor", () => ({ criarClienteServidor: async () => clienteBanco() }));
 
 const idRequisicao = "0b7f6f0e-5a8e-4a57-9d43-0c1f8e2b7a10";
@@ -45,6 +47,8 @@ type ArgumentosConclusao = {
 const banco = {
   usuarioLogado: true,
   perfil: "financeiro",
+  aal: "aal2",
+  temFator: true,
   tenantNoClaim: "tenant-teste" as string | null,
   tenantNoBanco: null as string | null,
   // null reserva normalmente; "limite" e "teto" simulam o P0001 que app.reservar_pergunta levanta.
@@ -63,9 +67,18 @@ function clienteBanco() {
       getUser: async () => ({ data: { user: banco.usuarioLogado ? { id: idUsuario } : null } }),
       getClaims: async () => ({
         data: banco.usuarioLogado
-          ? { claims: { sub: idUsuario, app_metadata: { tenant_id: banco.tenantNoClaim ?? undefined, perfil: banco.perfil } } }
+          ? {
+              claims: {
+                sub: idUsuario,
+                aal: banco.aal,
+                app_metadata: { tenant_id: banco.tenantNoClaim ?? undefined, perfil: banco.perfil },
+              },
+            }
           : null,
       }),
+      mfa: {
+        listFactors: async () => ({ data: { totp: banco.temFator ? [{ id: "fator-teste" }] : [] }, error: null }),
+      },
     },
     schema: () => ({
       from: () => ({
@@ -155,6 +168,8 @@ beforeEach(() => {
   Object.assign(banco, {
     usuarioLogado: true,
     perfil: "financeiro",
+    aal: "aal2",
+    temFator: true,
     tenantNoClaim: "tenant-teste",
     tenantNoBanco: null,
     recusaReserva: null,
@@ -165,6 +180,31 @@ beforeEach(() => {
   });
   modelo.respostas = [];
   modelo.chamadas = [];
+});
+
+describe("rota do assistente e o segundo fator", () => {
+  it.each(["diretor", "financeiro"])("recusa %s em aal1 antes de reservar a pergunta ou chamar o modelo", async (perfil) => {
+    Object.assign(banco, { perfil, aal: "aal1" });
+    modelo.respostas = [sqlGerado(exposicao, formatosExposicao), "{{0.obra}}"];
+
+    const { status, corpo } = await perguntar("Quanto dinheiro próprio cada obra precisa no pior momento?");
+
+    expect(status).toBe(403);
+    expect(corpo.erro).toBe("Confirme o código do aplicativo autenticador para usar o assistente. Recarregue a página para continuar.");
+    expect(banco.registros).toHaveLength(0);
+    expect(banco.execucoes).toHaveLength(0);
+    expect(modelo.chamadas).toHaveLength(0);
+  });
+
+  it("atende o gerente de obra em aal1", async () => {
+    Object.assign(banco, { perfil: "gerente_obra", aal: "aal1", temFator: false });
+    banco.linhas = [{ obra: "Residencial Aurora", exposicao_maxima: 10 }];
+    modelo.respostas = [sqlGerado(exposicao, formatosExposicao), "{{0.obra}} precisa de {{0.exposicao_maxima}}."];
+
+    const { status } = await perguntar("Quanto dinheiro próprio cada obra precisa no pior momento?");
+
+    expect(status).toBe(200);
+  });
 });
 
 describe("rota do assistente com texto livre", () => {

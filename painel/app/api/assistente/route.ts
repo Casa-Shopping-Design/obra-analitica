@@ -10,7 +10,9 @@ import { reservarPergunta } from "@/lib/assistente/limite";
 import { montarTabela, redigirResposta } from "@/lib/assistente/responder";
 import { registrar, type CamposLog, type ResultadoLog } from "@/lib/log";
 import { mensagens } from "@/lib/mensagens";
+import { decidirDestino } from "@/lib/supabase/nivel-acesso";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
+import { lerNivelSessao } from "@/lib/supabase/sessao";
 import { validarSql } from "@/lib/validador-sql";
 
 const formatoUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -89,9 +91,17 @@ export async function POST(request: Request): Promise<Response> {
     anotar("negado", { motivo: "sem_usuario" });
     return responderErro(401, mensagens.assistente.semUsuario, idRequisicao);
   }
+  campos.user_id = usuario.id;
+
+  // O proxy não barra /api; sem esta conferência o diretor em aal1 perguntaria ao assistente só com a senha.
+  const nivel = await lerNivelSessao(supabase);
+  if (decidirDestino({ ...nivel, caminho: "/assistente" }) !== "liberado") {
+    anotar("negado", { motivo: "sem_segundo_fator" });
+    return responderErro(403, mensagens.assistente.semSegundoFator, idRequisicao);
+  }
+
   const { data: dadosToken } = await supabase.auth.getClaims();
   const appMetadata = dadosToken?.claims?.app_metadata as { tenant_id?: string; perfil?: string } | undefined;
-  campos.user_id = usuario.id;
   campos.tenant_id = appMetadata?.tenant_id ?? null;
   const diretor = appMetadata?.perfil === "diretor";
 

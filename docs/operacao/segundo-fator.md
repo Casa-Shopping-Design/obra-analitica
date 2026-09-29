@@ -6,9 +6,22 @@ Vale para o projeto do Supabase que o painel usa. Tudo aqui é feito por quem ad
 
 1. No Dashboard, abrir Authentication, depois Multi-Factor (em Configuration). Em TOTP (App Authenticator), ligar Enroll e Verify e salvar. Sem isso o painel mostra "O segundo fator ainda não está ligado neste ambiente" ao diretor ou financeiro e ninguém desses perfis consegue entrar.
 2. No ambiente local e no `supabase config push`, as chaves já estão em `supabase/config.toml`: `[auth.mfa.totp] enroll_enabled = true` e `verify_enabled = true`. O `max_enrolled_factors = 10` padrão fica: o painel apaga fator não confirmado antes de gerar outro.
-3. Conferir com um usuário de teste com perfil `diretor`: ao entrar, ele precisa cair em `/seguranca/segundo-fator/cadastrar`.
+3. No Dashboard, abrir Authentication, depois Hooks, e ligar o Custom Access Token apontando para a função `app.claims_jwt`. No ambiente local o hook já vem ligado pelo `supabase/config.toml`. Com o hook desligado o painel continua exigindo o segundo fator, mas consulta o banco a cada requisição para saber o perfil, e o diretor deixa de ver o SQL das perguntas no assistente (decisão 0010).
+4. Conferir com um usuário de teste com perfil `diretor`: ao entrar, ele precisa cair em `/seguranca/segundo-fator/cadastrar`.
 
 A documentação do Supabase (guia auth-mfa/totp) afirma que a API de TOTP é gratuita e vem ligada em todo projeto. O texto do `config.toml` gerado pela CLI diz que MFA é do plano Pro; esse aviso se refere ao MFA por telefone, que consome SMS. Se o Dashboard do plano Free recusar a opção, registrar aqui.
+
+## Antes de aplicar a migration 0022
+
+A 0022 faz o banco recusar leitura de diretor e financeiro em `aal1`, inclusive pela API. Antes de aplicar num projeto hospedado:
+
+1. Conferir que o TOTP está ligado (seção acima). Com ele desligado, diretor e financeiro ficam sem ler nada e sem ter como cadastrar o aparelho.
+2. Avisar diretores e financeiros de que o próximo acesso pede o cadastro do aplicativo autenticador.
+3. Depois de aplicar, entrar com um diretor de teste, cadastrar o aparelho e conferir que as obras aparecem.
+
+## Testes de ponta a ponta
+
+O Playwright cadastra um aparelho para o diretor de teste e guarda a chave em `painel/test-results/`, que ele limpa a cada execução. Por isso os dois usuários de teste são criados de novo antes de cada execução, como o CI faz. Se o diretor de teste já tiver aparelho de uma execução anterior, o teste para com a mensagem "Recrie os usuários de teste".
 
 ## O que o usuário vê
 

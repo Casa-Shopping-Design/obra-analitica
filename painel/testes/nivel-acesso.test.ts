@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { caminhosAcesso, decidirDestino, perfilExigeSegundoFator } from "../lib/supabase/nivel-acesso";
+import { caminhosAcesso, decidirDestino, perfilExigeSegundoFator, sessaoExigeSegundoFator } from "../lib/supabase/nivel-acesso";
 
-const diretor = { usuarioId: "u1", perfil: "diretor", aal: "aal1", temFator: false, caminho: "/" };
+const diretor = { usuarioId: "u1", perfil: "diretor", perfilLido: true, aal: "aal1", temFator: false, caminho: "/" };
 
 describe("perfilExigeSegundoFator", () => {
   it.each([
@@ -81,11 +81,42 @@ describe("decidirDestino para perfis em aal1 no MVP", () => {
     expect(decidirDestino({ ...diretor, perfil, caminho: "/obras/12" })).toBe("liberado");
   });
 
-  it("usuário sem claim de perfil fica liberado e o RLS decide o que ele vê", () => {
+  it("usuário sem vínculo com construtora fica liberado e o RLS decide o que ele vê", () => {
     expect(decidirDestino({ ...diretor, perfil: null })).toBe("liberado");
   });
 
   it("pode abrir as telas de segurança sem ser redirecionado", () => {
     expect(decidirDestino({ ...diretor, perfil: "leitura", caminho: caminhosAcesso.cadastrar })).toBe("liberado");
+  });
+});
+
+describe("decidirDestino quando o perfil não pôde ser lido", () => {
+  const semPerfil = { ...diretor, perfil: null, perfilLido: false };
+
+  it("fecha a barreira em vez de liberar", () => {
+    expect(decidirDestino(semPerfil)).toBe("cadastrar");
+    expect(decidirDestino({ ...semPerfil, temFator: true, caminho: "/obras/12" })).toBe("verificar");
+  });
+
+  it("libera quem já passou pelo segundo fator", () => {
+    expect(decidirDestino({ ...semPerfil, aal: "aal2", temFator: true })).toBe("liberado");
+  });
+
+  it("não prende ninguém na tela de entrada nem na de saída", () => {
+    expect(decidirDestino({ ...semPerfil, caminho: "/sair" })).toBe("liberado");
+    expect(decidirDestino({ ...semPerfil, usuarioId: null, caminho: "/" })).toBe("entrar");
+  });
+});
+
+describe("sessaoExigeSegundoFator", () => {
+  it.each([
+    ["diretor", true, true],
+    ["financeiro", true, true],
+    ["gerente_obra", true, false],
+    [null, true, false],
+    [null, false, true],
+    ["gerente_obra", false, true],
+  ])("perfil %s, lido %s, exige: %s", (perfil, perfilLido, esperado) => {
+    expect(sessaoExigeSegundoFator(perfil, perfilLido)).toBe(esperado);
   });
 });

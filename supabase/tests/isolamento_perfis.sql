@@ -46,7 +46,7 @@ select is(
 );
 
 -- Diretor do tenant A
-select set_config('request.jwt.claims', '{"sub": "0a000000-0000-4000-8000-00000000d001", "role": "authenticated"}', true);
+select set_config('request.jwt.claims', '{"sub": "0a000000-0000-4000-8000-00000000d001", "role": "authenticated", "aal": "aal2"}', true);
 set local role authenticated;
 
 select is((select count(*) from marts.posicao_financeira_obra), 3::bigint, 'diretor vê as três obras do próprio tenant');
