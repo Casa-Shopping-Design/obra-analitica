@@ -25,6 +25,7 @@ export const mensagens = {
     perguntaDesconhecida: "Essa pergunta não está na lista. Escolha uma das perguntas abaixo.",
     semUsuario: "Sua sessão expirou. Entre de novo para continuar.",
     semAcesso: "Seu usuário ainda não está ligado a uma construtora. Peça acesso ao administrador.",
+    semSegundoFator: "Confirme o código do aplicativo autenticador para usar o assistente. Recarregue a página para continuar.",
     falhaRede: "Não foi possível falar com o servidor. Confira a conexão e tente de novo.",
     perguntaInvalida: "Escreva a pergunta com 3 a 500 caracteres.",
     limite: "Limite de 30 perguntas por hora atingido. Tente de novo mais tarde ou use as perguntas prontas.",

@@ -2,16 +2,19 @@ import { createServerClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { NextRequest, NextResponse } from "next/server";
 import { lerConfiguracaoSupabase } from "./configuracao";
-import { perfilExigeSegundoFator } from "./nivel-acesso";
+import { sessaoExigeSegundoFator } from "./nivel-acesso";
 
 type CookieRenovado = { name: string; value: string; options: Parameters<NextResponse["cookies"]["set"]>[2] };
 
 export type NivelSessao = {
   usuarioId: string | null;
   perfil: string | null;
+  perfilLido: boolean;
   aal: string | null;
   temFator: boolean;
 };
+
+type PerfilSessao = Pick<NivelSessao, "perfil" | "perfilLido">;
 
 export type SessaoRenovada = NivelSessao & {
   cookiesRenovados: CookieRenovado[];
@@ -24,13 +27,23 @@ export async function lerNivelSessao(supabase: SupabaseClient): Promise<NivelSes
   const { data } = await supabase.auth.getClaims();
   const claims = data?.claims;
   const usuarioId = claims?.sub ?? null;
-  const perfilClaim = claims?.app_metadata?.perfil;
-  const perfil = typeof perfilClaim === "string" ? perfilClaim : null;
   const aal = typeof claims?.aal === "string" ? claims.aal : null;
+  const { perfil, perfilLido } = await lerPerfil(supabase, usuarioId, claims?.app_metadata?.perfil);
 
-  const precisaConsultarFator = usuarioId !== null && perfilExigeSegundoFator(perfil) && aal !== "aal2";
+  const precisaConsultarFator = usuarioId !== null && sessaoExigeSegundoFator(perfil, perfilLido) && aal !== "aal2";
   const temFator = precisaConsultarFator ? await temFatorVerificado(supabase) : false;
-  return { usuarioId, perfil, aal, temFator };
+  return { usuarioId, perfil, perfilLido, aal, temFator };
+}
+
+// O claim vem do hook app.claims_jwt. Com o hook desligado o JWT chega sem perfil, e quem responde é
+// app.perfil_atual, a função que o RLS usa. A consulta ao banco só roda quando o claim falta.
+async function lerPerfil(supabase: SupabaseClient, usuarioId: string | null, perfilClaim: unknown): Promise<PerfilSessao> {
+  if (typeof perfilClaim === "string" && perfilClaim !== "") return { perfil: perfilClaim, perfilLido: true };
+  if (usuarioId === null) return { perfil: null, perfilLido: true };
+
+  const { data, error } = await supabase.schema("app").rpc("perfil_atual");
+  if (error) return { perfil: null, perfilLido: false };
+  return { perfil: typeof data === "string" ? data : null, perfilLido: true };
 }
 
 // Sem resposta do Auth, assume que há fator: manda verificar em vez de abrir o cadastro de outro aparelho.
@@ -47,6 +60,7 @@ export async function renovarSessao(request: NextRequest): Promise<SessaoRenovad
   const sessao: SessaoRenovada = {
     usuarioId: null,
     perfil: null,
+    perfilLido: true,
     aal: null,
     temFator: false,
     cookiesRenovados: [],

@@ -17,18 +17,25 @@ export function perfilExigeSegundoFator(perfil: string | null | undefined): bool
   return typeof perfil === "string" && perfisComSegundoFator.has(perfil);
 }
 
+// Perfil que ninguém conseguiu ler (JWT sem o claim e banco sem resposta) conta como perfil que exige:
+// na dúvida a barreira fecha, senão um diretor passaria só com a senha.
+export function sessaoExigeSegundoFator(perfil: string | null | undefined, perfilLido: boolean): boolean {
+  return !perfilLido || perfilExigeSegundoFator(perfil);
+}
+
 export type ContextoAcesso = {
   usuarioId: string | null;
   perfil: string | null;
+  perfilLido: boolean;
   aal: string | null;
   temFator: boolean;
   caminho: string;
 };
 
-export function decidirDestino({ usuarioId, perfil, aal, temFator, caminho }: ContextoAcesso): DestinoAcesso {
+export function decidirDestino({ usuarioId, perfil, perfilLido, aal, temFator, caminho }: ContextoAcesso): DestinoAcesso {
   if (caminhosSemBarreira.has(caminho) || caminho.startsWith("/api/")) return "liberado";
   if (!usuarioId) return "entrar";
-  if (!perfilExigeSegundoFator(perfil) || aal === "aal2") return "liberado";
+  if (!sessaoExigeSegundoFator(perfil, perfilLido) || aal === "aal2") return "liberado";
 
   // Quem já tem fator verificado não pode cadastrar outro em aal1: a senha roubada bastaria para trocar o celular.
   const destino: DestinoAcesso = temFator ? "verificar" : "cadastrar";
