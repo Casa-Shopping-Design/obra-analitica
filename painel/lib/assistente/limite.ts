@@ -2,23 +2,25 @@ import "server-only";
 import { ErroConsulta } from "@/lib/consultas/posicao";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
 
-export const perguntasPorHora = 30;
+export type MotivoRecusaReserva = "limite" | "teto";
 
-export type SituacaoLimite = { permitido: boolean; restante: number };
+export type Reserva = { ok: true; idPergunta: number } | { ok: false; motivo: MotivoRecusaReserva };
 
-// Uma contagem só, pelo índice (user_id, criado_em desc) de app.pergunta_assistente: O(log n) mais as linhas da hora.
-// Falha na contagem vira erro, e não permissão, para o limite não abrir quando o banco falha.
-export async function verificarLimite(userId: string): Promise<SituacaoLimite> {
+// A contagem por hora, a soma do dia e a gravação da linha 'pendente' acontecem numa função só do banco,
+// sob bloqueio por usuário: duas perguntas ao mesmo tempo não passam do limite. A função levanta P0001
+// com a mensagem 'limite' ou 'teto'; qualquer outro erro vira ErroConsulta, e não permissão.
+export async function reservarPergunta(idRequisicao: string, pergunta: string): Promise<Reserva> {
   const supabase = await criarClienteServidor();
-  const umaHoraAtras = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-  const { count, error } = await supabase
+  const { data, error } = await supabase
     .schema("app")
-    .from("pergunta_assistente")
-    .select("id", { count: "exact", head: true })
-    .eq("user_id", userId)
-    .gte("criado_em", umaHoraAtras);
+    .rpc("reservar_pergunta", { p_id_requisicao: idRequisicao, p_pergunta: pergunta });
 
-  if (error || count === null) throw new ErroConsulta(error?.code ?? "contagem_ausente");
-  const restante = Math.max(perguntasPorHora - count, 0);
-  return { permitido: restante > 0, restante };
+  if (error) {
+    if (error.code === "P0001" && (error.message === "limite" || error.message === "teto")) {
+      return { ok: false, motivo: error.message };
+    }
+    throw new ErroConsulta(error.code ?? "reserva_falhou");
+  }
+  if (typeof data !== "number") throw new ErroConsulta("reserva_sem_id");
+  return { ok: true, idPergunta: data };
 }

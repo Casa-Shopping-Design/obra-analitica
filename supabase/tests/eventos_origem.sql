@@ -174,6 +174,7 @@ select is_empty(
       and p.proname <> 'registrar_evento_origem'$$,
   'anon só executa a função de registro de evento no schema app'
 );
+-- carga_execucao.sql repete esta lista fechada: a rota de saúde lê public.ultima_carga(), fora de app.
 
 set local role anon;
 select throws_ok('select count(*) from app.evento_origem', '42501', null, 'anon não lê a fila');

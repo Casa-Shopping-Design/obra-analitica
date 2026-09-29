@@ -1,9 +1,10 @@
 -- Execução do SQL do assistente e registro das perguntas: o RLS de quem pergunta continua valendo,
--- escrita falha, sem usuário ou sem assinatura falha, e o registro de uma pessoa não aparece para outra.
--- Cria os próprios dados para não depender do seed.
+-- escrita direta falha, a reserva conta o limite por hora e o teto diário, o SQL gravado sai só para
+-- o diretor e uma consulta que troca os claims no meio não devolve linha. Cria os próprios dados.
+-- As reservas e conclusões vêm antes das execuções, porque executar_consulta deixa a transação só de leitura.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(25);
+select plan(44);
 
 insert into app.tenant (id, razao_social) values
   ('0e000000-0000-4000-8000-0000000000d1', 'Construtora Assistente A'),
@@ -54,6 +55,11 @@ select ok(
   'anônimo não executa consulta'
 );
 select ok(
+  not has_function_privilege('anon', 'app.reservar_pergunta(uuid, text)', 'execute')
+  and not has_function_privilege('anon', 'app.sql_das_perguntas(bigint[])', 'execute'),
+  'anônimo não reserva pergunta nem lê SQL gravado'
+);
+select ok(
   (select setconfig @> array['statement_timeout=8s'] from pg_db_role_setting
    where setrole = 'authenticated'::regrole and setdatabase = 0),
   'papel authenticated tem statement_timeout de 8s'
@@ -68,10 +74,25 @@ select is(
   true,
   'RLS ligado e forçado em chave_assinatura_consulta'
 );
+select is(
+  (select relrowsecurity and relforcerowsecurity from pg_class where oid = 'app.parametro_assistente'::regclass),
+  true,
+  'RLS ligado e forçado em parametro_assistente'
+);
+select ok(
+  not has_table_privilege('authenticated', 'app.parametro_assistente', 'select'),
+  'usuário logado não lê os parâmetros do assistente'
+);
+select ok(
+  not has_table_privilege('authenticated', 'app.pergunta_assistente', 'insert')
+  and not has_column_privilege('authenticated', 'app.pergunta_assistente', 'sql_executado', 'select')
+  and not has_column_privilege('authenticated', 'app.pergunta_assistente', 'sql_gerado', 'select'),
+  'usuário logado não insere nem lê as colunas de SQL pela tabela'
+);
 select has_index('app', 'pergunta_assistente', 'pergunta_assistente_usuario_criado_idx', array['user_id', 'criado_em'],
   'índice do limite por usuário');
 select has_index('app', 'pergunta_assistente', 'pergunta_assistente_tenant_criado_idx', array['tenant_id', 'criado_em'],
-  'índice da leitura por tenant');
+  'índice do teto por tenant');
 
 -- Sem usuário
 set local role authenticated;
@@ -81,30 +102,30 @@ select throws_ok(
   null,
   'sem usuário a consulta falha'
 );
+select throws_ok(
+  $$select app.reservar_pergunta('00000000-0000-4000-8000-000000000000', 'x')$$,
+  '42501',
+  null,
+  'sem usuário a reserva falha'
+);
 
--- Gerente da Aurora: registro de perguntas antes das consultas, porque a consulta deixa a transação só de leitura
+-- Gerente da Aurora: reserva, escrita direta e leitura do próprio registro
 reset role;
 select set_config('request.jwt.claims', '{"sub": "0a000000-0000-4000-8000-00000000c101", "role": "authenticated"}', true);
 set local role authenticated;
 
 select lives_ok(
-  $$insert into app.pergunta_assistente (id_requisicao, pergunta, sql_gerado, resultado)
-    values ('00000000-0000-4000-8000-000000000001', 'Quanto a Aurora vai receber?', 'select 1', 'ok')$$,
-  'gerente grava a própria pergunta com usuário e tenant preenchidos pelo banco'
+  $$select set_config('teste.pergunta_gerente',
+    app.reservar_pergunta('00000000-0000-4000-8000-000000000001', 'Quanto a Aurora vai receber?')::text, true)$$,
+  'gerente reserva a própria pergunta com usuário e tenant preenchidos pelo banco'
 );
 select throws_ok(
-  $$insert into app.pergunta_assistente (user_id, id_requisicao, pergunta, sql_gerado, resultado)
-    values ('0a000000-0000-4000-8000-00000000d101', '00000000-0000-4000-8000-000000000002', 'x', 'select 1', 'ok')$$,
+  $$insert into app.pergunta_assistente (user_id, tenant_id, id_requisicao, pergunta, resultado)
+    values ('0a000000-0000-4000-8000-00000000c101', '0e000000-0000-4000-8000-0000000000d1',
+            '00000000-0000-4000-8000-000000000002', 'x', 'ok')$$,
   '42501',
   null,
-  'gerente não grava pergunta em nome de outro usuário'
-);
-select throws_ok(
-  $$insert into app.pergunta_assistente (tenant_id, id_requisicao, pergunta, sql_gerado, resultado)
-    values ('0e000000-0000-4000-8000-0000000000d2', '00000000-0000-4000-8000-000000000003', 'x', 'select 1', 'ok')$$,
-  '42501',
-  null,
-  'gerente não grava pergunta em outro tenant'
+  'gerente não grava pergunta direto na tabela'
 );
 select throws_ok(
   $$delete from app.pergunta_assistente$$,
@@ -116,7 +137,45 @@ select throws_ok(
   $$update app.pergunta_assistente set pergunta = 'alterada'$$,
   '42501',
   null,
-  'registro de pergunta não pode ser alterado'
+  'registro de pergunta não pode ser alterado direto'
+);
+select throws_ok(
+  $$select sql_executado from app.pergunta_assistente$$,
+  '42501',
+  null,
+  'gerente não lê sql_executado pela tabela'
+);
+select throws_ok(
+  $$select * from app.pergunta_assistente$$,
+  '42501',
+  null,
+  'select * na tabela falha para quem está logado'
+);
+select is(
+  (select resultado from app.pergunta_assistente where id = current_setting('teste.pergunta_gerente')::bigint),
+  'pendente',
+  'reserva nasce pendente e é legível pelo próprio usuário'
+);
+select lives_ok(
+  format($$select app.concluir_pergunta(%s, 'select 1 as n', 'select 1 as n', 'ok', 1, 12, 100, 20, 0.001)$$,
+    current_setting('teste.pergunta_gerente')),
+  'gerente conclui a própria reserva'
+);
+select is(
+  (select resultado from app.pergunta_assistente where id = current_setting('teste.pergunta_gerente')::bigint),
+  'ok',
+  'conclusão grava o resultado'
+);
+select throws_ok(
+  format($$select app.concluir_pergunta(%s, 'x', null, 'erro', null, null, null, null, null)$$,
+    current_setting('teste.pergunta_gerente')),
+  '42501',
+  null,
+  'reserva já concluída não é fechada de novo'
+);
+select is_empty(
+  format('select * from app.sql_da_pergunta(%s)', current_setting('teste.pergunta_gerente')),
+  'gerente não lê o SQL da própria pergunta pela função'
 );
 select throws_ok(
   $$select chave from app.chave_assinatura_consulta$$,
@@ -125,13 +184,55 @@ select throws_ok(
   'usuário logado não lê a chave de assinatura'
 );
 
--- Diretor do mesmo tenant grava e vê as perguntas do tenant
+-- Diretor do mesmo tenant vê as perguntas do tenant e o SQL; não fecha reserva alheia
 reset role;
 select set_config('request.jwt.claims', '{"sub": "0a000000-0000-4000-8000-00000000d101", "role": "authenticated"}', true);
 set local role authenticated;
-insert into app.pergunta_assistente (id_requisicao, pergunta, sql_gerado, resultado)
-  values ('00000000-0000-4000-8000-000000000004', 'Qual a exposição máxima?', 'select 1', 'ok');
+select throws_ok(
+  format($$select app.concluir_pergunta(%s, 'x', null, 'erro', null, null, null, null, null)$$,
+    current_setting('teste.pergunta_gerente')),
+  '42501',
+  null,
+  'diretor não conclui reserva de outro usuário'
+);
+select set_config('teste.pergunta_diretor',
+  app.reservar_pergunta('00000000-0000-4000-8000-000000000004', 'Qual a exposição máxima?')::text, true);
 select is((select count(*) from app.pergunta_assistente), 2::bigint, 'diretor vê as perguntas do tenant');
+select results_eq(
+  format('select sql_executado from app.sql_da_pergunta(%s)', current_setting('teste.pergunta_gerente')),
+  $$values ('select 1 as n')$$,
+  'diretor lê o SQL executado de pergunta do tenant'
+);
+select is(
+  (select count(*) from app.sql_das_perguntas(array[
+    current_setting('teste.pergunta_gerente')::bigint, current_setting('teste.pergunta_diretor')::bigint])),
+  2::bigint,
+  'diretor lê o SQL de várias perguntas numa chamada'
+);
+
+-- Limite por hora: o diretor já tem uma reserva; mais 29 passam, a 31ª é recusada
+select lives_ok(
+  $$select app.reservar_pergunta(gen_random_uuid(), 'pergunta repetida') from generate_series(1, 29)$$,
+  'diretor faz 30 perguntas na hora'
+);
+select throws_ok(
+  $$select app.reservar_pergunta(gen_random_uuid(), 'a trigésima primeira')$$,
+  'P0001',
+  'limite',
+  '31ª pergunta na hora é recusada com a mensagem limite'
+);
+
+-- Teto diário do tenant: as 30 perguntas do diretor custaram US$ 6, acima dos US$ 5 do parâmetro
+reset role;
+update app.pergunta_assistente set custo_estimado = 0.2 where user_id = '0a000000-0000-4000-8000-00000000d101';
+select set_config('request.jwt.claims', '{"sub": "0a000000-0000-4000-8000-00000000c101", "role": "authenticated"}', true);
+set local role authenticated;
+select throws_ok(
+  $$select app.reservar_pergunta(gen_random_uuid(), 'mais uma')$$,
+  'P0001',
+  'teto',
+  'tenant que passou do teto diário é recusado com a mensagem teto'
+);
 
 reset role;
 select set_config('request.jwt.claims', '{"sub": "0a000000-0000-4000-8000-00000000c101", "role": "authenticated"}', true);
@@ -176,8 +277,8 @@ select is(
 );
 select throws_ok(
   format('select marts.executar_consulta(%L, %L)',
-    'insert into app.pergunta_assistente (id_requisicao, pergunta, sql_gerado, resultado) values (gen_random_uuid(), ''x'', ''x'', ''ok'') returning id',
-    pg_temp.assinar('insert into app.pergunta_assistente (id_requisicao, pergunta, sql_gerado, resultado) values (gen_random_uuid(), ''x'', ''x'', ''ok'') returning id')),
+    'insert into app.pergunta_assistente (user_id, tenant_id, id_requisicao, pergunta, resultado) values (auth.uid(), app.tenant_atual(), gen_random_uuid(), ''x'', ''ok'') returning id',
+    pg_temp.assinar('insert into app.pergunta_assistente (user_id, tenant_id, id_requisicao, pergunta, resultado) values (auth.uid(), app.tenant_atual(), gen_random_uuid(), ''x'', ''ok'') returning id')),
   '42601',
   null,
   'insert pelo executar_consulta falha'
@@ -190,6 +291,22 @@ select throws_ok(
   null,
   'segundo comando escondido no SQL, trocando os claims, não roda'
 );
+-- set_config é função, passa pelo cursor e pela transação só de leitura: a função confere os claims depois do fetch.
+select throws_ok(
+  format('select marts.executar_consulta(%L, %L)',
+    'select count(*) as total from staging.parcela_receber where (select set_config(''request.jwt.claims'', ''{"sub": "0a000000-0000-4000-8000-00000000d101", "role": "authenticated"}'', true)) is not null',
+    pg_temp.assinar('select count(*) as total from staging.parcela_receber where (select set_config(''request.jwt.claims'', ''{"sub": "0a000000-0000-4000-8000-00000000d101", "role": "authenticated"}'', true)) is not null')),
+  '42501',
+  null,
+  'select assinado que troca os claims por set_config não devolve linha'
+);
+select is(
+  current_setting('request.jwt.claims', true),
+  '{"sub": "0a000000-0000-4000-8000-00000000c101", "role": "authenticated"}',
+  'claims voltam ao valor da gerente depois da tentativa'
+);
+-- O statement_timeout da transação (o PostgREST põe o do papel antes de chamar) corta o fetch do cursor com
+-- 57014, conferido à mão com pg_sleep; não há caso pgTAP porque query_canceled não é capturado por throws_ok.
 select is(current_setting('transaction_read_only'), 'on', 'consulta deixa a transação só de leitura');
 
 select * from finish();

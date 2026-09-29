@@ -30,6 +30,7 @@ async function lerHistorico(): Promise<Historico | null> {
 }
 
 const situacaoPergunta: Record<string, string> = {
+  pendente: "Em andamento",
   ok: "Respondida",
   recusada: "Recusada",
   erro: "Não executada",

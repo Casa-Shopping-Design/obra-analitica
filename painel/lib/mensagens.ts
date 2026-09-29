@@ -28,6 +28,7 @@ export const mensagens = {
     falhaRede: "Não foi possível falar com o servidor. Confira a conexão e tente de novo.",
     perguntaInvalida: "Escreva a pergunta com 3 a 500 caracteres.",
     limite: "Limite de 30 perguntas por hora atingido. Tente de novo mais tarde ou use as perguntas prontas.",
+    teto: "A construtora atingiu o limite diário de uso do assistente. As perguntas prontas continuam disponíveis; o assistente volta amanhã.",
     consultaInsegura: "Não consegui montar uma consulta segura para essa pergunta. Tente perguntar de outro jeito.",
     foraDoCatalogo:
       "Não encontrei nos dados do painel como responder a essa pergunta. Pergunte sobre caixa, recebimentos, pagamentos, vendas ou estoque das obras.",
@@ -35,5 +36,23 @@ export const mensagens = {
     semDados: "Não encontrei dados para essa pergunta nas obras liberadas para o seu perfil.",
     historicoIndisponivel: "Não foi possível carregar suas últimas perguntas agora. Recarregue a página em alguns minutos.",
     respostaSoTabela: "A resposta está na tabela abaixo, calculada direto dos dados do painel.",
+  },
+  carga: {
+    semConferencia: "Atenção: não foi possível conferir a data da última carga. Recarregue a página em alguns minutos.",
+    semCarga: "Atenção: nenhuma carga de dados foi concluída ainda. Os números aparecem depois da primeira carga.",
+    atrasada: "Atenção: a carga de hoje não rodou.",
+    numerosDe: "Os números são de",
+    carregadaEm: "Dados carregados em",
+    avisoDemo: "Dados da demo: valores gerados para demonstração, sem relação com uma construtora real.",
+  },
+  segundoFator: {
+    codigoFormato: "Digite os seis dígitos que aparecem no aplicativo autenticador.",
+    codigoInvalido: "Código incorreto ou vencido. Espere o aplicativo gerar um código novo e tente de novo.",
+    muitasTentativas: "Muitas tentativas seguidas. Espere alguns minutos e tente de novo.",
+    desligado: "O segundo fator ainda não está ligado neste ambiente. Avise o administrador da construtora.",
+    semFator: "Nenhum aplicativo autenticador cadastrado. Cadastre um para continuar.",
+    indisponivel: "Não foi possível concluir agora. Tente de novo em alguns minutos.",
+    recomecar: "O cadastro não pôde ser concluído. Gere o código QR de novo e cadastre o aplicativo outra vez.",
+    confirmarAntes: "Confirme o código do aplicativo já cadastrado antes de cadastrar outro.",
   },
 } as const;

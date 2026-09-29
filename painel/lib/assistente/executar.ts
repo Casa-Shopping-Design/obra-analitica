@@ -1,6 +1,6 @@
 import "server-only";
 import { createHmac } from "node:crypto";
-import pino from "pino";
+import { registrar, type CamposLog, type ResultadoLog } from "@/lib/log";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
 import { validarSql } from "@/lib/validador-sql";
 
@@ -8,8 +8,8 @@ export type LinhaConsulta = Record<string, unknown>;
 
 export type UsoModelo = { tokensEntrada: number; tokensSaida: number; custoEstimado: number };
 
-// Roda com as linhas antes da gravação, para o registro trazer tokens e custo da resposta também:
-// a tabela não aceita update depois do insert.
+// Roda com as linhas antes da conclusão, para o registro trazer tokens e custo da resposta também:
+// a reserva é fechada uma vez só.
 export type ComplementoUso = (linhas: LinhaConsulta[]) => Promise<UsoModelo>;
 
 // O código da falha é traduzido para texto na borda, por lib/mensagens.ts; SQL e erro do banco nunca saem daqui.
@@ -21,23 +21,17 @@ export type ResultadoExecucao =
 
 type Cliente = Awaited<ReturnType<typeof criarClienteServidor>>;
 
-type RegistroPergunta = {
-  id_requisicao: string;
-  pergunta: string;
-  sql_gerado: string;
-  sql_executado?: string;
+export type ConclusaoPergunta = {
+  idPergunta: number;
+  sqlGerado: string;
+  sqlExecutado: string | null;
   resultado: "ok" | "recusada" | "erro";
-  linhas_devolvidas?: number;
-  duracao_ms?: number;
-  tokens_entrada: number | null;
-  tokens_saida: number | null;
-  custo_estimado: number | null;
+  linhas: number | null;
+  duracaoMs: number | null;
+  uso: UsoModelo | undefined;
 };
 
-type CamposLog = { id_requisicao: string; rota: string; user_id: string | null; tenant_id: string | null };
-
-// Campos fixos da seção 4.2 do plano; sem pergunta, sem SQL e sem e-mail no log.
-const log = pino({ base: null, messageKey: "mensagem" });
+type CamposBase = Pick<CamposLog, "id_requisicao" | "rota" | "user_id" | "tenant_id">;
 
 // Sem a chave não há assinatura, e o banco recusa a consulta; melhor falhar aqui com o motivo no log.
 export function lerChaveAssinatura(): string | null {
@@ -54,25 +48,30 @@ function somarUso(base: UsoModelo | undefined, extra: UsoModelo): UsoModelo {
   };
 }
 
-function camposUso(uso: UsoModelo | undefined) {
-  return {
-    tokens_entrada: uso?.tokensEntrada ?? null,
-    tokens_saida: uso?.tokensSaida ?? null,
-    custo_estimado: uso?.custoEstimado ?? null,
-  };
-}
-
-// user_id e tenant_id ficam a cargo do banco (default e política de insert), então ninguém grava em nome de outro.
-async function gravarPergunta(supabase: Cliente, registro: RegistroPergunta, campos: CamposLog): Promise<boolean> {
-  const { error } = await supabase.schema("app").from("pergunta_assistente").insert(registro);
-  if (error) log.error({ ...campos, resultado: "erro", codigo_erro: error.code }, "falha ao registrar pergunta do assistente");
+// Fecha a linha 'pendente' aberta por reservarPergunta. O banco só aceita a conclusão de quem reservou,
+// uma vez; falha aqui é registrada e devolvida, porque resposta sem registro não sai.
+export async function concluirPergunta(supabase: Cliente, conclusao: ConclusaoPergunta, campos: CamposBase): Promise<boolean> {
+  const { error } = await supabase.schema("app").rpc("concluir_pergunta", {
+    p_id: conclusao.idPergunta,
+    p_sql_gerado: conclusao.sqlGerado,
+    p_sql_executado: conclusao.sqlExecutado,
+    p_resultado: conclusao.resultado,
+    p_linhas: conclusao.linhas,
+    p_duracao_ms: conclusao.duracaoMs,
+    p_tokens_entrada: conclusao.uso?.tokensEntrada ?? null,
+    p_tokens_saida: conclusao.uso?.tokensSaida ?? null,
+    p_custo: conclusao.uso?.custoEstimado ?? null,
+  });
+  if (error) {
+    registrar("error", "falha ao concluir o registro da pergunta", { ...campos, resultado: "erro", codigo_erro: error.code });
+  }
   return !error;
 }
 
 export async function executarConsultaValidada(
   sqlGerado: string,
   idRequisicao: string,
-  pergunta: string,
+  idPergunta: number,
   uso?: UsoModelo,
   complementarUso?: ComplementoUso,
 ): Promise<ResultadoExecucao> {
@@ -80,35 +79,33 @@ export async function executarConsultaValidada(
   // getClaims valida o JWT; o tenant vem do claim que o hook do Auth grava, e não do registro do usuário.
   const { data: dadosToken } = await supabase.auth.getClaims();
   const claims = dadosToken?.claims;
-  const campos: CamposLog = {
+  const campos: CamposBase = {
     id_requisicao: idRequisicao,
     rota: "assistente",
     user_id: claims?.sub ?? null,
     tenant_id: (claims?.app_metadata?.tenant_id as string | undefined) ?? null,
   };
+  const anotar = (nivel: "info" | "warn" | "error", mensagem: string, resultado: ResultadoLog, extra: Partial<CamposLog> = {}) =>
+    registrar(nivel, mensagem, { ...campos, ...extra, resultado });
 
   if (!claims?.sub) {
-    log.warn({ ...campos, resultado: "sem_usuario" }, "consulta do assistente sem usuário autenticado");
+    anotar("warn", "consulta do assistente sem usuário autenticado", "negado");
     return { ok: false, falha: "sem_usuario", idRequisicao };
   }
 
-  const registroBase = {
-    id_requisicao: idRequisicao,
-    pergunta,
-    sql_gerado: sqlGerado,
-    ...camposUso(uso),
-  };
+  const conclusaoBase = { idPergunta, sqlGerado, sqlExecutado: null, linhas: null, duracaoMs: null, uso };
 
   const validacao = validarSql(sqlGerado);
   if (!validacao.ok) {
-    log.warn({ ...campos, resultado: "recusada", motivo: validacao.motivo }, "consulta recusada pelo validador");
-    await gravarPergunta(supabase, { ...registroBase, resultado: "recusada" }, campos);
+    anotar("warn", "consulta recusada pelo validador", "recusada", { motivo: validacao.motivo });
+    await concluirPergunta(supabase, { ...conclusaoBase, resultado: "recusada" }, campos);
     return { ok: false, falha: "recusada", idRequisicao };
   }
 
   const chave = lerChaveAssinatura();
   if (!chave) {
-    log.error({ ...campos, resultado: "erro" }, "ASSISTENTE_CHAVE_ASSINATURA ausente ou curta");
+    anotar("error", "ASSISTENTE_CHAVE_ASSINATURA ausente ou curta", "erro");
+    await concluirPergunta(supabase, { ...conclusaoBase, resultado: "erro" }, campos);
     return { ok: false, falha: "configuracao", idRequisicao };
   }
 
@@ -118,24 +115,24 @@ export async function executarConsultaValidada(
     .schema("marts")
     .rpc("executar_consulta", { p_sql: validacao.sql, p_assinatura: assinatura });
   const duracaoMs = Math.round(performance.now() - inicio);
-  const execucao = { ...registroBase, sql_executado: validacao.sql, duracao_ms: duracaoMs };
+  const execucao = { ...conclusaoBase, sqlExecutado: validacao.sql, duracaoMs };
 
   if (error) {
-    log.error({ ...campos, duracao_ms: duracaoMs, resultado: "erro", codigo_erro: error.code }, "falha ao executar consulta do assistente");
-    await gravarPergunta(supabase, { ...execucao, resultado: "erro" }, campos);
+    anotar("error", "falha ao executar consulta do assistente", "erro", { duracao_ms: duracaoMs, codigo_erro: error.code });
+    await concluirPergunta(supabase, { ...execucao, resultado: "erro" }, campos);
     return { ok: false, falha: "execucao", idRequisicao };
   }
 
   const linhas: LinhaConsulta[] = Array.isArray(data) ? data : [];
   const usoTotal = complementarUso ? somarUso(uso, await complementarUso(linhas)) : uso;
   // Resposta sem registro não sai: a rastreabilidade de quem perguntou o quê vale mais que a resposta.
-  const registrou = await gravarPergunta(
+  const registrou = await concluirPergunta(
     supabase,
-    { ...execucao, ...camposUso(usoTotal), resultado: "ok", linhas_devolvidas: linhas.length },
+    { ...execucao, uso: usoTotal, resultado: "ok", linhas: linhas.length },
     campos,
   );
   if (!registrou) return { ok: false, falha: "execucao", idRequisicao };
 
-  log.info({ ...campos, duracao_ms: duracaoMs, resultado: "ok", linhas: linhas.length }, "consulta do assistente executada");
+  anotar("info", "consulta do assistente executada", "ok", { duracao_ms: duracaoMs, linhas: linhas.length });
   return { ok: true, linhas, totalLinhas: linhas.length, duracaoMs, idRequisicao };
 }

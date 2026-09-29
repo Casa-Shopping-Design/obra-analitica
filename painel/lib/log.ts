@@ -1,9 +1,20 @@
 import pino from "pino";
 
 export type NivelLog = "info" | "warn" | "error";
-export type ResultadoLog = "ok" | "negado" | "erro" | "indisponivel";
+export type ResultadoLog =
+  | "ok"
+  | "negado"
+  | "erro"
+  | "indisponivel"
+  | "recusada"
+  | "limite"
+  | "teto"
+  | "fora_do_catalogo"
+  | "pergunta_invalida"
+  | "erro_redacao";
 
-// Tipo fechado de propósito: e-mail, token, cookie ou SQL não têm campo onde entrar.
+// Tipo fechado de propósito: e-mail, token, cookie, pergunta ou SQL não têm campo onde entrar.
+// O motivo é o código curto do validador ou da falha, nunca o texto da consulta.
 export type CamposLog = {
   id_requisicao: string | null;
   rota: string;
@@ -12,6 +23,9 @@ export type CamposLog = {
   tenant_id?: string | null;
   duracao_ms?: number;
   codigo_erro?: string;
+  linhas?: number;
+  motivo?: string;
+  tipo_erro?: string;
 };
 
 const registrador = pino({

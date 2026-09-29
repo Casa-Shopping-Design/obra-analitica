@@ -16,6 +16,7 @@ create table app.carga_execucao (
 );
 
 create index carga_execucao_tenant_terminado on app.carga_execucao (tenant_id, terminado_em desc);
+create index carga_execucao_tenant_iniciado on app.carga_execucao (tenant_id, iniciado_em desc);
 
 -- Só o carregador grava, com o dono do banco; o usuário logado lê as execuções do próprio tenant.
 alter table app.carga_execucao enable row level security;
@@ -35,26 +36,34 @@ group by tenant_id;
 
 grant select on marts.ultima_carga to authenticated;
 
--- A rota de saúde roda sem login e o anônimo não lê tabela nenhuma. A função devolve só a data da
--- carga mais atrasada entre os tenants ativos, sem dizer qual; tenant sem carga nenhuma devolve nulo.
--- O(t) em tenants, com uma busca por índice em carga_execucao para cada um.
-create function app.saude_carga() returns timestamptz
+-- A rota de saúde roda sem login e o anônimo continua fora do schema app: a função fica em public,
+-- executável por anon, e devolve só a carga mais atrasada entre os tenants ativos, sem dizer qual, e a
+-- situação do staging mais recente. Tenant ativo sem carga nenhuma deixa a data nula.
+-- O(t) em tenants, com duas buscas por índice em carga_execucao para cada um.
+create function public.ultima_carga() returns table (concluida_em timestamptz, situacao text)
 language sql stable security definer set search_path = '' as $$
-  select case when bool_and(u.ultima is not null) then min(u.ultima) end
-  from app.tenant t
-  left join lateral (
-    select max(ce.terminado_em) as ultima
-    from app.carga_execucao ce
-    where ce.tenant_id = t.id and ce.situacao = 'ok' and ce.endpoint = 'staging'
-  ) u on true
-  where t.status = 'ativo'
+  with por_tenant as (
+    select
+      (select max(ce.terminado_em)
+       from app.carga_execucao ce
+       where ce.tenant_id = t.id and ce.situacao = 'ok' and ce.endpoint = 'staging') as concluida,
+      (select ce.situacao
+       from app.carga_execucao ce
+       where ce.tenant_id = t.id and ce.endpoint = 'staging'
+       order by ce.iniciado_em desc
+       limit 1) as recente
+    from app.tenant t
+    where t.status = 'ativo'
+  )
+  select
+    case when bool_and(concluida is not null) then min(concluida) end,
+    case
+      when bool_or(recente = 'falha') then 'falha'
+      when bool_or(recente = 'executando') then 'executando'
+      when bool_and(recente = 'ok') then 'ok'
+    end
+  from por_tenant
 $$;
 
--- O anônimo passa a enxergar o schema app só para chamar a função acima. Toda função de app
--- já tem execute revogado de public. Função nova em app nasce executável por public e, daqui em
--- diante, pelo anônimo: a migration que a criar revoga no mesmo arquivo. Um "alter default
--- privileges in schema app revoke" não resolveria, porque o default por schema só soma ao global.
--- O teste carga_execucao.sql falha se alguma função de app ficar aberta ao anônimo.
-grant usage on schema app to anon;
-revoke execute on function app.saude_carga() from public;
-grant execute on function app.saude_carga() to anon, authenticated;
+revoke execute on function public.ultima_carga() from public, authenticated;
+grant execute on function public.ultima_carga() to anon, authenticated;

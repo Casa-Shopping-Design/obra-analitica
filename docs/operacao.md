@@ -24,7 +24,7 @@ Sem `SENTRY_DSN` e `NEXT_PUBLIC_SENTRY_DSN` o SDK fica desligado, que é o norma
 
 ## Rota de saúde
 
-`GET /api/saude` responde `{ ok, commit, ultima_carga_em, idade_horas }`, sem login. Responde 503 quando o banco não responde ou quando algum tenant ativo está há mais de 26 horas sem carga concluída. O UptimeRobot chama a cada 5 minutos e manda e-mail na falha.
+`GET /api/saude` responde `{ ok, idade_horas }`, sem login; com o segredo `MONITOR_TOKEN` no cabeçalho `x-monitor-token` acrescenta `commit`, `ultima_carga_em` e `situacao_carga`. A data vem de `public.ultima_carga()`, a única função que o anônimo chama fora do webhook. Responde 503 quando o banco não responde ou quando algum tenant ativo está há mais de 26 horas sem carga concluída. O UptimeRobot chama a cada 5 minutos e manda e-mail na falha.
 
 Com 503, olhe `idade_horas`: nulo com `ultima_carga_em` nulo quer dizer banco fora do ar ou nenhuma carga concluída; número acima de 26 quer dizer que a carga noturna não rodou ou falhou.
 

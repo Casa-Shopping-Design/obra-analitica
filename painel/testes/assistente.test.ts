@@ -2,21 +2,27 @@ import type Anthropic from "@anthropic-ai/sdk";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // O vitest não lê o alias "@/" do tsconfig; cada módulo do painel é apontado para o arquivo real,
-// e só o banco, o limite e o cliente da Anthropic são simulados.
+// e só o banco e o cliente da Anthropic são simulados. A reserva e a conclusão passam pelo cliente simulado.
 vi.mock("server-only", () => ({}));
-vi.mock("pino", () => ({ default: () => ({ info: () => {}, warn: () => {}, error: () => {} }) }));
+vi.mock("pino", () => ({
+  default: Object.assign(() => ({ info: () => {}, warn: () => {}, error: () => {} }), {
+    stdTimeFunctions: { isoTime: () => "" },
+  }),
+}));
 vi.mock("@/lib/catalogo-views", async () => await import("../lib/catalogo-views"));
 vi.mock("@/lib/validador-sql", async () => await import("../lib/validador-sql"));
 vi.mock("@/lib/mensagens", async () => await import("../lib/mensagens"));
 vi.mock("@/lib/formatar", async () => await import("../lib/formatar"));
+vi.mock("@/lib/log", async () => await import("../lib/log"));
+vi.mock("@/lib/consultas/posicao", async () => await import("../lib/consultas/posicao"));
 vi.mock("@/lib/assistente/prompt", async () => await import("../lib/assistente/prompt"));
 vi.mock("@/lib/assistente/executar", async () => await import("../lib/assistente/executar"));
+vi.mock("@/lib/assistente/limite", async () => await import("../lib/assistente/limite"));
 vi.mock("@/lib/assistente/responder", async () => await import("../lib/assistente/responder"));
 vi.mock("@/lib/assistente/gerar-sql", async () => {
   const real = await import("../lib/assistente/gerar-sql");
   return { ...real, criarClienteModelo: () => modelo.cliente };
 });
-vi.mock("@/lib/assistente/limite", () => ({ verificarLimite: async () => banco.limite }));
 vi.mock("@/lib/supabase/servidor", () => ({ criarClienteServidor: async () => clienteBanco() }));
 
 const idRequisicao = "0b7f6f0e-5a8e-4a57-9d43-0c1f8e2b7a10";
@@ -24,17 +30,33 @@ const idUsuario = "5f0c2a52-8e0b-4f0e-9d7c-2b1b4a6f3c11";
 
 type Registro = Record<string, unknown>;
 
+type ArgumentosConclusao = {
+  p_id: number;
+  p_sql_gerado: string;
+  p_sql_executado: string | null;
+  p_resultado: string;
+  p_linhas: number | null;
+  p_duracao_ms: number | null;
+  p_tokens_entrada: number | null;
+  p_tokens_saida: number | null;
+  p_custo: number | null;
+};
+
 const banco = {
   usuarioLogado: true,
   perfil: "financeiro",
   tenantNoClaim: "tenant-teste" as string | null,
   tenantNoBanco: null as string | null,
-  limite: { permitido: true, restante: 29 },
+  // null reserva normalmente; "limite" e "teto" simulam o P0001 que app.reservar_pergunta levanta.
+  recusaReserva: null as "limite" | "teto" | null,
+  proximoId: 1,
   linhas: [] as Registro[],
   registros: [] as Registro[],
   execucoes: [] as { p_sql: string; p_assinatura: string }[],
 };
 
+// Espelha o contrato das funções do banco: a reserva grava a linha pendente e a conclusão só fecha a
+// linha pendente do próprio usuário, uma vez; a tabela em si não aceita insert.
 function clienteBanco() {
   return {
     auth: {
@@ -47,14 +69,39 @@ function clienteBanco() {
     },
     schema: () => ({
       from: () => ({
-        insert: async (registro: Registro) => {
-          banco.registros.push(registro);
-          return { error: null };
-        },
+        insert: async () => ({ error: { code: "42501", message: "permission denied" } }),
       }),
-      rpc: async (nome: string, argumentos: { p_sql: string; p_assinatura: string }) => {
+      rpc: async (nome: string, argumentos: Registro) => {
         if (nome === "tenant_atual") return { data: banco.tenantNoBanco, error: null };
-        banco.execucoes.push(argumentos);
+        if (nome === "reservar_pergunta") {
+          if (banco.recusaReserva) return { data: null, error: { code: "P0001", message: banco.recusaReserva } };
+          const id = banco.proximoId++;
+          banco.registros.push({
+            id,
+            user_id: idUsuario,
+            id_requisicao: argumentos.p_id_requisicao,
+            pergunta: argumentos.p_pergunta,
+            resultado: "pendente",
+          });
+          return { data: id, error: null };
+        }
+        if (nome === "concluir_pergunta") {
+          const conclusao = argumentos as unknown as ArgumentosConclusao;
+          const registro = banco.registros.find((linha) => linha.id === conclusao.p_id && linha.resultado === "pendente");
+          if (!registro) return { data: null, error: { code: "42501", message: "pergunta não está pendente" } };
+          Object.assign(registro, {
+            sql_gerado: conclusao.p_sql_gerado,
+            sql_executado: conclusao.p_sql_executado,
+            resultado: conclusao.p_resultado,
+            linhas_devolvidas: conclusao.p_linhas,
+            duracao_ms: conclusao.p_duracao_ms,
+            tokens_entrada: conclusao.p_tokens_entrada,
+            tokens_saida: conclusao.p_tokens_saida,
+            custo_estimado: conclusao.p_custo,
+          });
+          return { data: null, error: null };
+        }
+        banco.execucoes.push(argumentos as { p_sql: string; p_assinatura: string });
         return { data: banco.linhas, error: null };
       },
     }),
@@ -110,7 +157,8 @@ beforeEach(() => {
     perfil: "financeiro",
     tenantNoClaim: "tenant-teste",
     tenantNoBanco: null,
-    limite: { permitido: true, restante: 29 },
+    recusaReserva: null,
+    proximoId: 1,
     linhas: [],
     registros: [],
     execucoes: [],
@@ -205,7 +253,7 @@ describe("rota do assistente com texto livre", () => {
   });
 
   it("recusa com 429 quando o limite de perguntas por hora estourou, sem chamar o modelo", async () => {
-    banco.limite = { permitido: false, restante: 0 };
+    banco.recusaReserva = "limite";
 
     const { status, corpo } = await perguntar("Quanto dinheiro próprio cada obra precisa no pior momento?");
 
@@ -213,6 +261,68 @@ describe("rota do assistente com texto livre", () => {
     expect(corpo.erro).toMatch(/Limite de 30 perguntas por hora/);
     expect(modelo.chamadas).toHaveLength(0);
     expect(banco.execucoes).toHaveLength(0);
+    expect(banco.registros).toHaveLength(0);
+  });
+
+  it("recusa com 429 e mensagem própria quando a construtora passou do teto diário", async () => {
+    banco.recusaReserva = "teto";
+
+    const { status, corpo } = await perguntar("Quanto dinheiro próprio cada obra precisa no pior momento?");
+
+    expect(status).toBe(429);
+    expect(corpo.erro).toMatch(/limite diário de uso do assistente/);
+    expect(corpo.erro).not.toMatch(/por hora/);
+    expect(modelo.chamadas).toHaveLength(0);
+  });
+
+  it("reserva a pergunta antes de chamar o modelo e conclui a reserva depois da execução", async () => {
+    banco.linhas = [{ obra: "Residencial Aurora", exposicao_maxima: 10 }];
+    const situacaoNaChamada: string[] = [];
+    modelo.respostas = [sqlGerado(exposicao, formatosExposicao), "{{0.obra}}: {{0.exposicao_maxima}}."];
+    const criarOriginal = modelo.cliente.messages.create;
+    modelo.cliente.messages.create = async (parametros) => {
+      situacaoNaChamada.push(String(banco.registros[0]?.resultado));
+      return criarOriginal(parametros);
+    };
+
+    const { status } = await perguntar("Quanto dinheiro próprio cada obra precisa no pior momento?");
+    modelo.cliente.messages.create = criarOriginal;
+
+    expect(status).toBe(200);
+    expect(situacaoNaChamada).toEqual(["pendente", "pendente"]);
+    expect(banco.registros).toHaveLength(1);
+    expect(banco.registros[0]).toMatchObject({ resultado: "ok", sql_executado: banco.execucoes[0].p_sql });
+  });
+
+  it("fecha a reserva como erro quando o modelo falha, sem SQL no registro", async () => {
+    const criarOriginal = modelo.cliente.messages.create;
+    modelo.cliente.messages.create = async () => {
+      throw new Error("indisponível");
+    };
+
+    const { status, corpo } = await perguntar("Quanto dinheiro próprio cada obra precisa no pior momento?");
+    modelo.cliente.messages.create = criarOriginal;
+
+    expect(status).toBe(503);
+    expect(corpo.erro).toMatch(/Não foi possível responder agora/);
+    expect(banco.registros[0]).toMatchObject({ resultado: "erro", sql_gerado: "", sql_executado: null });
+  });
+
+  it("gera o id da requisição no servidor quando o cabeçalho não veio do proxy", async () => {
+    const { POST } = await import("../app/api/assistente/route");
+    modelo.respostas = [sqlGerado("")];
+    const resposta = await POST(
+      new Request("http://localhost/api/assistente", {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-id-requisicao": "escolhido-pelo-cliente" },
+        body: JSON.stringify({ pergunta: "Qual o saldo?" }),
+      }),
+    );
+    const corpo = await resposta.json();
+
+    expect(corpo.idRequisicao).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+    expect(corpo.idRequisicao).not.toBe("escolhido-pelo-cliente");
+    expect(banco.registros[0].id_requisicao).toBe(corpo.idRequisicao);
   });
 
   it("recusa com 401 sem usuário autenticado", async () => {
