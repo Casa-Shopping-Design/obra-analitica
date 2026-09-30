@@ -48,3 +48,15 @@ export function formatarMes(competencia: string): string {
   const [ano, mes] = competencia.split("-");
   return `${nomesMes[Number(mes) - 1]}/${ano.slice(2)}`;
 }
+
+const formatoDecimal = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 });
+
+// Uma casa decimal, sem zero sobrando: 9.7 vira "9,7" e 2 vira "2".
+export function formatarDecimal(valor: number): string {
+  return formatoDecimal.format(valor);
+}
+
+export function formatarMeses(quantidade: number): string {
+  const arredondado = Math.round(quantidade * 10) / 10;
+  return arredondado === 1 ? "1 mês" : `${formatarDecimal(arredondado)} meses`;
+}

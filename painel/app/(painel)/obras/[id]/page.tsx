@@ -4,7 +4,9 @@ import { CartaoIndicador, IndicadoresObra } from "@/componentes/CartaoIndicador"
 import { GraficoFluxo } from "@/componentes/GraficoFluxo";
 import { IndicadorVgv } from "@/componentes/IndicadorVgv";
 import { LinksObra } from "@/componentes/LinksObra";
+import { SecaoAlertas } from "@/componentes/ListaAlertas";
 import { SeletorCenario } from "@/componentes/SeletorCenario";
+import { listarAlertas } from "@/lib/consultas/carteira";
 import { cenariosAtraso, listarFluxoCenario, listarFluxoMensal, type MesesAtraso } from "@/lib/consultas/fluxo";
 import { buscarPosicaoObra } from "@/lib/consultas/posicao";
 import { mensagens } from "@/lib/mensagens";
@@ -19,15 +21,17 @@ function lerCenario(valor: string | string[] | undefined): MesesAtraso {
   return cenariosAtraso.find((opcao) => opcao === meses) ?? 0;
 }
 
-// Três consultas no máximo, em paralelo: posição da obra, fluxo mensal e, só com atraso, o cenário.
+// Quatro consultas no máximo, em paralelo: posição da obra, alertas, fluxo mensal e, só com atraso, o cenário.
+// Alerta que falha não derruba a tela; a seção mostra o aviso.
 async function carregarObra(centroCustoId: string, mesesAtraso: MesesAtraso) {
   try {
-    const [posicao, fluxoMensal, fluxoCenario] = await Promise.all([
+    const [posicao, alertas, fluxoMensal, fluxoCenario] = await Promise.all([
       buscarPosicaoObra(centroCustoId),
+      listarAlertas(centroCustoId).catch(() => null),
       listarFluxoMensal(centroCustoId),
       mesesAtraso > 0 ? listarFluxoCenario(centroCustoId, mesesAtraso) : Promise.resolve(null),
     ]);
-    return { posicao, fluxoMensal, fluxoCenario };
+    return { posicao, alertas, fluxoMensal, fluxoCenario };
   } catch {
     return null;
   }
@@ -84,6 +88,8 @@ export default async function PaginaObra({ params, searchParams }: PageProps<"/o
         </div>
         <IndicadoresObra posicao={posicao} emCartao />
       </section>
+
+      {obra.alertas?.length !== 0 && <SecaoAlertas alertas={obra.alertas} mostrarObra={false} />}
 
       <section aria-labelledby="titulo-fluxo" className="flex flex-col gap-5 rounded-xl border border-borda bg-superficie p-5">
         <div className="flex flex-col gap-1">

@@ -28,6 +28,20 @@ export const explicacoes = {
   vgv_vendido: "Soma dos contratos de venda ativos das unidades vendidas. Contrato distratado não entra.",
   resultado_projetado:
     "O resultado contratado mais o estoque a preço de hoje, como se todas as unidades fossem vendidas pela tabela atual.",
+  exposicao_carteira:
+    "Maior saldo negativo acumulado das obras somadas mês a mês. É menor que a soma das exposições de cada obra quando os piores meses não coincidem.",
+  unidades_estoque: "Unidades disponíveis, reservadas e em proposta. Vendida e fora de venda não entram.",
+  ritmo_vendas:
+    "Média de vendas menos distratos por mês nos últimos seis meses, contando mês sem venda como zero.",
+  meses_para_vender_estoque:
+    "Unidades em estoque divididas pelo ritmo dos últimos seis meses. É projeção no ritmo recente, não prazo garantido.",
+  cobertura_orcamento:
+    "Quanto do custo orçado os contratos ativos já cobrem. Não é caixa: ignora quando o dinheiro entra e sai.",
+  vso: "Venda sobre oferta: vendas menos distratos do mês divididas pelas unidades em estoque no início do mês.",
+  receita_simulada:
+    "Valor das unidades em estoque pela tabela de hoje, com o desconto escolhido. Entra em parcelas até a entrega e no repasse das chaves.",
+  exposicao_simulada:
+    "Maior saldo negativo acumulado da obra com as vendas simuladas somadas ao fluxo de hoje. Custo ainda não lançado como título não entra.",
 } as const;
 
 export type ChaveExplicacao = keyof typeof explicacoes;

@@ -27,7 +27,7 @@ OBRAS = [
         "chaves": date(2027, 6, 30), "entregue": False,
     },
     {
-        "id": 102, "name": "Parque das Aguas", "tipologias": {"2Q": 40, "3Q": 40},
+        "id": 102, "name": "Parque das Águas", "tipologias": {"2Q": 40, "3Q": 40},
         "ticket": {"2Q": 250_000, "3Q": 310_000}, "pct_vendido": 0.35, "pct_obra": 0.80,
         "orcamento": 17_500_000, "vso_faixa": (1, 2), "distratos": 6, "inicio_vendas": date(2024, 11, 1),
         "chaves": date(2027, 2, 28), "entregue": False,

@@ -31,8 +31,11 @@ jobs:
         run: pip install "psycopg[binary]==3.3.6" "python-dotenv==1.2.3"
 
       # income.json e outcome.json ficam fora do git; o gerador tem semente fixa e refaz os mesmos arquivos.
+      # A inadimplência sai das parcelas vencidas na data do dia, então é refeita a cada carga.
       - name: Dados da demo
-        run: python scripts/gerar_dados_demo.py
+        run: |
+          python scripts/gerar_dados_demo.py
+          python scripts/gerar_dados_complementares.py
 
       - name: Carga
         env:

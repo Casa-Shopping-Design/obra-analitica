@@ -18,7 +18,7 @@ export function ExplicacaoIndicador({
   const texto = explicacoes[chave];
 
   return (
-    <span className="relative inline-flex align-middle">
+    <span className="relative inline-flex align-middle print:hidden">
       <button
         type="button"
         title={texto}

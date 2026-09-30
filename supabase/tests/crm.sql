@@ -146,9 +146,14 @@ select is(
 );
 
 select staging.recarregar_crm('0e000000-0000-4000-8000-0000000000d1');
-select is(
-  (select count(*) from staging.repasse),
-  6::bigint,
+-- Só os dois tenants do teste: o banco local pode ter a carga da demo em outro tenant.
+select results_eq(
+  $$select tenant_id, count(*)::integer, sum(valor_financiado) filter (where valor_financiado = 999999)::integer
+    from staging.repasse
+    where tenant_id in ('0e000000-0000-4000-8000-0000000000d1', '0e000000-0000-4000-8000-0000000000d2')
+    group by 1 order by 1$$,
+  $$values ('0e000000-0000-4000-8000-0000000000d1'::uuid, 5, null::integer),
+           ('0e000000-0000-4000-8000-0000000000d2'::uuid, 1, 999999)$$,
   'recarregar de novo não duplica e não apaga o outro tenant'
 );
 

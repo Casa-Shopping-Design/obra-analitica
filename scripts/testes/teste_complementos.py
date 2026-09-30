@@ -5,12 +5,14 @@ import unittest
 import uuid
 from collections import defaultdict
 from datetime import date, timedelta
+from decimal import Decimal
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import gerar_dados_complementares as gerador  # noqa: E402
+import gerar_dados_demo  # noqa: E402
 from api_falsa import ApiFalsa  # noqa: E402
 from campos_permitidos import filtrar  # noqa: E402
 from carregar_origem import PLANO_BULK, RepositorioBanco, executar  # noqa: E402
@@ -81,6 +83,12 @@ def detalhe_medicao(metodo, consulta, corpo, autorizacao):
 ROTAS = {"building-projects/101/progress-logs/1": detalhe_medicao}
 
 
+def posicao_gravada():
+    """Data de posição do arquivo gerado; o gerador usa o dia em que rodou, que pode não ser hoje."""
+    aging = json.loads((gerador.PASTA_SAIDA / gerador.ARQUIVOS[AGING]).read_text(encoding="utf-8"))["data"]
+    return date.fromisoformat(aging[0]["positionDate"])
+
+
 class TesteCamposComplementos(unittest.TestCase):
     def test_inadimplencia_sem_cliente_spc_nem_observacao(self):
         filtrado = filtrar(AGING, {**titulo_inadimplente(1, 10), "positionDate": "2026-09-28"})
@@ -107,7 +115,10 @@ class TesteGerador(unittest.TestCase):
         cls.obras = gerador.ler("cost-centers.json")
         cls.contratos = gerador.ler("sales.json")
         cls.itens = gerador.ler("building-cost-estimation-items.json")
-        cls.gerados = gerador.gerar(cls.obras, cls.contratos, gerador.ler("units.json"), cls.itens)
+        cls.parcelas = gerador.ler("income.json")
+        cls.data_posicao = posicao_gravada()
+        cls.gerados = gerador.gerar(cls.obras, cls.contratos, gerador.ler("units.json"), cls.itens,
+                                    cls.parcelas, cls.data_posicao)
 
     def test_arquivos_gravados_sao_os_do_gerador(self):
         for endpoint, registros in self.gerados.items():
@@ -139,6 +150,14 @@ class TesteGerador(unittest.TestCase):
         estouro = por_obra[102][-1]["budgetedAndIncurredCost"]
         self.assertLess(estouro["costToIncur"], 0.05 * estouro["budgetedCost"])
 
+    def test_orcamento_em_centavos_fecha_no_total_da_obra(self):
+        total = defaultdict(Decimal)
+        for item in self.itens:
+            valor = Decimal(repr(item["totalPrice"]))
+            self.assertEqual(valor, valor.quantize(Decimal("0.01")), item["wbsCode"])
+            total[item["buildingId"]] += valor
+        self.assertEqual(dict(total), {o["id"]: Decimal(o["orcamento"]) for o in gerar_dados_demo.OBRAS})
+
     def test_medicao_acumulada_nao_recua_e_nao_passa_do_planejado(self):
         ultimo = {}
         for item in self.gerados[ITENS]:
@@ -152,15 +171,53 @@ class TesteGerador(unittest.TestCase):
 
     def test_inadimplencia_coerente_com_a_posicao(self):
         contratos = {c["id"]: c for c in self.contratos}
+        parcelas = {(p["billId"], p["installmentId"]): p for p in self.parcelas}
         self.assertGreater(len(self.gerados[AGING]), 0)
+        self.assertGreaterEqual(self.data_posicao, gerador.HOJE)
         for titulo in self.gerados[AGING]:
             contrato = contratos[titulo["receivableBillId"]]
             self.assertEqual(contrato["situation"], "1")
             self.assertEqual(titulo["costCentersId"], [contrato["enterpriseId"]])
-            parcela = titulo["defaulterInstallments"][0]
-            vencimento = date.fromisoformat(parcela["dueDate"])
-            self.assertEqual(vencimento + timedelta(days=parcela["daysOfDelay"]), gerador.HOJE)
-            self.assertGreater(vencimento, date.fromisoformat(contrato["contractDate"]))
+            self.assertEqual(titulo["positionDate"], self.data_posicao.isoformat())
+            for atrasada in titulo["defaulterInstallments"]:
+                parcela = parcelas[(titulo["receivableBillId"], atrasada["installmentId"])]
+                vencimento = date.fromisoformat(atrasada["dueDate"])
+                self.assertEqual(atrasada["dueDate"], parcela["dueDate"])
+                self.assertEqual(atrasada["correctedValueWithoutAdditions"], f"{parcela['correctedBalanceAmount']:.2f}")
+                self.assertNotEqual(atrasada["conditionType"], "FI")
+                self.assertGreater(atrasada["daysOfDelay"], 0)
+                self.assertEqual(vencimento + timedelta(days=atrasada["daysOfDelay"]), self.data_posicao)
+                self.assertGreaterEqual(vencimento, date.fromisoformat(contrato["contractDate"]))
+                self.assertGreaterEqual(float(atrasada["correctedValueWithAdditions"]),
+                                        float(atrasada["correctedValueWithoutAdditions"]))
+
+    def test_inadimplencia_soma_o_vencido_do_comprador_por_obra(self):
+        # Mesma regra de marts.fluxo_caixa_mensal: saldo em aberto, vencido, fora FI e fora distrato.
+        distratados = {c["id"] for c in self.contratos if c["situation"] == "3"}
+        vencido = defaultdict(int)
+        for parcela in self.parcelas:
+            if (parcela["billId"] not in distratados and parcela["paymentTerm"]["id"] != "FI"
+                    and parcela["correctedBalanceAmount"] > 0
+                    and date.fromisoformat(parcela["dueDate"]) < self.data_posicao):
+                vencido[parcela["projectId"]] += round(parcela["correctedBalanceAmount"] * 100)
+        aging = defaultdict(int)
+        for titulo in self.gerados[AGING]:
+            for atrasada in titulo["defaulterInstallments"]:
+                aging[titulo["costCentersId"][0]] += round(float(atrasada["correctedValueWithoutAdditions"]) * 100)
+        self.assertEqual(set(vencido), {o["id"] for o in self.obras})
+        self.assertEqual(dict(aging), dict(vencido))
+
+    def test_parcela_de_financiamento_vencida_fica_fora(self):
+        obras = [{"id": 101, "idCompany": 1}]
+        contratos = [{"id": 1, "situation": "1", "contractDate": "2026-01-10", "value": 1000.0}]
+        base = {"billId": 1, "projectId": 101, "installmentNumber": "1/1", "balanceAmount": 100.0,
+                "correctedBalanceAmount": 100.0, "dueDate": "2026-09-01"}
+        parcelas = [{**base, "installmentId": 1, "paymentTerm": {"id": "PM"}},
+                    {**base, "installmentId": 2, "paymentTerm": {"id": "FI"}},
+                    {**base, "installmentId": 3, "paymentTerm": {"id": "PM"}, "dueDate": "2026-09-22"}]
+        registros = gerador.gerar_inadimplencia(obras, contratos, parcelas, date(2026, 9, 22))
+        self.assertEqual([p["installmentId"] for p in registros[0]["defaulterInstallments"]], [1])
+        self.assertEqual(registros[0]["defaulterInstallments"][0]["daysOfDelay"], 21)
 
 
 class TesteCargaComplementos(unittest.TestCase):
@@ -289,10 +346,8 @@ class TesteBancoLocalComplementos(unittest.TestCase):
 
         self.assertEqual(um("select count(*) from staging.mapa_imobiliario_mensal where tenant_id = %s"), 72)
         self.assertEqual(um("select count(*) from staging.medicao_obra where tenant_id = %s"), 748)
-        esperado = sum(float(t["defaulterInstallments"][0]["correctedValueWithoutAdditions"])
-                       for t in gerador.gerar(gerador.ler("cost-centers.json"), gerador.ler("sales.json"),
-                                              gerador.ler("units.json"),
-                                              gerador.ler("building-cost-estimation-items.json"))[AGING])
+        aging = json.loads((gerador.PASTA_SAIDA / gerador.ARQUIVOS[AGING]).read_text(encoding="utf-8"))["data"]
+        esperado = sum(float(p["correctedValueWithoutAdditions"]) for t in aging for p in t["defaulterInstallments"])
         self.assertAlmostEqual(float(um("select sum(valor_atrasado) from marts.inadimplencia_faixa where tenant_id = %s")),
                                esperado, places=2)
         self.assertEqual(um("select count(*) from marts.inadimplencia_faixa where tenant_id = %s"), 12)

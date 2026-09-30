@@ -1,6 +1,5 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
 import {
   Bar,
   BarChart,
@@ -13,20 +12,10 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { cores } from "@/lib/cores-grafico";
 import { formatarMes, formatarReal, formatarRealCompacto } from "@/lib/formatar";
+import { useNoNavegador } from "@/lib/no-navegador";
 import type { PontoFluxo } from "@/lib/serie-fluxo";
-
-// Cópia dos tokens de globals.css para os atributos SVG do recharts. Mudou a paleta lá, muda aqui.
-const cores = {
-  entrada: "#2f5d46",
-  repasse: "#9cbf8c",
-  saida: "#4a4543",
-  atencao: "#8a5a0b",
-  superficie: "#ffffff",
-  borda: "#dccbc6",
-  suave: "#6a5552",
-  texto: "#221a19",
-};
 
 type Serie = {
   chave: keyof PontoFluxo;
@@ -138,18 +127,6 @@ function TabelaEquivalente({ serie, series }: { serie: PontoFluxo[]; series: Ser
         </tbody>
       </table>
     </div>
-  );
-}
-
-const assinarNada = () => () => {};
-
-// Recharts escreve style inline no HTML do servidor, e a CSP com nonce bloqueia esse atributo.
-// Desenhado só no navegador, o React aplica o estilo pelo DOM e a CSP não barra.
-function useNoNavegador(): boolean {
-  return useSyncExternalStore(
-    assinarNada,
-    () => true,
-    () => false,
   );
 }
 

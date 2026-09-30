@@ -37,3 +37,15 @@ body {
   outline: 3px solid var(--color-texto);
   outline-offset: 2px;
 }
+
+/* Relatório impresso: fundo branco para não gastar tinta e margem de folha A4. */
+@page {
+  size: A4;
+  margin: 12mm;
+}
+
+@media print {
+  body {
+    background: #ffffff;
+  }
+}
