@@ -1,7 +1,7 @@
 import "server-only";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
 import { ErroConsulta } from "@/lib/consultas/posicao";
-import type { IdPerguntaPronta } from "@/lib/perguntas-prontas";
+import { rotulosAlerta, type IdPerguntaPronta } from "@/lib/perguntas-prontas";
 
 export type LinhaResposta = Record<string, string | number | null>;
 
@@ -227,6 +227,55 @@ const consultas: Record<IdPerguntaPronta, ConsultaPergunta> = {
         .order("estoque_a_vender", { ascending: false })
         .limit(limiteLinhas),
     );
+  },
+
+  async "tempo-vender-estoque"(supabase) {
+    return lerLinhas(
+      await supabase
+        .schema("marts")
+        .from("estoque_obra")
+        .select("obra, unidades_estoque, meses_para_vender_estoque, data_entrega, meses_ate_entrega")
+        .order("meses_para_vender_estoque", { ascending: false, nullsFirst: true })
+        .limit(limiteLinhas),
+    );
+  },
+
+  async "exposicao-carteira"(supabase) {
+    return lerLinhas(
+      await supabase
+        .schema("marts")
+        .from("posicao_carteira")
+        .select("obras, exposicao_maxima, mes_exposicao_maxima, soma_exposicao_obras")
+        .limit(limiteLinhas),
+    );
+  },
+
+  async "obras-pedem-atencao"(supabase) {
+    const linhas = lerLinhas(
+      await supabase
+        .schema("marts")
+        .from("alertas_obra")
+        .select("obra, tipo")
+        .order("obra")
+        .order("tipo")
+        .limit(limiteLinhas),
+    );
+    // Tipo fora da lista sai nulo, como no case do sql da pergunta.
+    const rotulos: Record<string, string> = rotulosAlerta;
+    return linhas.map(({ obra, tipo }) => ({ obra, tipo: rotulos[String(tipo)] ?? null }));
+  },
+
+  async "estoque-tipologia-preco-hoje"(supabase) {
+    const linhas = lerLinhas(
+      await supabase
+        .schema("marts")
+        .from("estoque_tipologia")
+        .select("centro_custo_id, tipologia, disponiveis, reservadas, propostas, valor_estoque, preco_m2_estoque")
+        .order("tipologia")
+        .limit(limiteLinhas),
+    );
+    const comNome = await incluirNomeObra(supabase, linhas);
+    return comNome.sort((a, b) => porObra(a, b) || String(a.tipologia).localeCompare(String(b.tipologia), "pt-BR"));
   },
 };
 

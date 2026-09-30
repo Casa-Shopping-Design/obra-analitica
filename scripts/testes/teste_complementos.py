@@ -169,6 +169,24 @@ class TesteGerador(unittest.TestCase):
         self.assertIn((101, "EM_APROVACAO"), situacoes)
         self.assertNotIn((102, "EM_APROVACAO"), situacoes)
 
+    def test_so_o_parque_paga_a_frente_do_fisico(self):
+        # Mesma conta do alerta de marts.alertas_obra, que dispara acima de 0,10: pago sobre orçado menos o
+        # físico da última medição aprovada. Na demo só o Parque das Águas conta essa história.
+        orcado, pago, fisico = defaultdict(float), defaultdict(float), {}
+        for item in self.itens:
+            orcado[item["buildingId"]] += item["totalPrice"]
+        for titulo in gerador.ler("outcome.json"):
+            pago_titulo = sum(p["amount"] for p in titulo["payments"])
+            for rateio in titulo["buildingsCosts"]:
+                pago[rateio["buildingId"]] += pago_titulo * rateio["amount"] / titulo["originalAmount"]
+        for item in self.gerados[ITENS]:
+            if item["summary"] and item["statusApproval"] == "APROVADA":
+                fisico[item["buildingId"]] = item["cumulativeMeasuredQuantity"]
+        diferenca = {obra: pago[obra] / orcado[obra] - fisico[obra] for obra in orcado}
+        self.assertTrue(0.12 <= diferenca[102] <= 0.20, diferenca)
+        self.assertTrue(all(0 <= diferenca[obra] <= 0.06 for obra in (101, 103)), diferenca)
+        self.assertEqual(fisico[103], 1.0)
+
     def test_inadimplencia_coerente_com_a_posicao(self):
         contratos = {c["id"]: c for c in self.contratos}
         parcelas = {(p["billId"], p["installmentId"]): p for p in self.parcelas}

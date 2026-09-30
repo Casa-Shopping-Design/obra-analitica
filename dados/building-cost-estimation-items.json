@@ -837,8 +837,8 @@
    "quantity": 1,
    "unitPrice": 395379.57,
    "totalPrice": 395379.57,
-   "percentComplete": 42,
-   "measuredQuantity": 0.42
+   "percentComplete": 100,
+   "measuredQuantity": 1.0
   },
   {
    "buildingId": 102,
@@ -847,10 +847,10 @@
    "description": "Pintura - item 3",
    "unitOfMeasure": "vb",
    "quantity": 1,
-   "unitPrice": 574675.51,
-   "totalPrice": 574675.51,
-   "percentComplete": 72,
-   "measuredQuantity": 0.72
+   "unitPrice": 387378.12,
+   "totalPrice": 387378.12,
+   "percentComplete": 64,
+   "measuredQuantity": 0.64
   },
   {
    "buildingId": 102,
@@ -859,10 +859,10 @@
    "description": "Pintura - item 4",
    "unitOfMeasure": "vb",
    "quantity": 1,
-   "unitPrice": 408281.28,
-   "totalPrice": 408281.28,
-   "percentComplete": 63,
-   "measuredQuantity": 0.63
+   "unitPrice": 548269.82,
+   "totalPrice": 548269.82,
+   "percentComplete": 62,
+   "measuredQuantity": 0.62
   },
   {
    "buildingId": 102,
@@ -871,10 +871,10 @@
    "description": "Acabamentos - item 1",
    "unitOfMeasure": "vb",
    "quantity": 1,
-   "unitPrice": 508054.91,
-   "totalPrice": 508054.91,
-   "percentComplete": 56,
-   "measuredQuantity": 0.56
+   "unitPrice": 497678.49,
+   "totalPrice": 497678.49,
+   "percentComplete": 51,
+   "measuredQuantity": 0.51
   },
   {
    "buildingId": 102,
@@ -883,10 +883,10 @@
    "description": "Acabamentos - item 2",
    "unitOfMeasure": "vb",
    "quantity": 1,
-   "unitPrice": 466476.53,
-   "totalPrice": 466476.53,
-   "percentComplete": 60,
-   "measuredQuantity": 0.6
+   "unitPrice": 463283.23,
+   "totalPrice": 463283.23,
+   "percentComplete": 43,
+   "measuredQuantity": 0.43
   },
   {
    "buildingId": 102,
@@ -895,10 +895,10 @@
    "description": "Acabamentos - item 3",
    "unitOfMeasure": "vb",
    "quantity": 1,
-   "unitPrice": 297149.99,
-   "totalPrice": 297149.99,
-   "percentComplete": 56,
-   "measuredQuantity": 0.56
+   "unitPrice": 481471.54,
+   "totalPrice": 481471.54,
+   "percentComplete": 49,
+   "measuredQuantity": 0.49
   },
   {
    "buildingId": 102,
@@ -907,10 +907,10 @@
    "description": "Acabamentos - item 4",
    "unitOfMeasure": "vb",
    "quantity": 1,
-   "unitPrice": 358588.48,
-   "totalPrice": 358588.48,
-   "percentComplete": 38,
-   "measuredQuantity": 0.38
+   "unitPrice": 460418.78,
+   "totalPrice": 460418.78,
+   "percentComplete": 47,
+   "measuredQuantity": 0.47
   },
   {
    "buildingId": 102,
@@ -919,10 +919,10 @@
    "description": "Areas comuns - item 1",
    "unitOfMeasure": "vb",
    "quantity": 1,
-   "unitPrice": 347619.56,
-   "totalPrice": 347619.56,
-   "percentComplete": 28,
-   "measuredQuantity": 0.28
+   "unitPrice": 365659.09,
+   "totalPrice": 365659.09,
+   "percentComplete": 79,
+   "measuredQuantity": 0.79
   },
   {
    "buildingId": 102,
@@ -931,10 +931,10 @@
    "description": "Areas comuns - item 2",
    "unitOfMeasure": "vb",
    "quantity": 1,
-   "unitPrice": 301333.03,
-   "totalPrice": 301333.03,
-   "percentComplete": 0,
-   "measuredQuantity": 0.0
+   "unitPrice": 307160.83,
+   "totalPrice": 307160.83,
+   "percentComplete": 66,
+   "measuredQuantity": 0.66
   },
   {
    "buildingId": 102,
@@ -945,8 +945,8 @@
    "quantity": 1,
    "unitPrice": 276609.73,
    "totalPrice": 276609.73,
-   "percentComplete": 0,
-   "measuredQuantity": 0.0
+   "percentComplete": 72,
+   "measuredQuantity": 0.72
   },
   {
    "buildingId": 102,
@@ -955,8 +955,8 @@
    "description": "Areas comuns - item 4",
    "unitOfMeasure": "vb",
    "quantity": 1,
-   "unitPrice": 1732038.49,
-   "totalPrice": 1732038.49,
+   "unitPrice": 1482897.88,
+   "totalPrice": 1482897.88,
    "percentComplete": 0,
    "measuredQuantity": 0.0
   },
@@ -1401,8 +1401,8 @@
    "quantity": 1,
    "unitPrice": 100909.09,
    "totalPrice": 100909.09,
-   "percentComplete": 31,
-   "measuredQuantity": 0.31
+   "percentComplete": 100,
+   "measuredQuantity": 1.0
   },
   {
    "buildingId": 103,
@@ -1413,8 +1413,8 @@
    "quantity": 1,
    "unitPrice": 150761.14,
    "totalPrice": 150761.14,
-   "percentComplete": 57,
-   "measuredQuantity": 0.57
+   "percentComplete": 100,
+   "measuredQuantity": 1.0
   },
   {
    "buildingId": 103,
@@ -1425,8 +1425,8 @@
    "quantity": 1,
    "unitPrice": 118376.95,
    "totalPrice": 118376.95,
-   "percentComplete": 60,
-   "measuredQuantity": 0.6
+   "percentComplete": 100,
+   "measuredQuantity": 1.0
   },
   {
    "buildingId": 103,
@@ -1437,8 +1437,8 @@
    "quantity": 1,
    "unitPrice": 425408.75,
    "totalPrice": 425408.75,
-   "percentComplete": 41,
-   "measuredQuantity": 0.41
+   "percentComplete": 100,
+   "measuredQuantity": 1.0
   }
  ]
 }

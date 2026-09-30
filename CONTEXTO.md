@@ -64,7 +64,7 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 
 - Rodar `scripts/sondar_origem.py` no terminal do Mac (a rede das sessões do Claude bloqueia a API do ERP) e depois `sanitizar_amostras.py`.
 - Trocar o validador de SQL por parser (hoje é regex e deixa passar tabela depois de vírgula).
-- Gerador: custo realizado está à frente da execução física nas três obras; decidir se ajusta.
+- Gerador: desde 30/09 só a Parque das Águas paga à frente da medição (18 pontos), para a demo ter um alerta de execução. Na Aurora a medição segue a curva do custo, e `staging.item_orcamento.pct_concluido` dela ficou em 55% contra 78% medido; nenhuma tela lê essa coluna.
 - Exposição máxima só enxerga títulos já lançados; no ERP real o custo futuro sem título fica só no total (`custo_a_incorrer`). Decidir como distribuir por mês.
 - Staging lê só `buildingsCosts[0]` do título a pagar: rateio entre obras vai inteiro para a primeira e título sem obra (despesa da empresa, devolução de distrato) some. Conferir com as amostras reais.
 - Tirar `marts.consolidado_centro_custo` do catálogo do assistente (sobrepõe a posição financeira e ainda soma saldo de distrato).

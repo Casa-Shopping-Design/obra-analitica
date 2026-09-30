@@ -28,7 +28,7 @@ OBRAS = [
     },
     {
         "id": 102, "name": "Parque das Águas", "tipologias": {"2Q": 40, "3Q": 40},
-        "ticket": {"2Q": 250_000, "3Q": 310_000}, "pct_vendido": 0.35, "pct_obra": 0.80,
+        "ticket": {"2Q": 250_000, "3Q": 310_000}, "pct_vendido": 0.35, "pct_obra": 0.85,
         "orcamento": 17_500_000, "vso_faixa": (1, 2), "distratos": 6, "inicio_vendas": date(2024, 11, 1),
         "chaves": date(2027, 2, 28), "entregue": False,
     },
@@ -264,6 +264,9 @@ def gerar_orcamento(obra):
             valor = valor_centavos / 100
             posicao = (g * n_itens + i) / (len(grupos) * n_itens)
             pct = 100 if posicao < obra["pct_obra"] - 0.1 else (0 if posicao > obra["pct_obra"] + 0.1 else random.randint(20, 80))
+            if obra["entregue"]:
+                # obra entregue esta toda medida; o sorteio acima fica para os sorteios seguintes nao mudarem
+                pct = 100
             itens.append({
                 "buildingId": obra["id"],
                 "buildingName": obra["name"],

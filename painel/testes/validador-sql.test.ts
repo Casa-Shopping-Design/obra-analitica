@@ -46,6 +46,20 @@ describe("validador de SQL: consultas do catálogo e perguntas prontas", () => {
     expect(validarSql(sql)).toMatchObject({ ok: true });
   });
 
+  it.each(["marts.estoque_obra", "marts.estoque_tipologia", "marts.posicao_carteira", "marts.alertas_obra"])(
+    "aceita select na view %s da migration 0024",
+    (view) => {
+      expect(validarSql(`select * from ${view}`).ok).toBe(true);
+    },
+  );
+
+  it.each([
+    ["simulação no from", "select * from marts.simular_venda_estoque('00000000-0000-4000-8000-000000000000', 4, 0)"],
+    ["resumo da simulação no select", "select marts.resumo_venda_estoque(centro_custo_id, 4, 0) from marts.estoque_obra"],
+  ])("recusa a %s, que fica só na tela", (_caso, sql) => {
+    expect(validarSql(sql).ok).toBe(false);
+  });
+
   it("aceita agregação com filter (where ...), que o catálogo pode usar", () => {
     expect(validarSql("select count(*) filter (where vendas > 0) from marts.vso_mensal").ok).toBe(true);
   });

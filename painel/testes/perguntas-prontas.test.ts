@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { catalogoViews } from "../lib/catalogo-views";
-import { buscarPerguntaPronta, perguntasProntas } from "../lib/perguntas-prontas";
+import { tiposAlerta } from "../lib/alertas";
+import { buscarPerguntaPronta, perguntasProntas, rotulosAlerta } from "../lib/perguntas-prontas";
 import { validarSql } from "../lib/validador-sql";
 
 const colunasPorView = new Map(catalogoViews.map((view) => [view.nome, new Set(view.colunas)]));
@@ -47,6 +48,26 @@ describe("perguntas prontas", () => {
     perguntasProntas.forEach((pergunta) => {
       expect(pergunta.sql).not.toMatch(/nome_cliente|cpf/i);
     });
+  });
+
+  it("leva ao assistente as views de estoque, carteira e alertas da migration 0024", () => {
+    const views = new Set(perguntasProntas.flatMap((pergunta) => viewsDoSql(pergunta.sql)));
+    ["marts.estoque_obra", "marts.estoque_tipologia", "marts.posicao_carteira", "marts.alertas_obra"].forEach((nome) =>
+      expect(views).toContain(nome),
+    );
+  });
+
+  it("não chama as funções de simulação", () => {
+    perguntasProntas.forEach((pergunta) => {
+      expect(pergunta.sql).not.toMatch(/simular_venda_estoque|resumo_venda_estoque/);
+    });
+  });
+
+  it("dá rótulo a todo tipo de alerta, igual ao case do sql da pergunta de atenção", () => {
+    const sql = buscarPerguntaPronta("obras-pedem-atencao")!.sql;
+    const casos = [...sql.matchAll(/when '([a-z_]+)' then '([^']+)'/g)].map(([, tipo, rotulo]) => [tipo, rotulo]);
+    expect(Object.fromEntries(casos)).toEqual(rotulosAlerta);
+    expect(Object.keys(rotulosAlerta).sort()).toEqual([...tiposAlerta].sort());
   });
 
   it("busca pelo id e ignora id fora da lista", () => {

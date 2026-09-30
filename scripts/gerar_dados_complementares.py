@@ -4,7 +4,8 @@ Parte de dados/cost-centers.json, sales.json, units.json, income.json e building
 - mapa imobiliário mensal por obra, com o custo incorrido na mesma curva em S do a pagar da demo
   (o Parque das Águas estoura o orçado em 6%) e o recebido pelo cronograma das condições de pagamento;
 - medição física mensal por obra, uma tarefa por grupo do orçamento, chegando ao percentual concluído
-  do orçamento; a última medição do Residencial Aurora ainda está em aprovação;
+  do orçamento; o Residencial Aurora mede no ritmo do custo incorrido e a última medição dele ainda está
+  em aprovação, de modo que só o Parque das Águas aparece com o pago à frente do físico;
 - inadimplência por faixa de atraso tirada das parcelas vencidas e em aberto de income.json, de modo que o
   total por obra bate com o vencido do comprador da posição financeira. O financiamento (FI) fica de fora,
   porque o painel o mostra à parte, como repasse atrasado.
@@ -27,6 +28,9 @@ INICIO_OBRA = date(2024, 10, 1)
 # Mesmas datas de chaves e o mesmo estouro de custo de scripts/gerar_dados_demo.py.
 CHAVES = {101: date(2027, 6, 30), 102: date(2027, 2, 28), 103: date(2026, 5, 31)}
 FATOR_CUSTO = {102: 1.06}
+# O orçamento da Aurora saiu do sorteio com 55% concluído, atrás do custo que a curva da demo já incorreu, e
+# mudar o avanço dele em gerar_dados_demo.py reembaralha as outras obras. A medição dela segue o custo.
+MEDE_NO_RITMO_DO_CUSTO = {101}
 ARQUIVOS = {
     "real-estate-map": "real-estate-map.json",
     "building-projects/progress-logs/items": "building-projects-progress-logs-items.json",
@@ -160,7 +164,18 @@ def tarefas_da_obra(id_obra, itens):
             for codigo, g in sorted(grupos.items())]
 
 
-# O(o x m x t): uma linha por obra, medição mensal e tarefa, mais o agrupador da obra.
+def concluir_em_ordem(tarefas, avanco):
+    """Acumulado de cada tarefa quando a obra conclui as tarefas na ordem do orçamento até o avanço dado."""
+    restante = avanco * sum(t["valor"] for t in tarefas)
+    acumulados = []
+    for tarefa in tarefas:
+        acumulados.append(min(max(restante / tarefa["valor"], 0.0), 1.0) if tarefa["valor"] else 0.0)
+        restante -= tarefa["valor"]
+    return acumulados
+
+
+# O(o x m x t): uma linha por obra, medição mensal e tarefa, mais o agrupador da obra; custo_incorrido_ate
+# conta os meses da obra, O(m), o que leva a Aurora a O(m² + m x t), ainda poucas centenas de passos.
 def gerar_medicoes(obras, itens):
     registros = []
     for obra in obras:
@@ -173,12 +188,15 @@ def gerar_medicoes(obras, itens):
         for numero, mes in enumerate(meses, start=1):
             data_medicao = min(date(mes.year, mes.month, 25), HOJE)
             situacao = "EM_APROVACAO" if id_obra == 101 and mes == meses[-1] else "APROVADA"
-            fracao = curva_s(numero / len(meses))
+            if id_obra in MEDE_NO_RITMO_DO_CUSTO:
+                acumulados = concluir_em_ordem(tarefas, custo_incorrido_ate(id_obra, orcado, mes) / orcado)
+            else:
+                acumulados = [t["final"] * curva_s(numero / len(meses)) for t in tarefas]
             cabecalho = {"buildingId": id_obra, "measurementNumber": numero, "buildingUnitId": 1,
                          "date": data_medicao.isoformat(), "statusApproval": situacao, "consistent": True}
             medido_obra = 0.0
-            for tarefa in tarefas:
-                acumulado = round(tarefa["final"] * fracao, 4)
+            for tarefa, fracao in zip(tarefas, acumulados):
+                acumulado = round(fracao, 4)
                 medido_obra += acumulado * tarefa["valor"]
                 registros.append({
                     **cabecalho, "taskId": tarefa["taskId"], "presentationId": tarefa["taskId"], "summary": False,
