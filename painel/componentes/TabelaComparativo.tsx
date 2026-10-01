@@ -112,7 +112,8 @@ export function TabelaComparativo({ linhas }: { linhas: LinhaComparativo[] }) {
         Indicadores por obra
       </h2>
       <p className="text-sm text-suave md:hidden print:hidden">Arraste a tabela para o lado para ver todas as colunas.</p>
-      <div className="overflow-x-auto rounded-xl border border-borda bg-superficie print:overflow-visible print:rounded-none print:border-0">
+      {/* relative segura dentro da rolagem os textos sr-only, que são absolutos e alargariam a página no celular */}
+      <div className="relative overflow-x-auto rounded-xl border border-borda bg-superficie print:overflow-visible print:rounded-none print:border-0">
         <table className="w-full min-w-[1180px] border-collapse text-sm tabular-nums print:min-w-0 print:text-[8pt]">
           <caption className="sr-only">
             Indicadores de cada obra lado a lado. O pior valor de cada coluna vem marcado.
