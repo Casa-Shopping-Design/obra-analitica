@@ -1,11 +1,10 @@
 import { totalizarFunil, type LinhaFunil } from "@/lib/consultas/resumo-origem";
-import { formatarMes, formatarPercentual } from "@/lib/formatar";
+import { formatarConversao, formatarMes } from "@/lib/formatar";
 
 const inteiro = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 0 });
 
-function taxa(fracao: number | null): string {
-  return fracao === null ? "sem base" : formatarPercentual(fracao);
-}
+const maisReservas = "mais reservas que leads";
+const maisVendas = "mais vendas que reservas";
 
 const celula = "px-3 py-2 text-right tabular-nums";
 
@@ -35,8 +34,8 @@ export function TabelaFunil({ linhas }: { linhas: LinhaFunil[] }) {
               <td className={celula}>{inteiro.format(linha.reservas)}</td>
               <td className={celula}>{inteiro.format(linha.vendas)}</td>
               <td className={celula}>{inteiro.format(linha.distratos)}</td>
-              <td className={celula}>{taxa(linha.conversao_lead_reserva)}</td>
-              <td className={celula}>{taxa(linha.conversao_reserva_venda)}</td>
+              <td className={celula}>{formatarConversao(linha.conversao_lead_reserva, maisReservas)}</td>
+              <td className={celula}>{formatarConversao(linha.conversao_reserva_venda, maisVendas)}</td>
             </tr>
           ))}
         </tbody>
@@ -47,8 +46,8 @@ export function TabelaFunil({ linhas }: { linhas: LinhaFunil[] }) {
             <td className={celula}>{inteiro.format(total.reservas)}</td>
             <td className={celula}>{inteiro.format(total.vendas)}</td>
             <td className={celula}>{inteiro.format(total.distratos)}</td>
-            <td className={celula}>{taxa(total.conversaoLeadReserva)}</td>
-            <td className={celula}>{taxa(total.conversaoReservaVenda)}</td>
+            <td className={celula}>{formatarConversao(total.conversaoLeadReserva, maisReservas)}</td>
+            <td className={celula}>{formatarConversao(total.conversaoReservaVenda, maisVendas)}</td>
           </tr>
         </tfoot>
       </table>

@@ -6,10 +6,12 @@ import {
   numeroOuNulo,
   perfilVeConferencia,
   rotuloFaixa,
+  somarLeadsPorOrigem,
   totalizarFunil,
   totalizarInadimplencia,
   type LinhaExecucao,
   type LinhaFunil,
+  type LinhaLeadOrigem,
 } from "../lib/consultas/resumo-origem";
 
 function mesFunil(competencia: string, leads: number, reservas: number, vendas: number): LinhaFunil {
@@ -124,5 +126,39 @@ describe("inadimplência", () => {
     expect(total.valorAtrasado).toBeCloseTo(7234.56, 2);
     expect(rotuloFaixa(">180")).toBe("Mais de 180 dias");
     expect(rotuloFaixa("31-90")).toBe("31 a 90 dias");
+  });
+});
+
+function leadOrigem(origem: string, midia: string, leads: number, descartados: number): LinhaLeadOrigem {
+  return {
+    origem,
+    midia,
+    leads,
+    leads_descartados: descartados,
+    pct_descartados: leads > 0 ? descartados / leads : null,
+    motivo_principal_descarte: descartados > 0 ? "Preço" : null,
+    leads_motivo_principal: descartados > 0 ? descartados : null,
+  };
+}
+
+describe("somarLeadsPorOrigem", () => {
+  it("soma as mídias de cada origem e ordena por volume", () => {
+    const linhas = [
+      leadOrigem("Site", "Google Ads", 10, 4),
+      leadOrigem("Stand de vendas", "Placa na obra", 12, 2),
+      leadOrigem("Site", "Meta Ads", 5, 1),
+    ];
+    expect(somarLeadsPorOrigem(linhas)).toEqual([
+      { origem: "Site", leads: 15, leadsDescartados: 5 },
+      { origem: "Stand de vendas", leads: 12, leadsDescartados: 2 },
+    ]);
+  });
+
+  it("desempata pelo nome e devolve vazio sem lead", () => {
+    expect(somarLeadsPorOrigem([leadOrigem("Site", "Google Ads", 3, 0), leadOrigem("Indicação", "Portal", 3, 0)]).map((o) => o.origem)).toEqual([
+      "Indicação",
+      "Site",
+    ]);
+    expect(somarLeadsPorOrigem([])).toEqual([]);
   });
 });

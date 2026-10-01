@@ -2,6 +2,7 @@
 -- escrita direta falha, a reserva conta o limite por hora e o teto diário, o SQL gravado sai só para
 -- o diretor e uma consulta que troca os claims no meio não devolve linha. Cria os próprios dados.
 -- As reservas e conclusões vêm antes das execuções, porque executar_consulta deixa a transação só de leitura.
+-- A trilha com o SQL executado tem teste próprio em auditoria_assistente.sql.
 begin;
 create extension if not exists pgtap with schema extensions;
 select plan(44);
@@ -41,17 +42,34 @@ insert into app.chave_assinatura_consulta (chave) values ('chave-local-do-teste-
 create function pg_temp.assinar(p_sql text) returns text language sql as $$
   select encode(extensions.hmac(p_sql, 'chave-local-do-teste-pgtap-0000000000', 'sha256'), 'hex')
 $$;
-grant execute on function pg_temp.assinar(text) to authenticated;
+create function pg_temp.assinar_gerado(p_id bigint, p_sql text) returns text language sql as $$
+  select pg_temp.assinar(format('sql_gerado:%s:%s', p_id, p_sql))
+$$;
+-- Cada execução grava na reserva e deixa a transação só de leitura; o bloco desfaz as duas coisas para a
+-- mesma reserva servir a várias consultas do teste.
+create function pg_temp.consultar(p_sql text) returns jsonb language plpgsql as $$
+declare
+  linhas jsonb;
+begin
+  begin
+    linhas := marts.executar_consulta(current_setting('teste.execucao_gerente')::bigint, p_sql, pg_temp.assinar(p_sql));
+    raise exception using errcode = 'P0099';
+  exception when sqlstate 'P0099' then null;
+  end;
+  return linhas;
+end;
+$$;
+grant execute on function pg_temp.assinar(text), pg_temp.assinar_gerado(bigint, text), pg_temp.consultar(text) to authenticated;
 
 -- Estrutura e permissões
-select has_function('marts', 'executar_consulta', array['text', 'text'], 'executar_consulta existe');
+select has_function('marts', 'executar_consulta', array['bigint', 'text', 'text'], 'executar_consulta existe');
 select is(
-  (select prosecdef from pg_proc where oid = 'marts.executar_consulta(text, text)'::regprocedure),
+  (select prosecdef from pg_proc where oid = 'marts.executar_consulta(bigint, text, text)'::regprocedure),
   false,
   'executar_consulta roda com o papel de quem chama'
 );
 select ok(
-  not has_function_privilege('anon', 'marts.executar_consulta(text, text)', 'execute'),
+  not has_function_privilege('anon', 'marts.executar_consulta(bigint, text, text)', 'execute'),
   'anônimo não executa consulta'
 );
 select ok(
@@ -97,7 +115,7 @@ select has_index('app', 'pergunta_assistente', 'pergunta_assistente_tenant_criad
 -- Sem usuário
 set local role authenticated;
 select throws_ok(
-  format('select marts.executar_consulta(%L, %L)', 'select 1 as n', pg_temp.assinar('select 1 as n')),
+  format('select marts.executar_consulta(0, %L, %L)', 'select 1 as n', pg_temp.assinar('select 1 as n')),
   '42501',
   null,
   'sem usuário a consulta falha'
@@ -119,6 +137,8 @@ select lives_ok(
     app.reservar_pergunta('00000000-0000-4000-8000-000000000001', 'Quanto a Aurora vai receber?')::text, true)$$,
   'gerente reserva a própria pergunta com usuário e tenant preenchidos pelo banco'
 );
+select set_config('teste.execucao_gerente',
+  app.reservar_pergunta('00000000-0000-4000-8000-000000000003', 'Quantas parcelas a Aurora tem?')::text, true);
 select throws_ok(
   $$insert into app.pergunta_assistente (user_id, tenant_id, id_requisicao, pergunta, resultado)
     values ('0a000000-0000-4000-8000-00000000c101', '0e000000-0000-4000-8000-0000000000d1',
@@ -156,8 +176,9 @@ select is(
   'pendente',
   'reserva nasce pendente e é legível pelo próprio usuário'
 );
+select app.registrar_sql_executado(current_setting('teste.pergunta_gerente')::bigint, 'select 1 as n', pg_temp.assinar('select 1 as n'));
 select lives_ok(
-  format($$select app.concluir_pergunta(%s, 'select 1 as n', 'select 1 as n', 'ok', 1, 12, 100, 20, 0.001)$$,
+  format($$select app.concluir_pergunta(%1$s, 'select 1 as n', pg_temp.assinar_gerado(%1$s, 'select 1 as n'), 'ok', 1, 12, 100, 20, 0.001)$$,
     current_setting('teste.pergunta_gerente')),
   'gerente conclui a própria reserva'
 );
@@ -167,7 +188,7 @@ select is(
   'conclusão grava o resultado'
 );
 select throws_ok(
-  format($$select app.concluir_pergunta(%s, 'x', null, 'erro', null, null, null, null, null)$$,
+  format($$select app.concluir_pergunta(%s, null, null, 'erro', null, null, null, null, null)$$,
     current_setting('teste.pergunta_gerente')),
   '42501',
   null,
@@ -189,7 +210,7 @@ reset role;
 select set_config('request.jwt.claims', '{"sub": "0a000000-0000-4000-8000-00000000d101", "role": "authenticated", "aal": "aal2"}', true);
 set local role authenticated;
 select throws_ok(
-  format($$select app.concluir_pergunta(%s, 'x', null, 'erro', null, null, null, null, null)$$,
+  format($$select app.concluir_pergunta(%s, null, null, 'erro', null, null, null, null, null)$$,
     current_setting('teste.pergunta_gerente')),
   '42501',
   null,
@@ -197,7 +218,7 @@ select throws_ok(
 );
 select set_config('teste.pergunta_diretor',
   app.reservar_pergunta('00000000-0000-4000-8000-000000000004', 'Qual a exposição máxima?')::text, true);
-select is((select count(*) from app.pergunta_assistente), 2::bigint, 'diretor vê as perguntas do tenant');
+select is((select count(*) from app.pergunta_assistente), 3::bigint, 'diretor vê as perguntas do tenant');
 select results_eq(
   format('select sql_executado from app.sql_da_pergunta(%s)', current_setting('teste.pergunta_gerente')),
   $$values ('select 1 as n')$$,
@@ -237,17 +258,17 @@ select throws_ok(
 reset role;
 select set_config('request.jwt.claims', '{"sub": "0a000000-0000-4000-8000-00000000c101", "role": "authenticated"}', true);
 set local role authenticated;
-select is((select count(*) from app.pergunta_assistente), 1::bigint, 'gerente vê só as próprias perguntas');
+select is((select count(*) from app.pergunta_assistente), 2::bigint, 'gerente vê só as próprias perguntas');
 
 -- Consultas da gerente
 select throws_ok(
-  format('select marts.executar_consulta(%L, %L)', 'select 1 as n', 'assinatura-forjada'),
+  format('select marts.executar_consulta(%s, %L, %L)', current_setting('teste.execucao_gerente'), 'select 1 as n', 'assinatura-forjada'),
   '42501',
   null,
   'SQL sem assinatura válida não roda'
 );
 select throws_ok(
-  format('select marts.executar_consulta(%L, %L)',
+  format('select marts.executar_consulta(%s, %L, %L)', current_setting('teste.execucao_gerente'),
     'select set_config(''request.jwt.claims'', ''{}'', true)',
     pg_temp.assinar('select 1 as n')),
   '42501',
@@ -255,28 +276,22 @@ select throws_ok(
   'assinatura de outro SQL não serve'
 );
 select is(
-  marts.executar_consulta(
-    'select count(*) as total from staging.parcela_receber',
-    pg_temp.assinar('select count(*) as total from staging.parcela_receber')),
+  pg_temp.consultar('select count(*) as total from staging.parcela_receber'),
   '[{"total": 2}]'::jsonb,
   'gerente conta só as parcelas da Aurora pelo executar_consulta'
 );
 select is(
-  marts.executar_consulta(
-    'select distinct c.nome from staging.parcela_receber p join app.centro_custo c on c.id = p.centro_custo_id',
-    pg_temp.assinar('select distinct c.nome from staging.parcela_receber p join app.centro_custo c on c.id = p.centro_custo_id')),
+  pg_temp.consultar('select distinct c.nome from staging.parcela_receber p join app.centro_custo c on c.id = p.centro_custo_id'),
   '[{"nome": "Residencial Aurora"}]'::jsonb,
   'gerente só enxerga a Aurora'
 );
 select is(
-  marts.executar_consulta(
-    'select 1 as n from staging.parcela_receber where false',
-    pg_temp.assinar('select 1 as n from staging.parcela_receber where false')),
+  pg_temp.consultar('select 1 as n from staging.parcela_receber where false'),
   '[]'::jsonb,
   'consulta sem linha devolve lista vazia'
 );
 select throws_ok(
-  format('select marts.executar_consulta(%L, %L)',
+  format('select marts.executar_consulta(%s, %L, %L)', current_setting('teste.execucao_gerente'),
     'insert into app.pergunta_assistente (user_id, tenant_id, id_requisicao, pergunta, resultado) values (auth.uid(), app.tenant_atual(), gen_random_uuid(), ''x'', ''ok'') returning id',
     pg_temp.assinar('insert into app.pergunta_assistente (user_id, tenant_id, id_requisicao, pergunta, resultado) values (auth.uid(), app.tenant_atual(), gen_random_uuid(), ''x'', ''ok'') returning id')),
   '42601',
@@ -284,7 +299,7 @@ select throws_ok(
   'insert pelo executar_consulta falha'
 );
 select throws_ok(
-  format('select marts.executar_consulta(%L, %L)',
+  format('select marts.executar_consulta(%s, %L, %L)', current_setting('teste.execucao_gerente'),
     'select 1 as n) l; set local request.jwt.claims = ''{"sub": "0a000000-0000-4000-8000-00000000d101"}''; select jsonb_agg(l) from (select * from staging.parcela_receber',
     pg_temp.assinar('select 1 as n) l; set local request.jwt.claims = ''{"sub": "0a000000-0000-4000-8000-00000000d101"}''; select jsonb_agg(l) from (select * from staging.parcela_receber')),
   '42P11',
@@ -293,7 +308,7 @@ select throws_ok(
 );
 -- set_config é função, passa pelo cursor e pela transação só de leitura: a função confere os claims depois do fetch.
 select throws_ok(
-  format('select marts.executar_consulta(%L, %L)',
+  format('select marts.executar_consulta(%s, %L, %L)', current_setting('teste.execucao_gerente'),
     'select count(*) as total from staging.parcela_receber where (select set_config(''request.jwt.claims'', ''{"sub": "0a000000-0000-4000-8000-00000000d101", "role": "authenticated", "aal": "aal2"}'', true)) is not null',
     pg_temp.assinar('select count(*) as total from staging.parcela_receber where (select set_config(''request.jwt.claims'', ''{"sub": "0a000000-0000-4000-8000-00000000d101", "role": "authenticated", "aal": "aal2"}'', true)) is not null')),
   '42501',
@@ -307,6 +322,7 @@ select is(
 );
 -- O statement_timeout da transação (o PostgREST põe o do papel antes de chamar) corta o fetch do cursor com
 -- 57014, conferido à mão com pg_sleep; não há caso pgTAP porque query_canceled não é capturado por throws_ok.
+select marts.executar_consulta(current_setting('teste.execucao_gerente')::bigint, 'select 1 as n', pg_temp.assinar('select 1 as n'));
 select is(current_setting('transaction_read_only'), 'on', 'consulta deixa a transação só de leitura');
 
 select * from finish();

@@ -1,0 +1,40 @@
+name: Resumo semanal
+
+on:
+  # 10:00 UTC de segunda são 07:00 em Brasília, depois da carga noturna das 02:17.
+  schedule:
+    - cron: "0 10 * * 1"
+  workflow_dispatch:
+
+# Só leitura do repositório: o job lê o banco e chama o Resend, não escreve no GitHub.
+permissions:
+  contents: read
+
+# Dois envios ao mesmo tempo mandariam o resumo em dobro; a chave de idempotência do Resend cobre
+# a repetição no mesmo dia, e esta trava cobre a corrida.
+concurrency:
+  group: resumo-semanal
+  cancel-in-progress: false
+
+jobs:
+  resumo:
+    name: Resumo semanal por e-mail
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+
+      - name: Dependências
+        run: pip install "psycopg[binary]==3.3.6" "python-dotenv==1.2.3"
+
+      - name: Envio
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RESUMO_REMETENTE: ${{ secrets.RESUMO_REMETENTE }}
+          PAINEL_URL_BASE: ${{ secrets.PAINEL_URL_BASE }}
+        run: python scripts/enviar_resumo_semanal.py --enviar

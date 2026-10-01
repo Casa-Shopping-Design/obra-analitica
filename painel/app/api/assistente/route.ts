@@ -208,7 +208,7 @@ export async function POST(request: Request): Promise<Response> {
     // A reserva não fica aberta: fecha como erro, sem SQL, para o registro dizer que a pergunta falhou.
     await concluirPergunta(
       supabase,
-      { idPergunta, sqlGerado: "", sqlExecutado: null, resultado: "erro", linhas: null, duracaoMs: null, uso: undefined },
+      { idPergunta, sqlGerado: "", resultado: "erro", linhas: null, duracaoMs: null, uso: undefined },
       campos,
     );
     return responderErro(503, mensagens.assistente.indisponivel, idRequisicao);

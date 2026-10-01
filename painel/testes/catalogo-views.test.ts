@@ -15,6 +15,9 @@ const viewsNovas: Record<string, string> = {
   "marts.estoque_obra": "0024_estoque_carteira_simulacao.sql",
   "marts.posicao_carteira": "0024_estoque_carteira_simulacao.sql",
   "marts.alertas_obra": "0024_estoque_carteira_simulacao.sql",
+  "marts.repasse_banco": "0026_repasse_banco_leads_origem.sql",
+  "marts.leads_origem": "0026_repasse_banco_leads_origem.sql",
+  "marts.comparativo_obras": "0027_comparativo_obras.sql",
 };
 
 // Trecho da migration entre o create view e o próximo create ou grant no começo de linha.
@@ -28,7 +31,7 @@ function definicaoView(arquivo: string, nome: string): string {
 }
 
 describe("catálogo das views novas", () => {
-  it("tem as views das migrations 0018, 0019 e 0024", () => {
+  it("tem as views das migrations 0018, 0019, 0024, 0026 e 0027", () => {
     const nomes = catalogoViews.map((view) => view.nome);
     for (const nome of Object.keys(viewsNovas)) expect(nomes).toContain(nome);
   });
@@ -41,6 +44,12 @@ describe("catálogo das views novas", () => {
         expect(definicao, `${nome}.${coluna}`).toMatch(new RegExp(`\\b${coluna}\\b`));
       }
     }
+  });
+
+  it("responde qual obra tem a maior exposição pelo comparativo, para qualquer perfil", () => {
+    const sql = "select obra, exposicao_maxima from marts.comparativo_obras order by exposicao_maxima desc limit 1";
+    expect(validarSql(sql)).toMatchObject({ ok: true });
+    expect(catalogoDoPerfil("gerente_obra").map((view) => view.nome)).toContain("marts.comparativo_obras");
   });
 
   it("deixa as funções de simulação fora do catálogo", () => {
@@ -70,6 +79,9 @@ describe("catalogoDoPerfil", () => {
 
   it("mantém as views sem restrição para qualquer perfil", () => {
     expect(catalogoDoPerfil("leitura").map((view) => view.nome)).toContain("marts.repasse_obra");
+    expect(catalogoDoPerfil("gerente_obra").map((view) => view.nome)).toEqual(
+      expect.arrayContaining(["marts.repasse_banco", "marts.leads_origem"]),
+    );
     expect(catalogoDoPerfil(null)).toHaveLength(catalogoViews.length - 1);
   });
 });

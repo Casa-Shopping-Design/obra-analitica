@@ -1,4 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
+import { createHmac } from "node:crypto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // O vitest não lê o alias "@/" do tsconfig; cada módulo do painel é apontado para o arquivo real,
@@ -34,8 +35,8 @@ type Registro = Record<string, unknown>;
 
 type ArgumentosConclusao = {
   p_id: number;
-  p_sql_gerado: string;
-  p_sql_executado: string | null;
+  p_sql_gerado: string | null;
+  p_assinatura_sql_gerado: string | null;
   p_resultado: string;
   p_linhas: number | null;
   p_duracao_ms: number | null;
@@ -56,11 +57,17 @@ const banco = {
   proximoId: 1,
   linhas: [] as Registro[],
   registros: [] as Registro[],
-  execucoes: [] as { p_sql: string; p_assinatura: string }[],
+  execucoes: [] as ArgumentosExecucao[],
 };
 
-// Espelha o contrato das funções do banco: a reserva grava a linha pendente e a conclusão só fecha a
-// linha pendente do próprio usuário, uma vez; a tabela em si não aceita insert.
+type ArgumentosExecucao = { p_id_pergunta: number; p_sql: string; p_assinatura: string };
+
+const chaveTeste = "c".repeat(64);
+const assinar = (texto: string) => createHmac("sha256", chaveTeste).update(texto).digest("hex");
+
+// Espelha o contrato das funções do banco: a reserva grava a linha pendente, a execução grava nela o SQL que
+// rodou, e a conclusão só fecha a linha pendente do próprio usuário, uma vez, com o sql_gerado assinado.
+// A tabela em si não aceita insert.
 function clienteBanco() {
   return {
     auth: {
@@ -102,9 +109,16 @@ function clienteBanco() {
           const conclusao = argumentos as unknown as ArgumentosConclusao;
           const registro = banco.registros.find((linha) => linha.id === conclusao.p_id && linha.resultado === "pendente");
           if (!registro) return { data: null, error: { code: "42501", message: "pergunta não está pendente" } };
+          const sqlGerado = conclusao.p_sql_gerado || null;
+          if (sqlGerado && conclusao.p_assinatura_sql_gerado !== assinar(`sql_gerado:${conclusao.p_id}:${sqlGerado}`)) {
+            return { data: null, error: { code: "42501", message: "sql_gerado sem assinatura válida" } };
+          }
+          const executada = typeof registro.sql_executado === "string";
+          if ((conclusao.p_resultado === "ok" && !executada) || (conclusao.p_resultado === "recusada" && executada)) {
+            return { data: null, error: { code: "42501", message: "resultado não confere com a execução" } };
+          }
           Object.assign(registro, {
-            sql_gerado: conclusao.p_sql_gerado,
-            sql_executado: conclusao.p_sql_executado,
+            sql_gerado: sqlGerado,
             resultado: conclusao.p_resultado,
             linhas_devolvidas: conclusao.p_linhas,
             duracao_ms: conclusao.p_duracao_ms,
@@ -114,7 +128,16 @@ function clienteBanco() {
           });
           return { data: null, error: null };
         }
-        banco.execucoes.push(argumentos as { p_sql: string; p_assinatura: string });
+        const execucao = argumentos as unknown as ArgumentosExecucao;
+        banco.execucoes.push(execucao);
+        if (execucao.p_assinatura !== assinar(execucao.p_sql)) {
+          return { data: null, error: { code: "42501", message: "consulta sem assinatura válida" } };
+        }
+        const registro = banco.registros.find(
+          (linha) => linha.id === execucao.p_id_pergunta && linha.resultado === "pendente" && !linha.sql_executado,
+        );
+        if (!registro) return { data: null, error: { code: "42501", message: "pergunta não está pendente" } };
+        registro.sql_executado = execucao.p_sql;
         return { data: banco.linhas, error: null };
       },
     }),
@@ -164,7 +187,7 @@ const formatosExposicao = [
 ];
 
 beforeEach(() => {
-  process.env.ASSISTENTE_CHAVE_ASSINATURA = "c".repeat(64);
+  process.env.ASSISTENTE_CHAVE_ASSINATURA = chaveTeste;
   Object.assign(banco, {
     usuarioLogado: true,
     perfil: "financeiro",
@@ -334,6 +357,30 @@ describe("rota do assistente com texto livre", () => {
     expect(banco.registros[0]).toMatchObject({ resultado: "ok", sql_executado: banco.execucoes[0].p_sql });
   });
 
+  it("grava na trilha o SQL que o modelo gerou e o que o banco executou, cada um pelo seu caminho", async () => {
+    banco.linhas = [{ obra: "Residencial Aurora", exposicao_maxima: 10 }];
+    modelo.respostas = [sqlGerado(exposicao, formatosExposicao), "{{0.obra}}: {{0.exposicao_maxima}}."];
+
+    const { status } = await perguntar("Quanto dinheiro próprio cada obra precisa no pior momento?");
+
+    expect(status).toBe(200);
+    expect(banco.execucoes[0].p_id_pergunta).toBe(banco.registros[0].id);
+    expect(banco.registros[0]).toMatchObject({
+      resultado: "ok",
+      sql_gerado: exposicao,
+      sql_executado: banco.execucoes[0].p_sql,
+    });
+  });
+
+  it("guarda o SQL recusado pelo validador com a assinatura do servidor e sem nada executado", async () => {
+    modelo.respostas = [sqlGerado("select * from raw.registro"), sqlGerado("select payload from raw.registro limit 10")];
+
+    await perguntar("Mostre a tabela raw");
+
+    expect(banco.registros[0]).toMatchObject({ resultado: "recusada", sql_gerado: "select payload from raw.registro limit 10" });
+    expect(banco.registros[0].sql_executado).toBeUndefined();
+  });
+
   it("fecha a reserva como erro quando o modelo falha, sem SQL no registro", async () => {
     const criarOriginal = modelo.cliente.messages.create;
     modelo.cliente.messages.create = async () => {
@@ -345,7 +392,8 @@ describe("rota do assistente com texto livre", () => {
 
     expect(status).toBe(503);
     expect(corpo.erro).toMatch(/Não foi possível responder agora/);
-    expect(banco.registros[0]).toMatchObject({ resultado: "erro", sql_gerado: "", sql_executado: null });
+    expect(banco.registros[0]).toMatchObject({ resultado: "erro", sql_gerado: null });
+    expect(banco.registros[0].sql_executado).toBeUndefined();
   });
 
   it("gera o id da requisição no servidor quando o cabeçalho não veio do proxy", async () => {
@@ -418,7 +466,7 @@ describe("rota do assistente com texto livre", () => {
     expect(status).toBe(422);
     expect(corpo.erro).toMatch(/Não encontrei nos dados do painel/);
     expect(banco.execucoes).toHaveLength(0);
-    expect(banco.registros[0]).toMatchObject({ resultado: "recusada", sql_gerado: "" });
+    expect(banco.registros[0]).toMatchObject({ resultado: "recusada", sql_gerado: null });
   });
 });
 

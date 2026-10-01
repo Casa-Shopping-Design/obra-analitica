@@ -104,12 +104,30 @@ export const catalogoViews: ViewCatalogo[] = [
     ],
   },
   {
+    nome: "marts.repasse_banco",
+    descricao: "Repasse do financiamento por obra e banco, com a mesma regra de marts.repasse_obra: somando os bancos de uma obra, contagens e valores de etapa e de atraso fecham com a linha da obra la. banco e o nome que o CRM grava; vazio vira 'Nao informado'. contratos_com_repasse, repasses_em_analise, valor_em_analise, repasses_assinados, valor_assinado, repasses_liberados, valor_liberado, repasses_atrasados e valor_atrasado tem o mesmo significado de marts.repasse_obra. dias_medios_assinatura_liberacao e a media de dias entre a assinatura e a liberacao naquele banco, nula quando o banco ainda nao liberou nenhum; para a media de varios bancos, ponderar por repasses_liberados, nunca tirar media simples. repasses_parados_analise e valor_parado_analise contam os repasses em analise (sem assinatura) cuja situacao no CRM nao muda ha mais de 60 dias; repasse sem data de mudanca de situacao nao entra nessa conta.",
+    colunas: ["centro_custo_id", "obra", "banco", "contratos_com_repasse", "repasses_em_analise", "valor_em_analise", "repasses_assinados", "valor_assinado", "repasses_liberados", "valor_liberado", "repasses_atrasados", "valor_atrasado", "dias_medios_assinatura_liberacao", "repasses_parados_analise", "valor_parado_analise"],
+    exemplos: [
+      { pergunta: "Qual banco demora mais para liberar o repasse na Torre Comercial Sul?", sql: "select banco, repasses_liberados, dias_medios_assinatura_liberacao from marts.repasse_banco where obra ilike '%torre%' and dias_medios_assinatura_liberacao is not null order by dias_medios_assinatura_liberacao desc" },
+      { pergunta: "Quanto esta parado em analise ha mais de 60 dias em cada banco?", sql: "select banco, sum(repasses_parados_analise) as repasses, sum(valor_parado_analise) as valor from marts.repasse_banco group by banco order by valor desc" },
+    ],
+  },
+  {
     nome: "marts.funil_vendas_mensal",
     descricao: "Funil de vendas por obra e mes, em calendario continuo; so aparece obra com dado do CRM de vendas. leads e reservas vem do CRM (reserva pela data de cadastro, reservas_canceladas pela data do cancelamento). vendas e distratos vem do ERP pela mesma regra de marts.vso_mensal. conversao_lead_reserva e reservas dividido por leads do mesmo mes, e conversao_reserva_venda e vendas dividido por reservas do mesmo mes; sao fracoes (0,1 = 10%), nulas quando o denominador e zero, e nao sao coorte: a reserva de marco pode vir de lead de janeiro. Para conversao de um periodo, somar as contagens antes de dividir, nunca tirar media das conversoes mensais.",
     colunas: ["centro_custo_id", "competencia", "leads", "reservas", "reservas_canceladas", "vendas", "distratos", "conversao_lead_reserva", "conversao_reserva_venda"],
     exemplos: [
       { pergunta: "Quantos leads e reservas a Parque das Aguas teve nos ultimos 3 meses?", sql: "select f.competencia, f.leads, f.reservas, f.vendas from marts.funil_vendas_mensal f join app.centro_custo c on c.id = f.centro_custo_id where c.nome ilike '%parque%' and f.competencia >= date_trunc('month', current_date) - interval '2 months' order by f.competencia" },
       { pergunta: "Qual a conversao de reserva em venda da Aurora em 2026?", sql: "select sum(f.reservas) as reservas, sum(f.vendas) as vendas, round(sum(f.vendas)::numeric / nullif(sum(f.reservas), 0), 4) as conversao from marts.funil_vendas_mensal f join app.centro_custo c on c.id = f.centro_custo_id where c.nome ilike '%aurora%' and f.competencia >= '2026-01-01'" },
+    ],
+  },
+  {
+    nome: "marts.leads_origem",
+    descricao: "Leads do CRM de vendas por obra, origem e midia nos ultimos 12 meses (o mes atual e os 11 anteriores). leads conta os leads cadastrados no periodo; leads_descartados conta os que tem motivo de cancelamento ou situacao de descarte, cancelamento ou perda. pct_descartados e fracao, leads_descartados sobre leads (0,4 = 40%). motivo_principal_descarte e o motivo mais frequente entre os descartados com motivo, nulo quando nenhum descartado tem motivo; leads_motivo_principal e quantos leads tiveram esse motivo. O lead nao se liga a reserva nem a venda, entao esta view nao responde conversao por origem; para conversao use marts.funil_vendas_mensal, que e da obra inteira. Para o total por origem, somar leads e leads_descartados das midias; o motivo principal nao soma.",
+    colunas: ["centro_custo_id", "obra", "origem", "midia", "leads", "leads_descartados", "pct_descartados", "motivo_principal_descarte", "leads_motivo_principal"],
+    exemplos: [
+      { pergunta: "De onde vem a maior parte dos leads da Aurora?", sql: "select origem, sum(leads) as leads, sum(leads_descartados) as descartados from marts.leads_origem where obra ilike '%aurora%' group by origem order by leads desc" },
+      { pergunta: "Qual origem de lead tem mais descarte na Parque das Aguas?", sql: "select origem, midia, leads, leads_descartados, pct_descartados, motivo_principal_descarte from marts.leads_origem where obra ilike '%parque%' order by pct_descartados desc nulls last" },
     ],
   },
   {
@@ -137,6 +155,16 @@ export const catalogoViews: ViewCatalogo[] = [
     exemplos: [
       { pergunta: "Quais obras pedem atencao agora?", sql: "select obra, tipo, valor, referencia from marts.alertas_obra order by obra, tipo" },
       { pergunta: "Em que obras a inadimplencia passou do limite?", sql: "select obra, valor as vencido_comprador, referencia as fracao_vencida from marts.alertas_obra where tipo = 'inadimplencia_alta' order by valor desc" },
+    ],
+  },
+  {
+    nome: "marts.comparativo_obras",
+    descricao: "Uma linha por obra com os indicadores de comparacao entre obras, tirados dos outros marts sem regra nova. vgv_total, vgv_vendido, pct_vgv_vendido, resultado_projetado, exposicao_maxima, caixa_atual, vencido_direto e repasse_atrasado sao os de marts.posicao_financeira_obra. vendas_liquidas_12m soma as vendas menos distratos dos ultimos 12 meses de marts.vso_mensal, estoque_inicio_12m e o estoque no inicio do primeiro desses meses e vso_12m e a divisao dos dois (fracao, 0,5 = metade do estoque vendido no ano; nula sem estoque). unidades_estoque, valor_estoque e meses_para_vender_estoque sao os de marts.estoque_obra. margem_projetada e resultado_projetado sobre vgv_total (fracao). pct_inadimplencia e vencido_direto sobre recebido, a receber e vencido direto, a mesma fracao do alerta inadimplencia_alta. pct_fisico, pct_financeiro e diferenca_financeiro_fisico sao os do mes atual (competencia_execucao) em marts.execucao_fisica_obra, nulos sem medicao. alertas conta as linhas da obra em marts.alertas_obra, zero sem alerta. Exposicao maxima da carteira nao e a soma desta coluna: use marts.posicao_carteira.",
+    colunas: ["centro_custo_id", "obra", "vgv_total", "vgv_vendido", "pct_vgv_vendido", "vendas_liquidas_12m", "estoque_inicio_12m", "vso_12m", "unidades_estoque", "valor_estoque", "meses_para_vender_estoque", "resultado_projetado", "margem_projetada", "exposicao_maxima", "caixa_atual", "vencido_direto", "pct_inadimplencia", "repasse_atrasado", "competencia_execucao", "pct_fisico", "pct_financeiro", "diferenca_financeiro_fisico", "alertas"],
+    exemplos: [
+      { pergunta: "Qual obra tem a maior exposicao?", sql: "select obra, exposicao_maxima from marts.comparativo_obras order by exposicao_maxima desc limit 1" },
+      { pergunta: "Compare a margem e a VSO das obras", sql: "select obra, resultado_projetado, margem_projetada, vendas_liquidas_12m, estoque_inicio_12m, vso_12m from marts.comparativo_obras order by margem_projetada" },
+      { pergunta: "Qual obra tem mais inadimplencia e mais alertas?", sql: "select obra, vencido_direto, pct_inadimplencia, alertas from marts.comparativo_obras order by pct_inadimplencia desc nulls last" },
     ],
   },
   {

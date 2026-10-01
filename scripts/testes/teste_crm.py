@@ -8,6 +8,7 @@ import tempfile
 import threading
 import unittest
 import urllib.parse
+from datetime import date
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
@@ -340,6 +341,27 @@ class TesteGerador(unittest.TestCase):
         self.assertEqual({r["numero_contrato"] for r in liberados}, repassados_no_erp)
         for repasse in liberados:
             self.assertLessEqual(repasse["data_assinatura_de_contrato"], repasse["data_recurso_liberado"])
+
+    def test_caixa_na_maioria_e_banco_lento_demora_mais(self):
+        repasses = self.arquivos["repasses.json"]
+        por_banco = {}
+        for repasse in repasses:
+            por_banco.setdefault(repasse["banco"], []).append(repasse)
+        self.assertEqual(set(por_banco), {nome for nome, _ in gerar_dados_crm.BANCOS})
+        self.assertGreater(len(por_banco["Caixa Econômica Federal"]), len(repasses) / 2)
+
+        def prazo_medio(banco):
+            prazos = [
+                (date.fromisoformat(r["data_recurso_liberado"]) - date.fromisoformat(r["data_assinatura_de_contrato"])).days
+                for r in por_banco[banco] if r["data_recurso_liberado"]
+            ]
+            self.assertGreaterEqual(len(prazos), 2, banco)
+            return sum(prazos) / len(prazos)
+
+        lento = prazo_medio(gerar_dados_crm.BANCO_LENTO)
+        for banco in por_banco:
+            if banco != gerar_dados_crm.BANCO_LENTO:
+                self.assertGreater(lento, prazo_medio(banco) * 1.5, banco)
 
     def test_leads_por_obra_da_demo(self):
         codigos = {c for lead in self.arquivos["leads.json"] for c in lead["codigointerno_empreendimento"].split(";")}

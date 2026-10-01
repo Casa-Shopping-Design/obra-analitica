@@ -70,9 +70,43 @@ A documentação do GitHub diz que, em repositório público, o agendamento é d
 | --- | --- | --- |
 | GitHub, secrets do repositório | `DATABASE_URL` | Session pooler do projeto da demo, com a senha codificada |
 | GitHub, secrets do repositório | `TENANT_DEMO_ID` | Tenant que a carga grava |
+| GitHub, secrets do repositório | `RESEND_API_KEY` | Chave do Resend com permissão só de envio, usada pelo resumo semanal |
+| GitHub, secrets do repositório | `RESUMO_REMETENTE` | Remetente do resumo, no domínio verificado no Resend |
+| GitHub, secrets do repositório | `PAINEL_URL_BASE` | Endereço do painel em produção, com https, para o link do e-mail |
 | Vercel | `SENTRY_DSN` | Sentry no servidor |
 | Vercel | `NEXT_PUBLIC_SENTRY_DSN` | Sentry no navegador; o DSN só permite enviar eventos |
 
 Quando existir o banco do piloto, ele ganha secrets próprios, num environment do GitHub separado. O secret da demo nunca aponta para o piloto.
 
 O CI (`.github/workflows/ci.yml`) não usa secret nenhum: sobe um Supabase local, cria dois usuários de teste com senha sorteada e apaga tudo no fim.
+
+## Resumo semanal por e-mail
+
+Toda segunda às 07:00 de Brasília o job `.github/workflows/resumo_semanal.yml` manda a cada usuário um e-mail com os alertas abertos e os números principais das obras que ele vê no painel. Diretor e financeiro recebem todas as obras do tenant; gerente de obra, só as vinculadas a ele. Os outros perfis e quem ainda não confirmou o convite não recebem.
+
+O script conecta com a `DATABASE_URL` do servidor, que não passa pelo RLS. Os números saem de uma consulta só para todas as obras, e as obras de cada usuário são escolhidas pela regra de perfil e conferidas no banco com `app.obras_permitidas()` rodando com os claims dele. Se as duas listas discordarem, o usuário fica sem e-mail, o log conta `divergentes_rls` e o job termina com erro. Nesse caso não reenvie: procure o vínculo do usuário em `app.usuario_tenant` e `app.usuario_centro_custo`.
+
+### Como ligar
+
+1. Crie a conta no Resend (o plano gratuito manda 100 e-mails por dia) e cadastre o domínio do remetente em Domains. O Resend mostra os registros DNS (SPF, DKIM e, de preferência, DMARC); publique no DNS do domínio e espere a verificação.
+2. Em API Keys, crie uma chave com permissão "Sending access", restrita ao domínio.
+3. No GitHub, Settings, Secrets and variables, Actions, cadastre `RESEND_API_KEY`, `RESUMO_REMETENTE` (por exemplo `Obra Analítica <resumo@seudominio.com.br>`) e `PAINEL_URL_BASE`. A `DATABASE_URL` é a mesma da carga noturna.
+4. Rode uma vez à mão em Actions, Resumo semanal, Run workflow, e confira a caixa de entrada de um diretor e de um gerente.
+
+O log do job é uma linha JSON com contagens (destinatários, obras, alertas, enviados, falhas e o status HTTP das falhas). Não tem e-mail, nome de obra nem chave. Se o job rodar de novo no mesmo dia, o Resend descarta a repetição pela chave de idempotência, que vale 24 horas.
+
+### Prévia sem enviar
+
+Sem `--enviar`, o script só grava um HTML por usuário no diretório indicado. O nome do arquivo leva o perfil e o começo dos ids do usuário e do tenant, nunca o e-mail.
+
+```bash
+python scripts/enviar_resumo_semanal.py --previa /tmp/resumo
+```
+
+Usa a `DATABASE_URL` do ambiente; aponte para o banco local ou para o da demo. Sem `PAINEL_URL_BASE`, os links vão para `http://localhost:3000`.
+
+Os testes ficam em `scripts/testes/teste_resumo_semanal.py`. Com `DATABASE_URL` apontando para o Supabase local, rodam também o caso com dois tenants e cinco perfis, dentro de uma transação desfeita no fim:
+
+```bash
+cd scripts && python -m unittest testes.teste_resumo_semanal
+```
