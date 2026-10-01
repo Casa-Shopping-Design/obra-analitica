@@ -32,6 +32,15 @@ export const catalogoViews: ViewCatalogo[] = [
     ],
   },
   {
+    nome: "marts.posicao_carteira",
+    descricao: "Uma linha so, com a carteira somada: as obras que quem pergunta enxerga (o gerente ve a carteira do tamanho das obras dele). Nao tem centro_custo_id nem obra; para ver obra a obra, use marts.posicao_financeira_obra, de onde saem as somas. obras e quantas obras entraram. vgv_total, vgv_vendido, estoque_a_vender, caixa_atual, resultado_projetado, vencido_direto, repasse_atrasado, a_receber_direto, a_receber_repasse, a_pagar e estouro_orcamento sao a soma das obras, com o mesmo significado de la. pct_vgv_vendido e fracao, vgv_vendido sobre vgv_total. exposicao_maxima e o dinheiro proprio que a carteira exige no pior mes, tirado do saldo acumulado das obras juntas mes a mes em marts.fluxo_caixa_mensal; nao e a soma das exposicoes, porque o pior mes de cada obra cai em momentos diferentes. mes_exposicao_maxima e o mes desse pior saldo, nulo quando o saldo nunca fica negativo. soma_exposicao_obras e a soma das exposicoes obra a obra, so para comparar. Ao responder exposicao da carteira, usar exposicao_maxima.",
+    colunas: ["obras", "vgv_total", "vgv_vendido", "pct_vgv_vendido", "estoque_a_vender", "caixa_atual", "resultado_projetado", "vencido_direto", "repasse_atrasado", "a_receber_direto", "a_receber_repasse", "a_pagar", "estouro_orcamento", "exposicao_maxima", "mes_exposicao_maxima", "soma_exposicao_obras"],
+    exemplos: [
+      { pergunta: "Quanto dinheiro proprio a carteira exige no pior mes?", sql: "select obras, exposicao_maxima, mes_exposicao_maxima, soma_exposicao_obras from marts.posicao_carteira" },
+      { pergunta: "Quanto do VGV da carteira ja foi vendido e quanto falta vender?", sql: "select obras, vgv_total, vgv_vendido, pct_vgv_vendido, estoque_a_vender from marts.posicao_carteira" },
+    ],
+  },
+  {
     nome: "marts.vso_mensal",
     descricao: "VSO (vendas sobre oferta) por obra e mes, em calendario continuo do primeiro contrato ate o mes atual; mes sem venda aparece com zero. vendas conta os contratos assinados no mes, inclusive os distratados depois; distratos conta os cancelamentos no mes do cancelamento; vendas_liquidas e vendas menos distratos. vgv_vendido soma o valor dos contratos assinados no mes. estoque_inicio_mes e o denominador: unidades em oferta (fora de venda nao conta) sem contrato ativo no primeiro dia do mes. vso_pct e fracao, vendas_liquidas dividido por estoque_inicio_mes (0,05 = 5% do estoque vendido no mes); fica nulo sem estoque e pode ser negativo quando o distrato supera a venda. Ao responder taxa, mostrar tambem vendas_liquidas e estoque_inicio_mes.",
     colunas: ["centro_custo_id", "competencia", "vendas", "distratos", "vgv_vendido", "vendas_liquidas", "estoque_inicio_mes", "vso_pct"],
@@ -64,6 +73,24 @@ export const catalogoViews: ViewCatalogo[] = [
     exemplos: [
       { pergunta: "Quantas vendas faltam para o VGV da Parque das Aguas cobrir o orcamento?", sql: "select obra, custo_orcado, vgv_contratado, pct_cobertura, unidades_para_cobrir from marts.cobertura_orcamento_obra where obra ilike '%parque%'" },
       { pergunta: "No ritmo atual, em quantos meses as vendas cobrem o orcamento de cada obra?", sql: "select obra, unidades_para_cobrir, vendas_media_6m, meses_para_cobrir from marts.cobertura_orcamento_obra order by meses_para_cobrir desc nulls first" },
+    ],
+  },
+  {
+    nome: "marts.estoque_obra",
+    descricao: "Uma linha por obra com o estoque e o tempo para vende-lo. Estoque e unidade disponivel, reservada ou em proposta; vendida e fora de venda nao entram. unidades_estoque conta essas unidades e valor_estoque soma o valor delas a preco de hoje, pela regra de marts.mapa_unidades (unidade sem preco conta na quantidade e nao no valor). preco_medio_estoque e valor_estoque dividido por unidades_estoque. unidades_vendidas conta as vendidas. vendas_media_6m e o ritmo de vendas liquidas por mes, o mesmo de marts.cobertura_orcamento_obra. meses_para_vender_estoque e unidades_estoque dividido por vendas_media_6m: projecao no ritmo recente, nao prazo garantido; e zero sem estoque e nulo quando nao houve venda liquida no periodo (estoque parado). data_entrega e a maior data de entrega das unidades da obra. meses_ate_entrega conta os meses do mes atual ate o mes da entrega, zero se a obra ja foi entregue e nulo sem data. Estoque que nao acaba ate a entrega aparece em marts.alertas_obra.",
+    colunas: ["centro_custo_id", "obra", "unidades_estoque", "valor_estoque", "unidades_vendidas", "preco_medio_estoque", "vendas_media_6m", "meses_para_vender_estoque", "data_entrega", "meses_ate_entrega"],
+    exemplos: [
+      { pergunta: "Quanto tempo leva para vender o estoque de cada obra?", sql: "select obra, unidades_estoque, vendas_media_6m, meses_para_vender_estoque, meses_ate_entrega from marts.estoque_obra order by meses_para_vender_estoque desc nulls first" },
+      { pergunta: "O estoque da Aurora acaba antes da entrega?", sql: "select obra, unidades_estoque, valor_estoque, meses_para_vender_estoque, data_entrega, meses_ate_entrega from marts.estoque_obra where obra ilike '%aurora%'" },
+    ],
+  },
+  {
+    nome: "marts.estoque_tipologia",
+    descricao: "Unidades e valor do estoque por obra e tipologia; unidade sem tipologia cai em 'Sem tipologia'. disponiveis, reservadas, propostas, vendidas e fora_de_venda contam as unidades em cada situacao e total conta todas. Estoque e disponivel, reservada e proposta, como em marts.estoque_obra. valor_estoque soma o valor dessas unidades a preco de hoje, pela regra de marts.mapa_unidades; preco_medio_estoque e a media delas; preco_m2_estoque e o valor dividido pela area privativa, so com unidade que tem area e preco. Nao tem o nome da obra: faca join de app.centro_custo.",
+    colunas: ["centro_custo_id", "tipologia", "disponiveis", "reservadas", "propostas", "vendidas", "fora_de_venda", "total", "valor_estoque", "preco_medio_estoque", "preco_m2_estoque"],
+    exemplos: [
+      { pergunta: "Quanto vale o estoque de cada tipologia a preco de hoje?", sql: "select c.nome as obra, e.tipologia, e.disponiveis + e.reservadas + e.propostas as unidades_estoque, e.valor_estoque, e.preco_m2_estoque from marts.estoque_tipologia e join app.centro_custo c on c.id = e.centro_custo_id order by c.nome, e.tipologia" },
+      { pergunta: "Qual o preco medio por m2 do estoque de 3 quartos da Parque das Aguas?", sql: "select e.tipologia, e.preco_medio_estoque, e.preco_m2_estoque from marts.estoque_tipologia e join app.centro_custo c on c.id = e.centro_custo_id where c.nome ilike '%parque%' and e.tipologia ilike '3q%'" },
     ],
   },
   {
@@ -101,6 +128,15 @@ export const catalogoViews: ViewCatalogo[] = [
     exemplos: [
       { pergunta: "Quanto esta atrasado ha mais de 90 dias em cada obra?", sql: "select obra, sum(valor_atualizado) from marts.inadimplencia_faixa where ordem >= 3 group by obra order by 2 desc" },
       { pergunta: "Como se distribui a inadimplencia da Parque das Aguas por faixa?", sql: "select faixa, titulos, parcelas, valor_atrasado, valor_atualizado, data_posicao from marts.inadimplencia_faixa where obra ilike '%parque%' order by ordem" },
+    ],
+  },
+  {
+    nome: "marts.alertas_obra",
+    descricao: "Alertas por obra, uma linha por alerta que disparou; obra sem alerta nao aparece. valor e referencia mudam de unidade conforme o tipo, entao nunca some valor de tipos diferentes. Tipos: estouro_orcamento dispara quando o custo lancado (pago mais a pagar) passa o orcamento; valor e o estouro em reais e referencia e o custo orcado em reais (zero quando a obra nao tem orcamento). repasse_atrasado dispara com repasse do banco vencido e nao pago; valor e esse repasse em reais e referencia e nula. inadimplencia_alta dispara quando o vencido do comprador passa de 5% da carteira direta (recebido, a receber e vencido direto); valor e o vencido em reais e referencia e a fracao (0,06 = 6%). pago_a_frente_do_fisico dispara quando, no mes mais recente de marts.execucao_fisica_obra, o pago passa o fisico em mais de 10 pontos; valor e a diferenca em fracao (0,23 = 23 pontos) e referencia e nula. estoque_apos_entrega dispara quando ha estoque e, no ritmo dos ultimos 6 meses, ele nao acaba ate a entrega; valor e meses_para_vender_estoque de marts.estoque_obra (nulo quando nao houve venda liquida, estoque parado) e referencia e meses_ate_entrega (zero = obra ja entregue).",
+    colunas: ["centro_custo_id", "obra", "tipo", "valor", "referencia"],
+    exemplos: [
+      { pergunta: "Quais obras pedem atencao agora?", sql: "select obra, tipo, valor, referencia from marts.alertas_obra order by obra, tipo" },
+      { pergunta: "Em que obras a inadimplencia passou do limite?", sql: "select obra, valor as vencido_comprador, referencia as fracao_vencida from marts.alertas_obra where tipo = 'inadimplencia_alta' order by valor desc" },
     ],
   },
   {

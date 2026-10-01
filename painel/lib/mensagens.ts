@@ -15,6 +15,19 @@ export const mensagens = {
     indisponivel: "Não foi possível carregar esta obra agora. Recarregue a página em alguns minutos.",
     semMovimento: "Esta obra ainda não tem entradas nem saídas nos 36 meses mostrados no gráfico.",
   },
+  alertas: {
+    indisponivel: "Não foi possível carregar os alertas agora. Recarregue a página em alguns minutos.",
+    nenhum: "Nenhum alerta com os dados da última carga.",
+  },
+  estoque: {
+    indisponivel: "Não foi possível carregar o estoque desta obra agora. Recarregue a página em alguns minutos.",
+    semUnidades: "Esta obra ainda não tem unidades carregadas. Elas aparecem depois da próxima carga de dados.",
+    semVendas: "Esta obra ainda não tem contratos de venda carregados.",
+  },
+  simulacao: {
+    indisponivel: "Não foi possível calcular a simulação agora. Recarregue a página em alguns minutos.",
+    semEstoque: "Esta obra não tem unidade em estoque com preço de tabela, então não há venda para simular.",
+  },
   unidades: {
     indisponivel: "Não foi possível carregar o mapa de unidades agora. Recarregue a página em alguns minutos.",
     obraNaoEncontrada: "Obra não encontrada ou sem permissão para o seu perfil.",

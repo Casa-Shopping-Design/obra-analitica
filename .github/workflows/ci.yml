@@ -99,6 +99,7 @@ jobs:
       - name: Carga da demo no banco local
         run: |
           python scripts/gerar_dados_demo.py
+          python scripts/gerar_dados_complementares.py
           python scripts/carregar_demo.py
 
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0

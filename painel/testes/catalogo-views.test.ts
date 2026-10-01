@@ -11,20 +11,24 @@ const viewsNovas: Record<string, string> = {
   "marts.execucao_fisica_obra": "0019_complementos_origem.sql",
   "marts.inadimplencia_faixa": "0019_complementos_origem.sql",
   "marts.conferencia_origem": "0019_complementos_origem.sql",
+  "marts.estoque_tipologia": "0024_estoque_carteira_simulacao.sql",
+  "marts.estoque_obra": "0024_estoque_carteira_simulacao.sql",
+  "marts.posicao_carteira": "0024_estoque_carteira_simulacao.sql",
+  "marts.alertas_obra": "0024_estoque_carteira_simulacao.sql",
 };
 
-// Trecho da migration entre o create view e o grant da mesma view.
+// Trecho da migration entre o create view e o próximo create ou grant no começo de linha.
 function definicaoView(arquivo: string, nome: string): string {
   const sql = readFileSync(join(migrations, arquivo), "utf8");
-  const inicio = sql.indexOf(`create or replace view ${nome} `);
-  const fim = sql.indexOf(`grant select on ${nome} `, inicio);
+  const inicio = Math.max(sql.indexOf(`create or replace view ${nome} `), sql.indexOf(`create view ${nome} `));
   expect(inicio).toBeGreaterThanOrEqual(0);
-  expect(fim).toBeGreaterThan(inicio);
-  return sql.slice(inicio, fim);
+  const proximo = sql.slice(inicio + 1).search(/\n(create|grant) /);
+  expect(proximo).toBeGreaterThan(0);
+  return sql.slice(inicio, inicio + 1 + proximo);
 }
 
 describe("catálogo das views novas", () => {
-  it("tem as cinco views das migrations 0018 e 0019", () => {
+  it("tem as views das migrations 0018, 0019 e 0024", () => {
     const nomes = catalogoViews.map((view) => view.nome);
     for (const nome of Object.keys(viewsNovas)) expect(nomes).toContain(nome);
   });
@@ -37,6 +41,12 @@ describe("catálogo das views novas", () => {
         expect(definicao, `${nome}.${coluna}`).toMatch(new RegExp(`\\b${coluna}\\b`));
       }
     }
+  });
+
+  it("deixa as funções de simulação fora do catálogo", () => {
+    const nomes = catalogoViews.map((view) => view.nome);
+    expect(nomes).not.toContain("marts.simular_venda_estoque");
+    expect(nomes).not.toContain("marts.resumo_venda_estoque");
   });
 
   it("todo exemplo passa pelo validador", () => {

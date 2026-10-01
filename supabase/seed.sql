@@ -5,11 +5,12 @@ insert into app.tenant (id, razao_social, cnpj, conta_origem)
 values ('11111111-1111-1111-1111-111111111111', 'Construtora Demo Ltda', '12.345.678/0001-90', 'demo')
 on conflict do nothing;
 
+-- Rodar o seed de novo acerta o nome exibido da obra que já existe.
 insert into app.centro_custo (tenant_id, id_origem, nome, empresa_id) values
   ('11111111-1111-1111-1111-111111111111', 101, 'Residencial Aurora', 1),
-  ('11111111-1111-1111-1111-111111111111', 102, 'Parque das Aguas', 1),
+  ('11111111-1111-1111-1111-111111111111', 102, 'Parque das Águas', 1),
   ('11111111-1111-1111-1111-111111111111', 103, 'Torre Comercial Sul', 1)
-on conflict do nothing;
+on conflict (tenant_id, id_origem) do update set nome = excluded.nome;
 
 -- Substituir pelos ids reais de auth.users
 -- insert into app.usuario_tenant values ('<uuid diretor>', '11111111-1111-1111-1111-111111111111', 'diretor');

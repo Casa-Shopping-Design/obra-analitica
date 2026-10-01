@@ -8,10 +8,13 @@ export async function LinksObra({ id }: { id: string }) {
   const verConferencia = await podeVerConferencia().catch(() => false);
   const destinos = [
     { rotulo: "Mapa de unidades", caminho: "unidades" },
+    { rotulo: "Estoque e vendas", caminho: "estoque" },
+    { rotulo: "Simulação de vendas", caminho: "simulacao" },
     { rotulo: "Vendas e repasse", caminho: "vendas" },
     { rotulo: "Execução física", caminho: "execucao" },
     { rotulo: "Inadimplência", caminho: "inadimplencia" },
     ...(verConferencia ? [{ rotulo: "Conferência com o ERP", caminho: "conferencia" }] : []),
+    { rotulo: "Relatório para imprimir", caminho: "relatorio" },
   ];
   return (
     <nav aria-label="Telas da obra">

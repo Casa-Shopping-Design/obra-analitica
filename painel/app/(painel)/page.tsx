@@ -1,24 +1,34 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { IndicadoresObra } from "@/componentes/CartaoIndicador";
+import { FaixaCarteira } from "@/componentes/FaixaCarteira";
 import { IndicadorVgv } from "@/componentes/IndicadorVgv";
+import { SecaoAlertas } from "@/componentes/ListaAlertas";
 import { TabelaObras } from "@/componentes/TabelaObras";
+import type { AlertaObra } from "@/lib/alertas";
+import { buscarCarteira, listarAlertas, type PosicaoCarteira } from "@/lib/consultas/carteira";
 import { listarPosicaoObras, type PosicaoObra } from "@/lib/consultas/posicao";
 import { mensagens } from "@/lib/mensagens";
 
 export const metadata: Metadata = { title: "Visão geral" };
 
-async function carregarObras(): Promise<PosicaoObra[] | null> {
-  try {
-    return await listarPosicaoObras();
-  } catch {
-    return null;
-  }
+// Cada bloco falha sozinho: sem alertas ou sem carteira, as obras continuam na tela.
+async function carregarVisaoGeral(): Promise<{
+  obras: PosicaoObra[] | null;
+  carteira: PosicaoCarteira | null;
+  alertas: AlertaObra[] | null;
+}> {
+  const [obras, carteira, alertas] = await Promise.all([
+    listarPosicaoObras().catch(() => null),
+    buscarCarteira().catch(() => null),
+    listarAlertas().catch(() => null),
+  ]);
+  return { obras, carteira, alertas };
 }
 
-// Uma consulta só, na view de posição; o fluxo mensal e o cenário ficam para a tela de cada obra.
+// Três consultas em paralelo, todas em views somadas no banco; o fluxo mensal fica para a tela de cada obra.
 export default async function PaginaVisaoGeral() {
-  const obras = await carregarObras();
+  const { obras, carteira, alertas } = await carregarVisaoGeral();
 
   return (
     <>
@@ -31,6 +41,8 @@ export default async function PaginaVisaoGeral() {
       {obras?.length === 0 && <p>{mensagens.posicao.semObras}</p>}
       {obras && obras.length > 0 && (
         <>
+          {carteira && carteira.obras > 1 && <FaixaCarteira carteira={carteira} />}
+          <SecaoAlertas alertas={alertas} mostrarObra={obras.length > 1} />
           <ul aria-label="Obras" className="grid grid-cols-1 gap-4 xl:grid-cols-2 2xl:grid-cols-3">
             {obras.map((obra) => (
               <li key={obra.centro_custo_id}>

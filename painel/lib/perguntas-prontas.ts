@@ -2,6 +2,8 @@
 // até lá quem executa é a função de mesmo id em lib/consultas/perguntas-prontas.ts, que precisa
 // devolver exatamente o que este sql devolveria. Mudou um, muda o outro.
 
+import type { TipoAlerta } from "./alertas";
+
 export type FormatoColuna = "texto" | "real" | "inteiro" | "mes" | "data" | "area";
 
 export type ColunaResposta = { chave: string; rotulo: string; formato: FormatoColuna };
@@ -166,7 +168,66 @@ export const perguntasProntas = [
     ],
     semResultado: "Nenhuma obra liberada para o seu perfil.",
   },
+  {
+    id: "tempo-vender-estoque",
+    pergunta: "Quanto tempo leva para vender o estoque de cada obra?",
+    sql: "select obra, unidades_estoque, meses_para_vender_estoque, data_entrega, meses_ate_entrega from marts.estoque_obra order by meses_para_vender_estoque desc nulls first",
+    colunas: [
+      { chave: "obra", rotulo: "Obra", formato: "texto" },
+      { chave: "unidades_estoque", rotulo: "Unidades em estoque", formato: "inteiro" },
+      { chave: "meses_para_vender_estoque", rotulo: "Meses para vender no ritmo recente", formato: "inteiro" },
+      { chave: "data_entrega", rotulo: "Entrega", formato: "data" },
+      { chave: "meses_ate_entrega", rotulo: "Meses até a entrega", formato: "inteiro" },
+    ],
+    semResultado: "Nenhuma obra liberada para o seu perfil.",
+  },
+  {
+    id: "exposicao-carteira",
+    pergunta: "Quanto dinheiro próprio a carteira exige no pior mês?",
+    sql: "select obras, exposicao_maxima, mes_exposicao_maxima, soma_exposicao_obras from marts.posicao_carteira",
+    colunas: [
+      { chave: "obras", rotulo: "Obras na carteira", formato: "inteiro" },
+      { chave: "exposicao_maxima", rotulo: "Exposição da carteira", formato: "real" },
+      { chave: "mes_exposicao_maxima", rotulo: "Pior mês", formato: "mes" },
+      { chave: "soma_exposicao_obras", rotulo: "Soma das exposições de cada obra", formato: "real" },
+    ],
+    semResultado: "Nenhuma obra liberada para o seu perfil.",
+  },
+  {
+    id: "obras-pedem-atencao",
+    pergunta: "Quais obras pedem atenção agora?",
+    sql: "select a.obra, case a.tipo when 'repasse_atrasado' then 'Repasse do banco atrasado' when 'estoque_apos_entrega' then 'Estoque não acaba até a entrega' when 'estouro_orcamento' then 'Custo acima do orçamento' when 'inadimplencia_alta' then 'Inadimplência alta' when 'pago_a_frente_do_fisico' then 'Pago à frente do físico' end as tipo from marts.alertas_obra a order by a.obra, a.tipo",
+    colunas: [
+      { chave: "obra", rotulo: "Obra", formato: "texto" },
+      { chave: "tipo", rotulo: "Alerta", formato: "texto" },
+    ],
+    semResultado: "Nenhum alerta nas obras liberadas para o seu perfil.",
+  },
+  {
+    id: "estoque-tipologia-preco-hoje",
+    pergunta: "Quanto vale o estoque de cada tipologia a preço de hoje?",
+    sql: "select c.nome as obra, e.tipologia, e.disponiveis, e.reservadas, e.propostas, e.valor_estoque, e.preco_m2_estoque from marts.estoque_tipologia e join app.centro_custo c on c.id = e.centro_custo_id order by c.nome, e.tipologia",
+    colunas: [
+      { chave: "obra", rotulo: "Obra", formato: "texto" },
+      { chave: "tipologia", rotulo: "Tipologia", formato: "texto" },
+      { chave: "disponiveis", rotulo: "Disponíveis", formato: "inteiro" },
+      { chave: "reservadas", rotulo: "Reservadas", formato: "inteiro" },
+      { chave: "propostas", rotulo: "Em proposta", formato: "inteiro" },
+      { chave: "valor_estoque", rotulo: "Estoque a preço de hoje", formato: "real" },
+      { chave: "preco_m2_estoque", rotulo: "Preço por m²", formato: "real" },
+    ],
+    semResultado: "Nenhuma unidade cadastrada nas obras liberadas para o seu perfil.",
+  },
 ] as const satisfies readonly PerguntaPronta[];
+
+// Rótulo de cada tipo de marts.alertas_obra na pergunta "obras-pedem-atencao". Tem de ser igual ao case do sql dela.
+export const rotulosAlerta: Record<TipoAlerta, string> = {
+  repasse_atrasado: "Repasse do banco atrasado",
+  estoque_apos_entrega: "Estoque não acaba até a entrega",
+  estouro_orcamento: "Custo acima do orçamento",
+  inadimplencia_alta: "Inadimplência alta",
+  pago_a_frente_do_fisico: "Pago à frente do físico",
+};
 
 type PerguntaDoCatalogo = (typeof perguntasProntas)[number];
 export type IdPerguntaPronta = PerguntaDoCatalogo["id"];

@@ -22,7 +22,7 @@ export function MenuLateral({ perfil, construtora }: { perfil: string; construto
   return (
     <nav
       aria-label="Menu principal"
-      className="flex flex-col gap-1.5 bg-menu px-4 py-5 text-menu-texto md:sticky md:top-0 md:h-screen md:w-[220px] md:shrink-0 md:px-5 md:py-8"
+      className="flex flex-col gap-1.5 bg-menu px-4 py-5 print:hidden text-menu-texto md:sticky md:top-0 md:h-screen md:w-[220px] md:shrink-0 md:px-5 md:py-8"
     >
       <p className="px-3 pb-3 font-serif text-[22px] font-semibold md:pb-7">obra analítica</p>
       <ul className="flex flex-wrap gap-1.5 md:flex-col">

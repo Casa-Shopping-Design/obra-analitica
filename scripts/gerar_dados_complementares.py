@@ -1,18 +1,21 @@
 """Gera os JSON das rotas complementares do ERP em dados/complementos, coerentes com a demo.
 
-Parte de dados/cost-centers.json, sales.json, units.json e building-cost-estimation-items.json:
+Parte de dados/cost-centers.json, sales.json, units.json, income.json e building-cost-estimation-items.json:
 - mapa imobiliário mensal por obra, com o custo incorrido na mesma curva em S do a pagar da demo
   (o Parque das Águas estoura o orçado em 6%) e o recebido pelo cronograma das condições de pagamento;
 - medição física mensal por obra, uma tarefa por grupo do orçamento, chegando ao percentual concluído
-  do orçamento; a última medição do Residencial Aurora ainda está em aprovação;
-- inadimplência na posição de hoje, só a parcela de maior atraso por título, mais alta na obra entregue.
+  do orçamento; o Residencial Aurora mede no ritmo do custo incorrido e a última medição dele ainda está
+  em aprovação, de modo que só o Parque das Águas aparece com o pago à frente do físico;
+- inadimplência por faixa de atraso tirada das parcelas vencidas e em aberto de income.json, de modo que o
+  total por obra bate com o vencido do comprador da posição financeira. O financiamento (FI) fica de fora,
+  porque o painel o mostra à parte, como repasse atrasado.
 
 Nenhum registro traz nome, documento ou contato de cliente. Mesmos nomes de campo da API, para que
 o staging leia a demo e a carga real do mesmo jeito.
 """
 
 import json
-import random
+from collections import defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -25,8 +28,9 @@ INICIO_OBRA = date(2024, 10, 1)
 # Mesmas datas de chaves e o mesmo estouro de custo de scripts/gerar_dados_demo.py.
 CHAVES = {101: date(2027, 6, 30), 102: date(2027, 2, 28), 103: date(2026, 5, 31)}
 FATOR_CUSTO = {102: 1.06}
-TAXA_INADIMPLENCIA = {101: 0.06, 102: 0.08, 103: 0.15}
-FAIXAS_ATRASO = [((5, 30), 0.45), ((31, 90), 0.30), ((91, 180), 0.15), ((181, 420), 0.10)]
+# O orçamento da Aurora saiu do sorteio com 55% concluído, atrás do custo que a curva da demo já incorreu, e
+# mudar o avanço dele em gerar_dados_demo.py reembaralha as outras obras. A medição dela segue o custo.
+MEDE_NO_RITMO_DO_CUSTO = {101}
 ARQUIVOS = {
     "real-estate-map": "real-estate-map.json",
     "building-projects/progress-logs/items": "building-projects-progress-logs-items.json",
@@ -160,7 +164,18 @@ def tarefas_da_obra(id_obra, itens):
             for codigo, g in sorted(grupos.items())]
 
 
-# O(o x m x t): uma linha por obra, medição mensal e tarefa, mais o agrupador da obra.
+def concluir_em_ordem(tarefas, avanco):
+    """Acumulado de cada tarefa quando a obra conclui as tarefas na ordem do orçamento até o avanço dado."""
+    restante = avanco * sum(t["valor"] for t in tarefas)
+    acumulados = []
+    for tarefa in tarefas:
+        acumulados.append(min(max(restante / tarefa["valor"], 0.0), 1.0) if tarefa["valor"] else 0.0)
+        restante -= tarefa["valor"]
+    return acumulados
+
+
+# O(o x m x t): uma linha por obra, medição mensal e tarefa, mais o agrupador da obra; custo_incorrido_ate
+# conta os meses da obra, O(m), o que leva a Aurora a O(m² + m x t), ainda poucas centenas de passos.
 def gerar_medicoes(obras, itens):
     registros = []
     for obra in obras:
@@ -173,12 +188,15 @@ def gerar_medicoes(obras, itens):
         for numero, mes in enumerate(meses, start=1):
             data_medicao = min(date(mes.year, mes.month, 25), HOJE)
             situacao = "EM_APROVACAO" if id_obra == 101 and mes == meses[-1] else "APROVADA"
-            fracao = curva_s(numero / len(meses))
+            if id_obra in MEDE_NO_RITMO_DO_CUSTO:
+                acumulados = concluir_em_ordem(tarefas, custo_incorrido_ate(id_obra, orcado, mes) / orcado)
+            else:
+                acumulados = [t["final"] * curva_s(numero / len(meses)) for t in tarefas]
             cabecalho = {"buildingId": id_obra, "measurementNumber": numero, "buildingUnitId": 1,
                          "date": data_medicao.isoformat(), "statusApproval": situacao, "consistent": True}
             medido_obra = 0.0
-            for tarefa in tarefas:
-                acumulado = round(tarefa["final"] * fracao, 4)
+            for tarefa, fracao in zip(tarefas, acumulados):
+                acumulado = round(fracao, 4)
                 medido_obra += acumulado * tarefa["valor"]
                 registros.append({
                     **cabecalho, "taskId": tarefa["taskId"], "presentationId": tarefa["taskId"], "summary": False,
@@ -198,55 +216,65 @@ def gerar_medicoes(obras, itens):
     return registros
 
 
-def sortear_atraso(sorteio):
-    limiar, acumulado = sorteio.random(), 0.0
-    for (minimo, maximo), peso in FAIXAS_ATRASO:
-        acumulado += peso
-        if limiar <= acumulado:
-            return sorteio.randint(minimo, maximo)
-    return FAIXAS_ATRASO[-1][0][1]
+def data_posicao_padrao():
+    """Dia em que o gerador roda, nunca antes de HOJE.
+
+    A posição financeira conta como vencida a parcela que venceu antes de current_date, e a carga real
+    pede o relatório com a data do dia. Com a posição presa em HOJE, a parcela que vence depois dele
+    apareceria no vencido do painel e não na inadimplência.
+    """
+    return max(HOJE, date.today())
 
 
-# O(c) em contratos: um sorteio por contrato ativo.
-def gerar_inadimplencia(obras, contratos):
-    registros = []
+def saldo_corrigido(parcela):
+    # Mesmo coalesce(saldo_corrigido, saldo) de marts.fluxo_caixa_mensal.
+    corrigido = parcela.get("correctedBalanceAmount")
+    return corrigido if corrigido is not None else (parcela.get("balanceAmount") or 0)
+
+
+# O(p log p) nas parcelas: um passe agrupando por título num dicionário e a ordenação da saída.
+def gerar_inadimplencia(obras, contratos, parcelas, data_posicao):
     empresa = {o["id"]: o["idCompany"] for o in obras}
-    for id_obra in sorted(empresa):
-        sorteio = random.Random(2026 + id_obra)
-        for contrato in sorted((c for c in contratos if c["enterpriseId"] == id_obra and c["situation"] == "1"),
-                               key=lambda c: c["id"]):
-            mensal = next((p for p in contrato["paymentConditions"] if p["conditionType"] == "PM"), None)
-            if mensal is None or sorteio.random() >= TAXA_INADIMPLENCIA[id_obra]:
-                continue
-            inicio = date.fromisoformat(contrato["contractDate"])
-            dias = sortear_atraso(sorteio)
-            vencimento = HOJE - timedelta(days=dias)
-            numero = (vencimento.year - inicio.year) * 12 + vencimento.month - inicio.month
-            if numero < 1 or numero > mensal["installmentsNumber"]:
-                continue
-            valor = mensal["totalValue"] / mensal["installmentsNumber"] * 1.004 ** numero
-            multa = valor * 0.02
-            juros = valor * 0.01 * dias / 30
-            registros.append({
-                "companyId": empresa[id_obra], "receivableBillId": contrato["id"],
-                "issueDate": contrato["contractDate"], "costCentersId": [id_obra],
-                "receivableBillValue": contrato["value"], "positionDate": HOJE.isoformat(),
-                "defaulterInstallments": [{
-                    "installmentId": numero, "installmentNumber": f"{numero}/{mensal['installmentsNumber']}",
-                    "conditionType": "PM", "dueDate": vencimento.isoformat(), "daysOfDelay": dias,
-                    "correctedValueWithoutAdditions": f"{valor:.2f}", "proRata": "0.00",
-                    "interest": f"{juros:.2f}", "fine": f"{multa:.2f}", "totalAdditions": f"{multa + juros:.2f}",
-                    "correctedValueWithAdditions": f"{valor + multa + juros:.2f}",
-                }],
+    ativos = {c["id"]: c for c in contratos if c["situation"] != "3"}
+    vencidas = defaultdict(list)
+    for parcela in parcelas:
+        vencimento = date.fromisoformat(parcela["dueDate"])
+        if (parcela["billId"] in ativos and parcela["projectId"] in empresa
+                and parcela["paymentTerm"]["id"] != "FI" and saldo_corrigido(parcela) > 0
+                and vencimento < data_posicao):
+            vencidas[parcela["billId"]].append(parcela)
+
+    registros = []
+    for id_titulo, lista in sorted(vencidas.items(), key=lambda par: (par[1][0]["projectId"], par[0])):
+        contrato = ativos[id_titulo]
+        id_obra = lista[0]["projectId"]
+        atrasadas = []
+        for parcela in sorted(lista, key=lambda p: (p["dueDate"], p["installmentId"])):
+            valor = saldo_corrigido(parcela)
+            dias = (data_posicao - date.fromisoformat(parcela["dueDate"])).days
+            multa = dinheiro(valor * 0.02)
+            juros = dinheiro(valor * 0.01 * dias / 30)
+            atrasadas.append({
+                "installmentId": parcela["installmentId"], "installmentNumber": parcela["installmentNumber"],
+                "conditionType": parcela["paymentTerm"]["id"], "dueDate": parcela["dueDate"], "daysOfDelay": dias,
+                "correctedValueWithoutAdditions": f"{valor:.2f}", "proRata": "0.00",
+                "interest": f"{juros:.2f}", "fine": f"{multa:.2f}", "totalAdditions": f"{multa + juros:.2f}",
+                "correctedValueWithAdditions": f"{valor + multa + juros:.2f}",
             })
+        registros.append({
+            "companyId": empresa[id_obra], "receivableBillId": id_titulo,
+            "issueDate": contrato["contractDate"], "costCentersId": [id_obra],
+            "receivableBillValue": contrato["value"], "positionDate": data_posicao.isoformat(),
+            "defaulterInstallments": atrasadas,
+        })
     return registros
 
 
-def gerar(obras, contratos, unidades, itens):
+def gerar(obras, contratos, unidades, itens, parcelas, data_posicao):
     return {
         "real-estate-map": gerar_mapa(obras, contratos, unidades, itens),
         "building-projects/progress-logs/items": gerar_medicoes(obras, itens),
-        "defaulters-receivable-bills/by-aging": gerar_inadimplencia(obras, contratos),
+        "defaulters-receivable-bills/by-aging": gerar_inadimplencia(obras, contratos, parcelas, data_posicao),
     }
 
 
@@ -260,7 +288,7 @@ def salvar(endpoint, registros):
 def main():
     PASTA_SAIDA.mkdir(exist_ok=True)
     gerados = gerar(ler("cost-centers.json"), ler("sales.json"), ler("units.json"),
-                    ler("building-cost-estimation-items.json"))
+                    ler("building-cost-estimation-items.json"), ler("income.json"), data_posicao_padrao())
     for endpoint, registros in gerados.items():
         salvar(endpoint, registros)
 

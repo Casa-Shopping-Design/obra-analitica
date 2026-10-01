@@ -56,7 +56,7 @@ test("diretor só com a senha não chega ao painel nem ao assistente", async ({ 
 test("diretor cadastra o aplicativo, vê as três obras e a data da carga", async ({ page }) => {
   await entrarComoDiretor(page);
   await page.goto("/obras");
-  for (const obra of ["Residencial Aurora", "Parque das Aguas", "Torre Comercial Sul"]) {
+  for (const obra of ["Residencial Aurora", "Parque das Águas", "Torre Comercial Sul"]) {
     await expect(page.getByRole("link", { name: obra })).toBeVisible();
   }
   await expect(page.getByText(/Dados carregados em \d{2}\/\d{2}\/\d{4} \d{2}:\d{2}/)).toBeVisible();
@@ -77,12 +77,12 @@ test("diretor com aparelho cadastrado não entra com código errado", async ({ p
   await expect(page).toHaveURL(new RegExp(`${caminhoVerificar}$`));
 });
 
-test("gerente da Aurora entra sem segundo fator e não vê a Parque das Aguas, nem pelo endereço direto", async ({ browser }) => {
+test("gerente da Aurora entra sem segundo fator e não vê a Parque das Águas, nem pelo endereço direto", async ({ browser }) => {
   const contextoDiretor = await browser.newContext();
   const paginaDiretor = await contextoDiretor.newPage();
   await entrarComoDiretor(paginaDiretor);
   await paginaDiretor.goto("/obras");
-  const enderecoParque = await paginaDiretor.getByRole("link", { name: "Parque das Aguas" }).getAttribute("href");
+  const enderecoParque = await paginaDiretor.getByRole("link", { name: "Parque das Águas" }).getAttribute("href");
   await contextoDiretor.close();
   expect(enderecoParque).toMatch(/^\/obras\/[0-9a-f-]{36}$/);
 
@@ -96,10 +96,10 @@ test("gerente da Aurora entra sem segundo fator e não vê a Parque das Aguas, n
   await expect(paginaGerente.getByRole("heading", { level: 1 })).toContainText("Residencial Aurora");
 
   await paginaGerente.goto("/");
-  await expect(paginaGerente.getByText("Parque das Aguas")).toHaveCount(0);
+  await expect(paginaGerente.getByText("Parque das Águas")).toHaveCount(0);
 
   await paginaGerente.goto(enderecoParque ?? "/");
   await expect(paginaGerente.getByRole("heading", { level: 1 })).toHaveText("Obra não encontrada ou sem permissão.");
-  await expect(paginaGerente.getByText("Parque das Aguas")).toHaveCount(0);
+  await expect(paginaGerente.getByText("Parque das Águas")).toHaveCount(0);
   await contextoGerente.close();
 });
