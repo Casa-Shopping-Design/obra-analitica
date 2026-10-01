@@ -53,6 +53,15 @@ def formatar_percentual(fracao):
     return f"{pontos}%".replace(".", ",")
 
 
+def descrever_vso(vso):
+    """VSO negativo é mês com mais distrato que venda; dito assim, o leitor não acha que é erro."""
+    if vso is None:
+        return "Sem estoque no início do mês"
+    if vso < 0:
+        return "Mais distratos que vendas"
+    return formatar_percentual(vso)
+
+
 def formatar_decimal(valor):
     arredondado = Decimal(str(valor)).quantize(Decimal("0.1"), rounding=ROUND_HALF_UP)
     texto = f"{arredondado:.1f}".replace(".", ",")
@@ -157,8 +166,7 @@ def linhas_da_obra(obra, periodo):
     return [
         ("Vendas na semana", formatar_vendas(obra.vendas_semana, obra.valor_vendas_semana)),
         (f"Vendas em {mes}", vendas_mes),
-        (f"VSO de {mes_anterior}",
-         "Sem estoque no início do mês" if obra.vso_mes_anterior is None else formatar_percentual(obra.vso_mes_anterior)),
+        (f"VSO de {mes_anterior}", descrever_vso(obra.vso_mes_anterior)),
         ("Vencido dos compradores", inadimplencia),
         ("Caixa atual", formatar_real(obra.caixa_atual)),
         ("Exposição máxima", formatar_real(obra.exposicao_maxima)),

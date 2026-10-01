@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatarData, formatarMes, formatarPercentual, formatarReal, formatarRealCompacto } from "../lib/formatar";
+import { formatarConversao, formatarData, formatarMes, formatarPercentual, formatarReal, formatarRealCompacto } from "../lib/formatar";
 
 // Intl separa "R$" do número com espaço não quebrável; o teste normaliza para comparar.
 const semEspacoEspecial = (texto: string) => texto.replace(/ | /g, " ");
@@ -48,5 +48,20 @@ describe("formatarMes", () => {
   it("mostra mês abreviado e ano com dois dígitos", () => {
     expect(formatarMes("2026-09")).toBe("set/26");
     expect(formatarMes("2027-01-01")).toBe("jan/27");
+  });
+});
+
+describe("formatarConversao", () => {
+  it("mostra a taxa até 100%", () => {
+    expect(semEspacoEspecial(formatarConversao(0.5, "mais vendas que reservas"))).toBe("50,0%");
+    expect(semEspacoEspecial(formatarConversao(1, "mais vendas que reservas"))).toBe("100,0%");
+  });
+
+  it("acima de 100% diz o que aconteceu", () => {
+    expect(formatarConversao(2, "mais vendas que reservas")).toBe("mais vendas que reservas");
+  });
+
+  it("sem denominador não inventa taxa", () => {
+    expect(formatarConversao(null, "mais vendas que reservas")).toBe("sem base");
   });
 });

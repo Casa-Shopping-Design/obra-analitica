@@ -84,6 +84,11 @@ class TesteFormatacao(unittest.TestCase):
         self.assertEqual(email.formatar_vendas(0, Decimal(0)), "Nenhuma venda")
         self.assertEqual(email.formatar_vendas(2, Decimal("850000")), "2 unidades, R$\u00a0850.000,00")
 
+    def test_vso(self):
+        self.assertEqual(email.descrever_vso(Decimal("0.0976")), "9,8%")
+        self.assertEqual(email.descrever_vso(Decimal("-0.036")), "Mais distratos que vendas")
+        self.assertEqual(email.descrever_vso(None), "Sem estoque no início do mês")
+
     def test_datas(self):
         self.assertEqual(email.data_por_extenso(SEGUNDA), "segunda-feira, 5 de outubro de 2026")
         utc = datetime(2026, 9, 30, 21, 23, tzinfo=email.ZoneInfo("UTC"))

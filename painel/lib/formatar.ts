@@ -20,6 +20,13 @@ export function formatarPercentual(fracao: number): string {
   return formatoPercentual.format(fracao);
 }
 
+// Conversão do mês compara contagens do mesmo mês, então passa de 100% quando a venda vem de reserva de outro mês.
+// Acima de 100% a tela diz o que aconteceu em vez de mostrar uma taxa que parece erro.
+export function formatarConversao(fracao: number | null, acimaDoTotal: string): string {
+  if (fracao === null) return "sem base";
+  return fracao > 1 ? acimaDoTotal : formatarPercentual(fracao);
+}
+
 export function formatarData(iso: string): string {
   // Data pura ("2026-09-22") não passa por Date, que a leria como meia-noite UTC e mostraria o dia anterior no Brasil.
   const dataPura = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
