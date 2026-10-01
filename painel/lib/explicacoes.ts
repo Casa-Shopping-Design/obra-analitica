@@ -40,6 +40,18 @@ export const explicacoes = {
   vso: "Venda sobre oferta: vendas menos distratos do mês divididas pelas unidades em estoque no início do mês.",
   receita_simulada:
     "Valor das unidades em estoque pela tabela de hoje, com o desconto escolhido. Entra em parcelas até a entrega e no repasse das chaves.",
+  pct_vgv_vendido: "Parte do VGV que já tem contrato de venda ativo. Contrato distratado não entra.",
+  vso_12m:
+    "Vendas menos distratos dos últimos 12 meses divididas pelas unidades em estoque no começo desse período.",
+  estoque_obra:
+    "Unidades disponíveis, reservadas e em proposta, e quanto valem pela tabela de hoje. Vendida e fora de venda não entram.",
+  margem_projetada: "Resultado projetado dividido pelo VGV. Serve para comparar obras de tamanhos diferentes.",
+  pct_inadimplencia:
+    "Vencido e não pago dos compradores sobre tudo o que eles já pagaram, vão pagar e devem. Acima de 5% vira alerta.",
+  avanco_fisico_financeiro:
+    "Pago sobre o orçamento menos obra medida sobre o planejado, no mês atual. Positivo é pagamento à frente da obra; acima de 10 pontos vira alerta.",
+  alertas_obra:
+    "Alertas abertos com os dados da última carga: estouro do orçamento, repasse atrasado, inadimplência alta, pago à frente do físico e estoque que não acaba até a entrega.",
   exposicao_simulada:
     "Maior saldo negativo acumulado da obra com as vendas simuladas somadas ao fluxo de hoje. Custo ainda não lançado como título não entra.",
 } as const;

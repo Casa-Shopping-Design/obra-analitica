@@ -63,12 +63,12 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 - CNPJ: a sociedade com Lucas ainda não tem; definir quem assina.
 
 - Rodar `scripts/sondar_origem.py` no terminal do Mac (a rede das sessões do Claude bloqueia a API do ERP) e depois `sanitizar_amostras.py`.
-- Trocar o validador de SQL por parser (hoje é regex e deixa passar tabela depois de vírgula).
 - Gerador: desde 30/09 só a Parque das Águas paga à frente da medição (18 pontos), para a demo ter um alerta de execução. Na Aurora a medição segue a curva do custo, e `staging.item_orcamento.pct_concluido` dela ficou em 55% contra 78% medido; nenhuma tela lê essa coluna.
 - Exposição máxima só enxerga títulos já lançados; no ERP real o custo futuro sem título fica só no total (`custo_a_incorrer`). Decidir como distribuir por mês.
 - Staging lê só `buildingsCosts[0]` do título a pagar: rateio entre obras vai inteiro para a primeira e título sem obra (despesa da empresa, devolução de distrato) some. Conferir com as amostras reais.
-- Tirar `marts.consolidado_centro_custo` do catálogo do assistente (sobrepõe a posição financeira e ainda soma saldo de distrato).
-- Gerador: orçamento sai com resíduo de ponto flutuante (17500000.000000001); arredondar.
+
+- Migrations 0025 a 0029 (01/10/2026), sem aplicar em projeto hospedado: 0025 grava no banco o SQL executado pelo assistente e exige assinatura no SQL gerado (ADR 0014; publicar junto com o painel novo, senão o assistente para); 0026 repasse por banco e leads por origem; 0027 comparativo entre obras em `/obras`; 0028 não existe (o resumo semanal não precisou); 0029 corrige o alerta de estoque para obra sem data de entrega.
+- Resumo semanal por e-mail (`scripts/enviar_resumo_semanal.py`, workflow `resumo_semanal.yml`): falta conta no Resend, domínio com SPF, DKIM e DMARC, e os segredos no GitHub. Decidir com os sócios se o e-mail de diretor e financeiro leva valores em real, já que sai da barreira do segundo fator.
 
 ## Links
 

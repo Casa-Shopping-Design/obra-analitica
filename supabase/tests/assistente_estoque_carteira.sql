@@ -35,8 +35,35 @@ insert into staging.rateio_titulo (tenant_id, titulo_id_origem, centro_custo_id,
 delete from app.chave_assinatura_consulta;
 insert into app.chave_assinatura_consulta (chave) values ('chave-local-do-teste-estoque-000000000');
 
-create function pg_temp.consultar(p_sql text) returns jsonb language sql as $$
-  select marts.executar_consulta(p_sql, encode(extensions.hmac(p_sql, 'chave-local-do-teste-estoque-000000000', 'sha256'), 'hex'))
+-- Desde a 0025 cada execução grava na reserva pendente de quem pergunta e deixa a transação só de leitura.
+-- O bloco desfaz as duas coisas, e a mesma reserva serve a todas as consultas de cada usuário.
+with gerente as (
+  insert into app.pergunta_assistente (user_id, tenant_id, id_requisicao, pergunta, resultado)
+  values ('0a000000-0000-4000-8000-00000000c1a5', '0e000000-0000-4000-8000-0000000000a5', gen_random_uuid(), 'estoque', 'pendente')
+  returning id
+)
+select set_config('teste.pergunta_gerente', id::text, true) from gerente;
+with diretor as (
+  insert into app.pergunta_assistente (user_id, tenant_id, id_requisicao, pergunta, resultado)
+  values ('0a000000-0000-4000-8000-00000000d1a5', '0e000000-0000-4000-8000-0000000000a5', gen_random_uuid(), 'estoque', 'pendente')
+  returning id
+)
+select set_config('teste.pergunta_diretor', id::text, true) from diretor;
+
+create function pg_temp.consultar(p_sql text) returns jsonb language plpgsql as $$
+declare
+  linhas jsonb;
+begin
+  begin
+    linhas := marts.executar_consulta(
+      current_setting('teste.pergunta_atual')::bigint,
+      p_sql,
+      encode(extensions.hmac(p_sql, 'chave-local-do-teste-estoque-000000000', 'sha256'), 'hex'));
+    raise exception using errcode = 'P0099';
+  exception when sqlstate 'P0099' then null;
+  end;
+  return linhas;
+end;
 $$;
 grant execute on function pg_temp.consultar(text) to authenticated;
 
@@ -68,6 +95,7 @@ select ok(
 -- Gerente da Obra Leste
 
 select set_config('request.jwt.claims', '{"sub": "0a000000-0000-4000-8000-00000000c1a5", "role": "authenticated"}', true);
+select set_config('teste.pergunta_atual', current_setting('teste.pergunta_gerente'), true);
 set local role authenticated;
 
 select is(
@@ -97,6 +125,7 @@ select is(
 reset role;
 select set_config('request.jwt.claims',
   '{"sub": "0a000000-0000-4000-8000-00000000d1a5", "role": "authenticated", "aal": "aal2"}', true);
+select set_config('teste.pergunta_atual', current_setting('teste.pergunta_diretor'), true);
 set local role authenticated;
 
 select is(
@@ -123,14 +152,16 @@ select set_config('request.jwt.claims',
   '{"sub": "0a000000-0000-4000-8000-00000000d1a5", "role": "authenticated", "aal": "aal1"}', true);
 set local role authenticated;
 
-select is(
-  pg_temp.consultar('select obras from marts.posicao_carteira'),
-  '[]'::jsonb,
+select throws_ok(
+  $$select pg_temp.consultar('select obras from marts.posicao_carteira')$$,
+  '42501',
+  'pergunta exige o segundo fator',
   'diretor sem segundo fator não recebe a carteira pelo assistente'
 );
-select is(
-  pg_temp.consultar('select obra from marts.alertas_obra'),
-  '[]'::jsonb,
+select throws_ok(
+  $$select pg_temp.consultar('select obra from marts.alertas_obra')$$,
+  '42501',
+  'pergunta exige o segundo fator',
   'diretor sem segundo fator não recebe alertas pelo assistente'
 );
 

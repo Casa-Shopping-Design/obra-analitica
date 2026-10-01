@@ -5,7 +5,8 @@ com financiamento tem repasse: na Torre Comercial Sul, entregue, a maioria já t
 e os que o ERP ainda cobra estão atrasados; nas outras duas obras o repasse está em análise ou,
 no Parque das Águas, perto das chaves, alguns já assinados. Há reservas canceladas que não viraram
 venda, reservas em andamento nas unidades reservadas do ERP e leads por mês, só com campo agregável.
-Nenhum registro traz nome, documento, contato ou renda.
+O banco do repasse sai de um sorteio próprio, com a Caixa na maioria, e o BANCO_LENTO demora bem mais
+da assinatura à liberação. Nenhum registro traz nome, documento, contato ou renda.
 """
 
 import json
@@ -21,7 +22,11 @@ HOJE = date(2026, 9, 22)
 # id do empreendimento no CRM; o elo com o ERP é o codigointerno_empreendimento.
 EMPREENDIMENTO_CRM = {101: 11, 102: 12, 103: 13}
 CHAVES = {101: date(2027, 6, 30), 102: date(2027, 2, 28), 103: date(2026, 5, 31)}
-BANCO = {"104": "Caixa Econômica Federal"}
+BANCOS = [("Caixa Econômica Federal", 55), ("Itaú Unibanco", 12), ("Bradesco", 12), ("Santander", 11),
+          ("Banco do Brasil", 10)]
+BANCO_LENTO = "Santander"
+# Com esse deslocamento cada banco tem ao menos dois repasses liberados na Torre, e a média por banco tem base.
+DESLOCAMENTO_SEMENTE_BANCO = 35
 ORIGENS = [("SITE", "Site"), ("FB", "Facebook"), ("IG", "Instagram"), ("PT", "Portal imobiliário"),
            ("ST", "Stand de vendas"), ("IND", "Indicação")]
 MIDIAS = ["Google Ads", "Meta Ads", "Portal", "Placa na obra", "Indicação de cliente"]
@@ -152,8 +157,17 @@ def etapa_repasse(contrato, sorteio):
                            weights=[4, 4, 2])[0], None, None
 
 
-def gerar_repasses(contratos, reservas_por_contrato, sorteio):
+def atrasar_assinatura(assinatura, liberado, data_venda, sorteio_banco):
+    """No banco lento a assinatura vem bem antes da liberação, sem passar da data da venda."""
+    if not (assinatura and liberado):
+        return assinatura
+    return max(assinatura - timedelta(days=sorteio_banco.randint(45, 75)), min(assinatura, data_venda))
+
+
+def gerar_repasses(contratos, reservas_por_contrato, sorteio, sorteio_banco):
     repasses, historico = [], []
+    nomes_banco = [nome for nome, _ in BANCOS]
+    pesos_banco = [peso for _, peso in BANCOS]
     sequencia = ["Aguardando documentação", "Análise de crédito", "Crédito aprovado", "Contrato assinado",
                  "Recurso liberado"]
     for indice, contrato in enumerate(c for c in contratos if c["financialInstitutionNumber"]):
@@ -162,6 +176,9 @@ def gerar_repasses(contratos, reservas_por_contrato, sorteio):
         situacao, assinatura, liberado = etapa_repasse(contrato, sorteio)
         financiado = sum(p["totalValue"] for p in contrato["paymentConditions"] if p["conditionType"] == "FI")
         data_venda = date.fromisoformat(contrato["contractDate"])
+        banco = sorteio_banco.choices(nomes_banco, weights=pesos_banco)[0]
+        if banco == BANCO_LENTO:
+            assinatura = atrasar_assinatura(assinatura, liberado, data_venda, sorteio_banco)
         cadastro = min(data_venda + timedelta(days=sorteio.randint(1, 10)), HOJE)
         if liberado:
             cadastro = min(cadastro, assinatura)
@@ -179,7 +196,7 @@ def gerar_repasses(contratos, reservas_por_contrato, sorteio):
             "bloco": reserva["bloco"], "unidade": reserva["unidade"], "idunidade": reserva["idunidade"],
             "idcontrato": contrato["number"], "numero_contrato": contrato["number"],
             "valor_previsto": round(financiado, 2), "valor_financiado": round(financiado, 2),
-            "valor_contrato": contrato["value"], "banco": BANCO.get(contrato["financialInstitutionNumber"]),
+            "valor_contrato": contrato["value"], "banco": banco,
             "data_venda": reserva["data_venda"],
             "data_assinatura_de_contrato": assinatura.isoformat() if assinatura else None,
             "data_recurso_liberado": liberado.isoformat() if liberado else None,
@@ -263,7 +280,9 @@ def gerar(contratos, unidades, semente=2026):
     reservas_por_contrato = {int(r["codigointerno"]): r for r in reservas}
     extras, historico_extras = gerar_reservas_sem_venda(contratos, unidades, unidades_crm, sorteio,
                                                         30001 + len(reservas))
-    repasses, historico_repasses = gerar_repasses(contratos, reservas_por_contrato, sorteio)
+    # Sorteio separado: o banco não desloca a sequência do resto, e reservas e leads não mudam.
+    repasses, historico_repasses = gerar_repasses(contratos, reservas_por_contrato, sorteio,
+                                                  random.Random(semente + DESLOCAMENTO_SEMENTE_BANCO))
     return {
         "reservas.json": reservas + extras,
         "reservas_vinculo_erp.json": vinculos,

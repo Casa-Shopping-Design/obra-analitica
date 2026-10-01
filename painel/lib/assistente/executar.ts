@@ -21,10 +21,10 @@ export type ResultadoExecucao =
 
 type Cliente = Awaited<ReturnType<typeof criarClienteServidor>>;
 
+// O SQL que rodou não passa por aqui: executar_consulta grava ele na reserva (migration 0025).
 export type ConclusaoPergunta = {
   idPergunta: number;
   sqlGerado: string;
-  sqlExecutado: string | null;
   resultado: "ok" | "recusada" | "erro";
   linhas: number | null;
   duracaoMs: number | null;
@@ -39,6 +39,17 @@ export function lerChaveAssinatura(): string | null {
   return chave && chave.length >= 32 ? chave : null;
 }
 
+function assinar(chave: string, texto: string): string {
+  return createHmac("sha256", chave).update(texto).digest("hex");
+}
+
+// O prefixo e o id seguem app.concluir_pergunta: a assinatura do sql_gerado não serve para executar consulta
+// nem para outra pergunta. Sem texto ou sem chave, a trilha fica sem sql_gerado em vez de recusar a conclusão.
+export function assinarSqlGerado(chave: string | null, idPergunta: number, sqlGerado: string) {
+  if (!chave || !sqlGerado) return { sql: null, assinatura: null };
+  return { sql: sqlGerado, assinatura: assinar(chave, `sql_gerado:${idPergunta}:${sqlGerado}`) };
+}
+
 function somarUso(base: UsoModelo | undefined, extra: UsoModelo): UsoModelo {
   if (!base) return extra;
   return {
@@ -51,10 +62,11 @@ function somarUso(base: UsoModelo | undefined, extra: UsoModelo): UsoModelo {
 // Fecha a linha 'pendente' aberta por reservarPergunta. O banco só aceita a conclusão de quem reservou,
 // uma vez; falha aqui é registrada e devolvida, porque resposta sem registro não sai.
 export async function concluirPergunta(supabase: Cliente, conclusao: ConclusaoPergunta, campos: CamposBase): Promise<boolean> {
+  const sqlGerado = assinarSqlGerado(lerChaveAssinatura(), conclusao.idPergunta, conclusao.sqlGerado);
   const { error } = await supabase.schema("app").rpc("concluir_pergunta", {
     p_id: conclusao.idPergunta,
-    p_sql_gerado: conclusao.sqlGerado,
-    p_sql_executado: conclusao.sqlExecutado,
+    p_sql_gerado: sqlGerado.sql,
+    p_assinatura_sql_gerado: sqlGerado.assinatura,
     p_resultado: conclusao.resultado,
     p_linhas: conclusao.linhas,
     p_duracao_ms: conclusao.duracaoMs,
@@ -93,7 +105,7 @@ export async function executarConsultaValidada(
     return { ok: false, falha: "sem_usuario", idRequisicao };
   }
 
-  const conclusaoBase = { idPergunta, sqlGerado, sqlExecutado: null, linhas: null, duracaoMs: null, uso };
+  const conclusaoBase = { idPergunta, sqlGerado, linhas: null, duracaoMs: null, uso };
 
   const validacao = validarSql(sqlGerado);
   if (!validacao.ok) {
@@ -109,13 +121,12 @@ export async function executarConsultaValidada(
     return { ok: false, falha: "configuracao", idRequisicao };
   }
 
-  const assinatura = createHmac("sha256", chave).update(validacao.sql).digest("hex");
   const inicio = performance.now();
   const { data, error } = await supabase
     .schema("marts")
-    .rpc("executar_consulta", { p_sql: validacao.sql, p_assinatura: assinatura });
+    .rpc("executar_consulta", { p_id_pergunta: idPergunta, p_sql: validacao.sql, p_assinatura: assinar(chave, validacao.sql) });
   const duracaoMs = Math.round(performance.now() - inicio);
-  const execucao = { ...conclusaoBase, sqlExecutado: validacao.sql, duracaoMs };
+  const execucao = { ...conclusaoBase, duracaoMs };
 
   if (error) {
     anotar("error", "falha ao executar consulta do assistente", "erro", { duracao_ms: duracaoMs, codigo_erro: error.code });

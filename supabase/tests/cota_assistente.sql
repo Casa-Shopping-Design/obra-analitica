@@ -52,17 +52,17 @@ select lives_ok(
   'gerente em aal1 reserva'
 );
 select lives_ok(
-  format($$select app.concluir_pergunta(%s, 'select 1 as n', 'select 1 as n', 'ok', 1, 12, 100, 20, 0.01)$$,
+  format($$select app.concluir_pergunta(%s, null, null, 'erro', 1, 12, 100, 20, 0.01)$$,
     current_setting('teste.gerente_1')),
   'gerente em aal1 conclui'
 );
 select is(
   (select resultado from app.pergunta_assistente where id = current_setting('teste.gerente_1')::bigint),
-  'ok',
+  'erro',
   'conclusão da gerente grava o resultado'
 );
 select throws_ok(
-  format($$select app.concluir_pergunta(%s, 'x', null, 'erro', null, null, null, null, 0.01)$$,
+  format($$select app.concluir_pergunta(%s, null, null, 'erro', null, null, null, null, 0.01)$$,
     current_setting('teste.gerente_1')),
   '42501',
   null,
@@ -73,14 +73,14 @@ select throws_ok(
 select set_config('teste.gerente_2',
   app.reservar_pergunta('00000000-0000-4000-8000-0000000003c2', 'Qual obra atrasou?')::text, true);
 select throws_ok(
-  format($$select app.concluir_pergunta(%s, 'x', null, 'erro', null, null, null, null, -5)$$,
+  format($$select app.concluir_pergunta(%s, null, null, 'erro', null, null, null, null, -5)$$,
     current_setting('teste.gerente_2')),
   '22023',
   'custo inválido',
   'custo negativo é recusado'
 );
 select lives_ok(
-  format($$select app.concluir_pergunta(%s, 'x', null, 'erro', null, null, 100, 20, 1000)$$,
+  format($$select app.concluir_pergunta(%s, null, null, 'erro', null, null, 100, 20, 1000)$$,
     current_setting('teste.gerente_2')),
   'custo acima do teto não impede a conclusão'
 );
@@ -105,7 +105,7 @@ select lives_ok(
   'diretor em aal2 reserva'
 );
 select throws_ok(
-  format($$select app.concluir_pergunta(%s, 'x', null, 'erro', null, null, null, null, null)$$,
+  format($$select app.concluir_pergunta(%s, null, null, 'erro', null, null, null, null, null)$$,
     current_setting('teste.gerente_2')),
   '42501',
   null,
@@ -122,7 +122,7 @@ select throws_ok(
   'diretor em aal1 não reserva'
 );
 select throws_ok(
-  format($$select app.concluir_pergunta(%s, 'x', null, 'erro', null, null, null, null, 0.25)$$,
+  format($$select app.concluir_pergunta(%s, null, null, 'erro', null, null, null, null, 0.25)$$,
     current_setting('teste.diretor_1')),
   '42501',
   'pergunta exige o segundo fator',
@@ -154,7 +154,7 @@ select is(
 select set_config('request.jwt.claims', '{"sub": "0a000000-0000-4000-8000-0000000d03c1", "role": "authenticated", "aal": "aal2"}', true);
 set local role authenticated;
 select lives_ok(
-  format($$select app.concluir_pergunta(%s, 'select 1 as n', 'select 1 as n', 'ok', 1, 9, 100, 20, 0.02)$$,
+  format($$select app.concluir_pergunta(%s, null, null, 'erro', 1, 9, 100, 20, 0.02)$$,
     current_setting('teste.diretor_1')),
   'diretor em aal2 conclui a própria reserva'
 );
@@ -185,7 +185,7 @@ select set_config('request.jwt.claims', '{"sub": "0a000000-0000-4000-8000-000000
 set local role authenticated;
 select set_config('teste.gerente_3',
   app.reservar_pergunta('00000000-0000-4000-8000-0000000003c8', 'Quantas unidades vendidas?')::text, true);
-select app.concluir_pergunta(current_setting('teste.gerente_3')::bigint, 'x', null, 'erro', null, null, null, null, 0.2);
+select app.concluir_pergunta(current_setting('teste.gerente_3')::bigint, null, null, 'erro', null, null, null, null, 0.2);
 reset role;
 select is(
   (select custo_estimado from app.pergunta_assistente where id = current_setting('teste.gerente_3')::bigint),
