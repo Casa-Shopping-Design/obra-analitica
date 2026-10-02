@@ -80,6 +80,10 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 
 `docs/plano_implementacao.md` (22/09/2026) é o plano em pacotes de trabalho PT-00 a PT-11 para execução por vários agentes, com números de migration reservados (0006 a 0010), premissas de segurança, observabilidade, engenharia, PAA, usabilidade e ISO 25010, cronograma até 19/02/2027, orçamento e conceitos a estudar. Foi escrito para um modelo executor menos capaz: qualquer agente lê `CLAUDE.md`, este arquivo e o plano antes de mexer em código.
 
+## Aplicativo nas lojas
+
+`docs/plano_aplicativo_loja.md` (02/10/2026): primeira versão para App Store e Google Play em Expo, com agentes A0 a A10 e migrations 0030 e 0031 reservadas. Antes de começar, João fecha a tecnologia (D1) e o tipo de conta de desenvolvedor (D2). A recomendação é pedir já o D-U-N-S e abrir as contas de empresa, e deixar o código para depois da entrega 2.
+
 ## Próxima sessão
 
 Plano de 28/09/2026 para carga real do ERP, fila de webhooks e CRM como segunda origem: `docs/plano_origens.md` (grafo N1 a N8, migrations 0016 a 0019). As skills `erp-origem-api` e `crm-vendas-api` ficam em `.claude/skills/`.
