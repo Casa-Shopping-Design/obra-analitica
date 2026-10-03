@@ -1,6 +1,6 @@
 # Contexto do projeto
 
-Atualizado em 22/09/2026. Este arquivo é o resumo para retomar o trabalho em outra sessão.
+Atualizado em 03/10/2026. Este arquivo é o resumo para retomar o trabalho em outra sessão.
 
 ## O que é
 
@@ -85,13 +85,14 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 Plano de 28/09/2026 para carga real do ERP, fila de webhooks e CRM como segunda origem: `docs/plano_origens.md` (grafo N1 a N8, migrations 0016 a 0019). As skills `erp-origem-api` e `crm-vendas-api` ficam em `.claude/skills/`.
 
 
-Situação em 27/09/2026. PT-00 a PT-04 estão na `main`. O PT-07 está pronto em `claude/pt-07`, sem merge, e o relatório dele (`docs/relatorios/pt-07-noite.md`) lista o que falta com banco real. A branch `claude/sharp-knuth-96f5h3` tem dois commits só de `CONTEXTO.md` que também não entraram.
+Situação em 03/10/2026. A `main` está no merge do PR 5 (01/10), com as migrations 0001 a 0029 (não existe 0028). O PT-07 entrou pelo PR 2.
 
-A demo passou para o projeto Supabase da conta Casa Design (ref `rxbhxtbjxqlisbrfcbtt`, us-east-1). Migrations 0001 a 0006 e seed aplicados pelo SQL Editor, com o histórico gravado em `supabase_migrations.schema_migrations` para a CLI não reaplicar. Carga da demo feita (4.137 parcelas), dois usuários criados e vinculados, `app` e `marts` expostos, hook `app.claims_jwt` ligado, cadastro livre desligado. João entrou no painel local como diretor e passou por todas as telas sem erro. O projeto antigo (`obraanalitic`, ref `ndgwcunpnxhkzapmmvsq`, conta prof.joaosena) continua carregado, mas saiu de uso; a `DATABASE_URL` dele ficou comentada no `.env`.
+O projeto Supabase oficial é o `xwqwjawlbzvqpkxtqfld`, na organização Casa Design. Em 01/10 ele tinha as migrations 0001 a 0024 e o seed, sem carga e sem usuários. Os projetos `rxbhxtbjxqlisbrfcbtt` e `obraanalitic` (`ndgwcunpnxhkzapmmvsq`, conta prof.joaosena) não são o oficial: nada se aplica neles.
 
-Falta:
-- Entrar no painel com `gerente.aurora@demo.com` e ver uma obra só.
-- Vercel da Casa Design, com Root Directory `painel` e as variáveis `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY`. O repositório passou para a organização `Casa-Shopping-Design/obra-analitica`, e o plano Hobby não importa repositório privado de organização. Caminhos: devolver o repositório para `joaocss`, publicar com `npx vercel` de dentro de `painel/` ou assinar o Pro. Hobby é só para uso não comercial; o piloto vai precisar de Pro de qualquer jeito.
-- Depois do deploy, Site URL e Redirect URLs em Authentication, URL Configuration.
+Falta, na ordem de `docs/operacao/publicar-demo.md`:
+- Dashboard do projeto oficial: senha nova do banco, schemas expostos (`public`, `app`, `marts`), TOTP, hook `app.claims_jwt` e cadastro livre desligado.
+- Migrations 0025 a 0029 e painel novo publicados no mesmo dia, senão o assistente para.
+- Carga da demo, chave de assinatura do assistente e variáveis na Vercel (`casa-design/obra-analitica`); depois, Site URL e Redirect URLs no Supabase.
+- Usuários criados e vinculados. Entrar com `gerente.aurora@demo.com` e ver uma obra só.
 - Trocar a senha do banco do projeto antigo, que apareceu em print.
-- Integrar o PT-07 e seguir com PT-05 e PT-08. Demo em 16/10/2026.
+- Demo em 16/10/2026.
