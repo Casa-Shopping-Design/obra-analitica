@@ -6,6 +6,7 @@ import { MarcaApo } from "@/componentes/MarcaApo";
 
 const itens = [
   { rotulo: "Visão geral", destino: "/" },
+  { rotulo: "DRE de viabilidade", destino: "/dre" },
   { rotulo: "Obras", destino: "/obras" },
   { rotulo: "Mapa de unidades", destino: "/unidades" },
   { rotulo: "Assistente", destino: "/assistente" },

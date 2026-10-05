@@ -54,6 +54,25 @@ export const explicacoes = {
     "Alertas abertos com os dados da última carga: estouro do orçamento, repasse atrasado, inadimplência alta, pago à frente do físico e estoque que não acaba até a entrega.",
   exposicao_simulada:
     "Maior saldo negativo acumulado da obra com as vendas simuladas somadas ao fluxo de hoje. Custo ainda não lançado como título não entra.",
+  dre_viabilidade: "O que o estudo de viabilidade vigente previu para a linha. É o número de partida, digitado no estudo.",
+  dre_pct_viabilidade: "A linha do estudo sobre o VGV líquido do estudo.",
+  dre_apropriado:
+    "O que já entrou no resultado até o último mês fechado: receita pelo andamento da obra e custo incorrido, como o ERP fecha no mapa imobiliário. Não é caixa.",
+  dre_a_apropriar:
+    "O que já está contratado e ainda não entrou no resultado: vendas assinadas que faltam apropriar e títulos lançados que faltam incorrer.",
+  dre_a_contratar:
+    "O que ainda não tem contrato. No VGV, unidades em estoque pelo preço de tabela de hoje; na construção, o orçamento que ainda não virou título. Linha sem realizado carregado repete o estudo.",
+  dre_a_realizar: "A apropriar mais a contratar: o que falta acontecer até o fim da obra.",
+  dre_tendencia:
+    "Apropriado mais a apropriar mais a contratar. É o que a linha vai dar no fim da obra se nada mudar.",
+  dre_pct_tendencia: "A linha na tendência sobre o VGV líquido da tendência.",
+  dre_desvio:
+    "Tendência menos viabilidade. Favorável quando ajuda o resultado (receita acima ou custo abaixo do estudo), desfavorável quando atrapalha.",
+  dre_desvio_pct: "O desvio sobre o valor do estudo. Sem base quando o estudo previu zero para a linha.",
+  margem_operacional_viabilidade: "Lucro operacional do estudo sobre o VGV líquido do estudo.",
+  margem_operacional_tendencia: "Lucro operacional da tendência sobre o VGV líquido da tendência.",
+  desvio_margem_operacional:
+    "Margem na tendência menos margem no estudo, em pontos percentuais. Abaixo do estudo quer dizer que a obra vai render menos que o previsto.",
 } as const;
 
 export type ChaveExplicacao = keyof typeof explicacoes;

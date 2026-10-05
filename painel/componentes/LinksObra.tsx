@@ -3,10 +3,11 @@ import { podeVerConferencia } from "@/lib/consultas/conferencia";
 
 const classeLink = "w-fit text-sm font-semibold underline underline-offset-4 hover:text-menu";
 
-// A conferência só aparece para diretor e financeiro; a própria tela confere de novo o perfil.
+// A DRE e a conferência só aparecem para diretor e financeiro; cada tela confere de novo o perfil.
 export async function LinksObra({ id }: { id: string }) {
   const verConferencia = await podeVerConferencia().catch(() => false);
   const destinos = [
+    ...(verConferencia ? [{ rotulo: "DRE de viabilidade", caminho: "dre" }] : []),
     { rotulo: "Mapa de unidades", caminho: "unidades" },
     { rotulo: "Estoque e vendas", caminho: "estoque" },
     { rotulo: "Simulação de vendas", caminho: "simulacao" },
