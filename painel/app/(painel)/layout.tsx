@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { CarimboCarga } from "@/componentes/CarimboCarga";
+import { ChatAssistente } from "@/componentes/ChatAssistente";
 import { MenuLateral } from "@/componentes/MenuLateral";
 import { exigirIdentidade } from "@/lib/consultas/identidade";
 import { caminhosAcesso, decidirDestino } from "@/lib/supabase/nivel-acesso";
@@ -28,6 +29,7 @@ export default async function LayoutPainel({ children }: LayoutProps<"/">) {
           <CarimboCarga />
         </footer>
       </div>
+      <ChatAssistente />
     </div>
   );
 }
