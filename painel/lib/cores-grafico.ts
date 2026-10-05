@@ -1,12 +1,12 @@
 // Cópia dos tokens de globals.css para os atributos SVG do recharts. Mudou a paleta lá, muda aqui.
 export const cores = {
-  entrada: "#2f5d46",
-  repasse: "#9cbf8c",
+  entrada: "#4f7a19",
+  repasse: "#84b625",
   saida: "#4a4543",
   atencao: "#8a5a0b",
   superficie: "#ffffff",
-  borda: "#dccbc6",
-  suave: "#6a5552",
-  texto: "#221a19",
-  menu: "#4a1714",
+  borda: "#d5dcd6",
+  suave: "#52605c",
+  texto: "#16211f",
+  menu: "#0b4357",
 };

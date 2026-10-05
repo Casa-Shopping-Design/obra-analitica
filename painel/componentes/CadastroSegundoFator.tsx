@@ -47,7 +47,7 @@ export function CadastroSegundoFator() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={estado.qrCode}
-            alt="Código QR para cadastrar o Obra Analítica no aplicativo autenticador"
+            alt="Código QR para cadastrar o APO no aplicativo autenticador"
             width={200}
             height={200}
             className="self-center rounded-lg border border-borda bg-superficie p-2"

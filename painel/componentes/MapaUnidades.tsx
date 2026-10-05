@@ -15,12 +15,12 @@ import {
 // Fundo claro com texto escuro em todas as situações; cada uma tem também ícone de forma própria
 // e rótulo escrito, porque cor sozinha não identifica a situação (WCAG 1.4.1).
 const estiloSituacao: Record<SituacaoUnidade, { fundo: string; icone: string }> = {
-  disponivel: { fundo: "bg-[#dcebe1] border-entrada", icone: "text-entrada" },
+  disponivel: { fundo: "bg-[#e4efd3] border-entrada", icone: "text-entrada" },
   reservada: { fundo: "bg-[#f5e6c6] border-atencao", icone: "text-atencao" },
-  proposta: { fundo: "bg-[#f4dbd3] border-[#9c3a26]", icone: "text-[#9c3a26]" },
-  vendida: { fundo: "bg-[#e4dedc] border-saida", icone: "text-saida" },
+  proposta: { fundo: "bg-[#d9e8ee] border-[#0b6a8c]", icone: "text-[#0b6a8c]" },
+  vendida: { fundo: "bg-[#e3e6e3] border-saida", icone: "text-saida" },
   indisponivel: {
-    fundo: "bg-[image:repeating-linear-gradient(135deg,#f3eeed_0_6px,#dcd3d1_6px_8px)] border-suave",
+    fundo: "bg-[image:repeating-linear-gradient(135deg,#eef0ee_0_6px,#d5dcd6_6px_8px)] border-suave",
     icone: "text-suave",
   },
 };

@@ -19,7 +19,7 @@ export default async function PaginaVerificarSegundoFator() {
       <div className="flex flex-col gap-2">
         <h1 className="font-serif text-3xl font-semibold">Confirmar entrada</h1>
         <p className="text-[15px] leading-relaxed text-suave">
-          Abra o aplicativo autenticador no celular e digite o código de seis dígitos mostrado para o Obra Analítica.
+          Abra o aplicativo autenticador no celular e digite o código de seis dígitos mostrado para o APO.
         </p>
       </div>
       <VerificacaoSegundoFator />

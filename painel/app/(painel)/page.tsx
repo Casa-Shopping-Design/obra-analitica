@@ -2,37 +2,45 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { IndicadoresObra } from "@/componentes/CartaoIndicador";
 import { FaixaCarteira } from "@/componentes/FaixaCarteira";
+import { FaixaResultado } from "@/componentes/FaixaResultado";
 import { IndicadorVgv } from "@/componentes/IndicadorVgv";
 import { SecaoAlertas } from "@/componentes/ListaAlertas";
 import { TabelaObras } from "@/componentes/TabelaObras";
 import type { AlertaObra } from "@/lib/alertas";
 import { buscarCarteira, listarAlertas, type PosicaoCarteira } from "@/lib/consultas/carteira";
+import { buscarResumoCarteira } from "@/lib/consultas/dre";
 import { listarPosicaoObras, type PosicaoObra } from "@/lib/consultas/posicao";
+import type { ResumoCarteiraDre } from "@/lib/dre";
 import { mensagens } from "@/lib/mensagens";
 
 export const metadata: Metadata = { title: "Visão geral" };
 
-// Cada bloco falha sozinho: sem alertas ou sem carteira, as obras continuam na tela.
+// Cada bloco falha sozinho: sem alertas, sem carteira ou sem resultado, as obras continuam na tela.
 async function carregarVisaoGeral(): Promise<{
   obras: PosicaoObra[] | null;
   carteira: PosicaoCarteira | null;
   alertas: AlertaObra[] | null;
+  resultado: ResumoCarteiraDre | null;
 }> {
-  const [obras, carteira, alertas] = await Promise.all([
+  const [obras, carteira, alertas, resultado] = await Promise.all([
     listarPosicaoObras().catch(() => null),
     buscarCarteira().catch(() => null),
     listarAlertas().catch(() => null),
+    buscarResumoCarteira().catch(() => null),
   ]);
-  return { obras, carteira, alertas };
+  return { obras, carteira, alertas, resultado };
 }
 
-// Três consultas em paralelo, todas em views somadas no banco; o fluxo mensal fica para a tela de cada obra.
+// Quatro consultas em paralelo, todas em views somadas no banco; o fluxo mensal fica para a tela de cada obra.
+// A faixa de resultado só aparece para quem o RLS deixa ler a DRE (diretor e financeiro com segundo fator, e
+// leitura).
 export default async function PaginaVisaoGeral() {
-  const { obras, carteira, alertas } = await carregarVisaoGeral();
+  const { obras, carteira, alertas, resultado } = await carregarVisaoGeral();
 
   return (
     <>
       <h1 className="font-serif text-[34px] font-semibold">Visão geral</h1>
+      {resultado && <FaixaResultado resumo={resultado} />}
       {obras === null && (
         <p role="alert" className="text-alerta">
           {mensagens.posicao.indisponivel}

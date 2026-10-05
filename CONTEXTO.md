@@ -32,6 +32,7 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 - CRM de vendas como segunda origem (28/09/2026): sem conflito de interesse. O projeto usa a API contratada pelo cliente para entregar análise que o CRM não oferece.
 - O mapa das telas do ERP foi levantado numa base de produto com login e não entra no repositório. Fica na skill pessoal `erp-origem-interface`, em `~/.claude/skills`.
 - Premissas do repositório em `CLAUDE.md` (nomes em português, humanizer, PAA, ISO 25010, segurança Supabase/Vercel). Claude não faz commit.
+- Desde 01/10/2026 o produto se chama APO, com a assinatura "Agente da Governança Financeira" (ADR 0015). O deck do Braga põe a DRE de Viabilidade com tendência como eixo do produto; o plano está em `docs/planejamento/plano-apo.md`. Repositório, Vercel e Supabase seguem com o nome antigo até depois de 16/10.
 
 ## ERP de origem: o que foi verificado
 

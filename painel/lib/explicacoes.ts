@@ -54,6 +54,40 @@ export const explicacoes = {
     "Alertas abertos com os dados da última carga: estouro do orçamento, repasse atrasado, inadimplência alta, pago à frente do físico e estoque que não acaba até a entrega.",
   exposicao_simulada:
     "Maior saldo negativo acumulado da obra com as vendas simuladas somadas ao fluxo de hoje. Custo ainda não lançado como título não entra.",
+  dre_viabilidade: "O que o estudo de viabilidade vigente previu para a linha. É o número de partida, digitado no estudo.",
+  dre_pct_viabilidade: "A linha do estudo sobre o VGV líquido do estudo.",
+  dre_apropriado:
+    "O que já entrou no resultado até o último mês fechado: receita e custo das unidades vendidas, pelo andamento da obra, como o ERP fecha no mapa imobiliário. Não é caixa.",
+  dre_a_apropriar:
+    "O que já está contratado e ainda não entrou no resultado: vendas assinadas que faltam apropriar e títulos lançados que faltam incorrer.",
+  dre_a_contratar:
+    "O que ainda não tem contrato. No VGV, unidades em estoque pelo preço de tabela de hoje; na construção, o orçamento que ainda não virou título. Linha sem realizado carregado repete o estudo.",
+  dre_a_realizar: "A apropriar mais a contratar: o que falta acontecer até o fim da obra.",
+  dre_tendencia:
+    "Apropriado mais a apropriar mais a contratar. É o que a linha vai dar no fim da obra se nada mudar.",
+  dre_pct_tendencia: "A linha na tendência sobre o VGV líquido da tendência.",
+  dre_desvio:
+    "Tendência menos viabilidade. Favorável quando ajuda o resultado (receita acima ou custo abaixo do estudo), desfavorável quando atrapalha.",
+  dre_desvio_pct: "O desvio sobre o valor do estudo. Sem base quando o estudo previu zero para a linha.",
+  margem_operacional_viabilidade: "Lucro operacional do estudo sobre o VGV líquido do estudo.",
+  margem_operacional_tendencia: "Lucro operacional da tendência sobre o VGV líquido da tendência.",
+  desvio_margem_operacional:
+    "Margem na tendência menos margem no estudo, em pontos percentuais. Abaixo do estudo quer dizer que a obra vai render menos que o previsto.",
+  vgv_bruto_resultado:
+    "VGV de hoje das obras com estudo de viabilidade: unidades vendidas pelo valor do contrato mais o estoque pelo preço de tabela atual. É a tendência do VGV bruto na DRE.",
+  pct_vendido_resultado: "VGV vendido sobre o VGV de hoje, só nas obras com estudo de viabilidade. Contrato distratado não entra.",
+  poc_resultado:
+    "Receita apropriada sobre o VGV vendido: quanto das vendas já entrou no resultado pelo andamento da obra, até o último mês fechado no ERP.",
+  margem_operacional_viabilidade_carteira:
+    "Lucro operacional do estudo somado sobre o VGV líquido do estudo somado, nas obras com estudo. Não é a média das margens de cada obra.",
+  margem_operacional_tendencia_carteira:
+    "Lucro operacional da tendência somado sobre o VGV líquido da tendência somado. A nota compara com a margem do estudo, em pontos percentuais.",
+  lucro_operacional_tendencia:
+    "VGV líquido menos custo das vendas e despesas, na tendência: o que as obras vão dar no fim se nada mudar.",
+  custo_apropriado:
+    "Custo das vendas que já entrou no resultado até o último mês fechado, como o ERP fecha no mapa imobiliário. Não é o que foi pago.",
+  recebido_acumulado:
+    "Tudo o que já entrou em caixa, do comprador e do banco, nas obras com estudo. É caixa, não receita apropriada.",
 } as const;
 
 export type ChaveExplicacao = keyof typeof explicacoes;

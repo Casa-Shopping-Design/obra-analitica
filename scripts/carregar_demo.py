@@ -4,6 +4,8 @@ Na demo a fonte e o JSON; no MVP a carga vem de carregar_origem.py e carregar_cr
 chamam a API e gravam no mesmo formato. Os arquivos de dados/complementos e dados/crm sao
 opcionais: sem eles a demo carrega como antes e as recargas deles nao rodam. Cada endpoint
 e o staging deixam uma linha em app.carga_execucao, que alimenta a data da ultima carga.
+O estudo de viabilidade de dados/viabilidade nao e dado do ERP: vai direto para as tabelas
+de app, so para obra que ainda nao tem estudo.
 """
 
 import hashlib
@@ -38,6 +40,7 @@ ARQUIVOS_COMPLEMENTOS = {
     "building-projects/progress-logs/items": "building-projects-progress-logs-items.json",
     "defaulters-receivable-bills/by-aging": "defaulters-receivable-bills-by-aging.json",
 }
+ARQUIVO_VIABILIDADE = PASTA_DADOS / "viabilidade" / "estudos.json"
 # marts.ultima_carga so considera a carga feita quando esta etapa termina com sucesso.
 ETAPA_STAGING = "staging"
 
@@ -133,6 +136,53 @@ def recarregar_staging(conexao, tenant, com_complementos, com_crm):
     print("staging recarregado")
 
 
+def ler_estudos(caminho=ARQUIVO_VIABILIDADE):
+    if not caminho.exists():
+        return []
+    return [e for e in json.loads(caminho.read_text(encoding="utf-8")) if isinstance(e, dict)]
+
+
+# O(obras x linhas): uma consulta para achar as obras sem estudo e tres inserts por obra gravada.
+def gravar_viabilidade_demo(conexao, tenant, estudos):
+    """Grava estudo e aliquota so para obra sem estudo, entao a carga noturna nao cria versao nova."""
+    if not estudos:
+        return 0
+    with conexao.cursor() as cur:
+        cur.execute(
+            "select cc.id_origem, cc.id from app.centro_custo cc "
+            "where cc.tenant_id = %s and not exists ("
+            "  select 1 from app.estudo_viabilidade e where e.tenant_id = cc.tenant_id and e.centro_custo_id = cc.id)",
+            (tenant,),
+        )
+        obras_sem_estudo = dict(cur.fetchall())
+        gravados = 0
+        for estudo in estudos:
+            centro_custo = obras_sem_estudo.get(estudo["id_origem"])
+            if centro_custo is None:
+                continue
+            cur.execute(
+                "insert into app.estudo_viabilidade (tenant_id, centro_custo_id, versao, descricao, data_base, situacao) "
+                "values (%s, %s, 1, %s, %s, 'vigente') returning id",
+                (tenant, centro_custo, estudo.get("descricao"), estudo["data_base"]),
+            )
+            id_estudo = cur.fetchone()[0]
+            cur.executemany(
+                "insert into app.estudo_viabilidade_linha (estudo_id, tenant_id, centro_custo_id, linha, valor) "
+                "values (%s, %s, %s, %s, %s)",
+                [(id_estudo, tenant, centro_custo, linha, valor) for linha, valor in estudo["linhas"].items()],
+            )
+            if estudo.get("aliquota") is not None:
+                cur.execute(
+                    "insert into app.aliquota_imposto_obra (tenant_id, centro_custo_id, vigencia_inicio, aliquota) "
+                    "values (%s, %s, %s, %s)",
+                    (tenant, centro_custo, estudo["vigencia_inicio"], estudo["aliquota"]),
+                )
+            gravados += 1
+    conexao.commit()
+    print(f"viabilidade: {gravados} estudos gravados, {len(estudos) - gravados} obras ja tinham estudo")
+    return gravados
+
+
 # O(n) no total de registros dos arquivos; uma instrucao de delete e um insert em lote por endpoint.
 def main():
     tenant = os.environ["TENANT_DEMO_ID"]
@@ -161,6 +211,7 @@ def main():
                 com_crm = True
 
         recarregar_staging(conexao, tenant, com_complementos, com_crm)
+        gravar_viabilidade_demo(conexao, tenant, ler_estudos())
 
 
 if __name__ == "__main__":

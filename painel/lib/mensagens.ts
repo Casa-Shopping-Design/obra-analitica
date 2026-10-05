@@ -69,4 +69,10 @@ export const mensagens = {
     recomecar: "O cadastro não pôde ser concluído. Gere o código QR de novo e cadastre o aplicativo outra vez.",
     confirmarAntes: "Confirme o código do aplicativo já cadastrado antes de cadastrar outro.",
   },
+  dre: {
+    indisponivel: "Não foi possível carregar a DRE de viabilidade agora. Recarregue a página em alguns minutos.",
+    semEstudo: "Esta obra ainda não tem estudo de viabilidade cadastrado.",
+    semObras: "Nenhuma obra tem estudo de viabilidade cadastrado ainda.",
+    restrita: "O seu perfil não abre a DRE de viabilidade. Peça ao diretor da construtora para liberar.",
+  },
 } as const;

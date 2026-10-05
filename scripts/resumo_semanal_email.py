@@ -15,15 +15,15 @@ NOMES_MES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho"
 NOMES_DIA = ["segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado", "domingo"]
 
 # Paleta de painel/app/globals.css.
-COR_FUNDO = "#efe4e1"
+COR_FUNDO = "#f3f5f1"
 COR_SUPERFICIE = "#ffffff"
-COR_TEXTO = "#221a19"
-COR_SUAVE = "#6a5552"
-COR_BORDA = "#dccbc6"
-COR_TRILHO = "#e7d8d4"
-COR_MENU = "#4a1714"
-COR_MENU_TEXTO = "#f4e9e6"
-COR_ENTRADA = "#2f5d46"
+COR_TEXTO = "#16211f"
+COR_SUAVE = "#52605c"
+COR_BORDA = "#d5dcd6"
+COR_TRILHO = "#e3e8e3"
+COR_MENU = "#0b4357"
+COR_MENU_TEXTO = "#eef4f2"
+COR_ENTRADA = "#4f7a19"
 COR_ATENCAO = "#8a5a0b"
 COR_ALERTA = "#b3261e"
 FONTE = "Arial, Helvetica, sans-serif"
@@ -277,7 +277,7 @@ def montar_html(obras, periodo, painel_url_base, agora):
 <tr><td align="center" style="padding:16px 8px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:{COR_SUPERFICIE};border-radius:8px;">
 <tr><td style="padding:20px 24px;background:{COR_MENU};border-radius:8px 8px 0 0;font-family:{FONTE};">
-<div style="font-size:13px;color:{COR_MENU_TEXTO};letter-spacing:0.5px;">Obra Analítica</div>
+<div style="font-size:13px;color:{COR_MENU_TEXTO};letter-spacing:0.5px;">APO</div>
 <div style="font-size:22px;font-weight:bold;color:{COR_MENU_TEXTO};padding-top:4px;">Resumo da semana</div>
 <div style="font-size:14px;color:{COR_MENU_TEXTO};padding-top:4px;">{escape(data_por_extenso(periodo.hoje))}</div>
 </td></tr>

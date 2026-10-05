@@ -7,7 +7,7 @@ function BarraVendido({ fracao }: { fracao: number }) {
   const largura = Math.min(Math.max(fracao, 0), 1) * 1000;
   return (
     <svg viewBox="0 0 1000 10" preserveAspectRatio="none" className="h-2.5 w-full overflow-hidden rounded-full" aria-hidden="true" focusable="false">
-      <rect width="1000" height="10" className="fill-[#dcebe1]" />
+      <rect width="1000" height="10" className="fill-[#e4efd3]" />
       <rect width={largura} height="10" className="fill-saida" />
     </svg>
   );
@@ -52,7 +52,7 @@ export function IndicadorVgv({ valores, emCartao = false }: { valores: ValoresVg
           <dd className="font-medium tabular-nums">{valorOuAviso(valores.vgv_vendido)}</dd>
         </div>
         <div className="flex items-center gap-1.5">
-          <Amostra classe="border border-entrada bg-[#dcebe1]" />
+          <Amostra classe="border border-entrada bg-[#e4efd3]" />
           <dt className="text-suave">Em estoque</dt>
           <dd className="font-medium tabular-nums">{valorOuAviso(valores.estoque_a_vender)}</dd>
         </div>
