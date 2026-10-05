@@ -73,6 +73,6 @@ export const mensagens = {
     indisponivel: "Não foi possível carregar a DRE de viabilidade agora. Recarregue a página em alguns minutos.",
     semEstudo: "Esta obra ainda não tem estudo de viabilidade cadastrado.",
     semObras: "Nenhuma obra tem estudo de viabilidade cadastrado ainda.",
-    restrita: "A DRE de viabilidade é restrita a diretor e financeiro.",
+    restrita: "O seu perfil não abre a DRE de viabilidade. Peça ao diretor da construtora para liberar.",
   },
 } as const;

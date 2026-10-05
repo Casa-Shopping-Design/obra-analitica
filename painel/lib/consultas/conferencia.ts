@@ -1,6 +1,7 @@
 import "server-only";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
 import { ErroConsulta } from "@/lib/consultas/posicao";
+import { lerPerfilAtual } from "@/lib/consultas/perfil";
 import { numeroOuNulo, numeroOuZero, perfilVeConferencia } from "@/lib/consultas/resumo-origem";
 
 export type ItemConferencia = {
@@ -19,15 +20,8 @@ export type ConferenciaObra = {
   recebido: ItemConferencia;
 };
 
-// getClaims valida o JWT. O perfil sai de app.perfil_atual, a mesma função que o RLS usa, que lê
-// app_metadata ou a tabela de vínculo. Nunca user_metadata. Falha de leitura conta como sem permissão.
 export async function podeVerConferencia(): Promise<boolean> {
-  const supabase = await criarClienteServidor();
-  const { data: sessao } = await supabase.auth.getClaims();
-  if (!sessao?.claims?.sub) return false;
-  const { data, error } = await supabase.schema("app").rpc("perfil_atual");
-  if (error) return false;
-  return perfilVeConferencia(typeof data === "string" ? data : null);
+  return perfilVeConferencia(await lerPerfilAtual());
 }
 
 function item(linha: Record<string, unknown>, painel: string, origem: string, diferenca: string, pct: string | null) {

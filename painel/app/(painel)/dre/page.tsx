@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ExplicacaoIndicador } from "@/componentes/ExplicacaoIndicador";
-import { podeVerConferencia } from "@/lib/consultas/conferencia";
-import { listarResumoDre } from "@/lib/consultas/dre";
+import { listarResumoDre, podeVerDre } from "@/lib/consultas/dre";
 import {
   formatarMesAno,
   percentualOuSemBase,
@@ -42,7 +41,7 @@ const celula = "px-3 py-3 text-right align-top whitespace-nowrap";
 
 // O perfil é conferido antes da leitura; o RLS também esconderia as linhas, mas a tela diz por quê.
 export default async function PaginaDre() {
-  const permitido = await podeVerConferencia().catch(() => false);
+  const permitido = await podeVerDre().catch(() => false);
   if (!permitido) {
     return (
       <>

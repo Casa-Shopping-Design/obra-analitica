@@ -1,11 +1,13 @@
 import "server-only";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
 import { ErroConsulta } from "@/lib/consultas/posicao";
+import { lerPerfilAtual } from "@/lib/consultas/perfil";
 import {
   lerCabecalhoDre,
   lerLinhaDre,
   lerResumoCarteiraDre,
   lerResumoDre,
+  perfilVeDre,
   type CabecalhoDre,
   type LinhaDre,
   type ResumoCarteiraDre,
@@ -14,8 +16,12 @@ import {
 
 export type DreObra = { cabecalho: CabecalhoDre; linhas: LinhaDre[] };
 
-// Uma leitura só, já somada no banco; o RLS deixa a lista vazia para quem não é diretor nem financeiro.
-// A tela chama podeVerConferencia antes, para dizer que a tela é restrita em vez de mostrar lista vazia.
+export async function podeVerDre(): Promise<boolean> {
+  return perfilVeDre(await lerPerfilAtual());
+}
+
+// Uma leitura só, já somada no banco; o RLS deixa a lista vazia para quem não é diretor, financeiro ou
+// leitura. A tela chama podeVerDre antes, para dizer que a tela é restrita em vez de mostrar lista vazia.
 export async function listarResumoDre(): Promise<ResumoDre[]> {
   const supabase = await criarClienteServidor();
   const { data, error } = await supabase

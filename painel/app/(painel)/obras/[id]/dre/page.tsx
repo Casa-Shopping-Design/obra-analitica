@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { AvisoTelaObra, CabecalhoTelaObra } from "@/componentes/CabecalhoTelaObra";
 import { TabelaDre } from "@/componentes/TabelaDre";
-import { podeVerConferencia } from "@/lib/consultas/conferencia";
-import { listarDreObra } from "@/lib/consultas/dre";
+import { listarDreObra, podeVerDre } from "@/lib/consultas/dre";
 import { mensagensOrigem } from "@/lib/consultas/resumo-origem";
 import { buscarObra, idObraValido } from "@/lib/consultas/unidades";
 import { notaDre, prepararLinhasDre } from "@/lib/dre";
@@ -24,7 +23,7 @@ async function carregar(id: string) {
 // O perfil é conferido antes de qualquer leitura; esconder o link na obra não basta.
 export default async function PaginaDreObra({ params }: PageProps<"/obras/[id]/dre">) {
   const { id } = await params;
-  const permitido = await podeVerConferencia().catch(() => false);
+  const permitido = await podeVerDre().catch(() => false);
   if (!permitido) return <AvisoTelaObra tela={tela} mensagem={mensagens.dre.restrita} />;
   if (!idObraValido(id)) return <AvisoTelaObra tela={tela} mensagem={mensagensOrigem.obraNaoEncontrada} />;
 

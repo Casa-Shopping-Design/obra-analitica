@@ -80,12 +80,14 @@ describe("catalogoDoPerfil", () => {
     expect(nomesDe(null)).not.toContain("marts.conferencia_origem");
   });
 
-  it("deixa a DRE de viabilidade e os resumos dela só para diretor e financeiro", () => {
+  it("deixa a DRE de viabilidade e os resumos dela para diretor, financeiro e leitura", () => {
     const nomesDe = (perfil: string | null) => catalogoDoPerfil(perfil).map((view) => view.nome);
     for (const nome of ["marts.dre_viabilidade", "marts.dre_resumo_obra", "marts.dre_resumo_carteira"]) {
       expect(nomesDe("diretor")).toContain(nome);
       expect(nomesDe("financeiro")).toContain(nome);
+      expect(nomesDe("leitura")).toContain(nome);
       expect(nomesDe("gerente_obra")).not.toContain(nome);
+      expect(nomesDe("comercial")).not.toContain(nome);
       expect(nomesDe(null)).not.toContain(nome);
     }
   });

@@ -32,7 +32,8 @@ async function carregarVisaoGeral(): Promise<{
 }
 
 // Quatro consultas em paralelo, todas em views somadas no banco; o fluxo mensal fica para a tela de cada obra.
-// A faixa de resultado só aparece para quem o RLS deixa ler a DRE (diretor e financeiro com segundo fator).
+// A faixa de resultado só aparece para quem o RLS deixa ler a DRE (diretor e financeiro com segundo fator, e
+// leitura).
 export default async function PaginaVisaoGeral() {
   const { obras, carteira, alertas, resultado } = await carregarVisaoGeral();
 

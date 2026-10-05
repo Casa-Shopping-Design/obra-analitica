@@ -47,6 +47,13 @@ const rotulosLinha: Record<LinhaResultado, string> = {
 };
 
 // Linha que a view mandar e o painel ainda não conhecer aparece com o código, em vez de sumir da tabela.
+// Diretor e financeiro gravam o estudo; leitura só consulta, para os sócios acompanharem sem segundo fator.
+export const perfisDre = ["diretor", "financeiro", "leitura"] as const;
+
+export function perfilVeDre(perfil: string | null | undefined): boolean {
+  return perfisDre.some((permitido) => permitido === perfil);
+}
+
 export function rotuloLinha(linha: string): string {
   return (rotulosLinha as Record<string, string>)[linha] ?? linha;
 }

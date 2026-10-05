@@ -8,6 +8,7 @@ import {
   notaDre,
   percentualComSinal,
   percentualOuSemBase,
+  perfilVeDre,
   prepararLinhasDre,
   rotuloLinha,
   situacaoDesvioMargem,
@@ -172,7 +173,22 @@ describe("cabeçalho e mensagens", () => {
       expect(texto).not.toMatch(/marts|select|dre_|stack/i);
     }
     expect(mensagens.dre.semEstudo).toBe("Esta obra ainda não tem estudo de viabilidade cadastrado.");
-    expect(mensagens.dre.restrita).toBe("A DRE de viabilidade é restrita a diretor e financeiro.");
+    expect(mensagens.dre.restrita).toBe(
+      "O seu perfil não abre a DRE de viabilidade. Peça ao diretor da construtora para liberar.",
+    );
+  });
+});
+
+describe("perfis que abrem a DRE", () => {
+  it("diretor, financeiro e leitura abrem; gerente, comercial e sessão sem perfil não", () => {
+    expect(perfilVeDre("diretor")).toBe(true);
+    expect(perfilVeDre("financeiro")).toBe(true);
+    expect(perfilVeDre("leitura")).toBe(true);
+    expect(perfilVeDre("gerente_obra")).toBe(false);
+    expect(perfilVeDre("comercial")).toBe(false);
+    expect(perfilVeDre(null)).toBe(false);
+    expect(perfilVeDre(undefined)).toBe(false);
+    expect(perfilVeDre("Leitura")).toBe(false);
   });
 });
 
