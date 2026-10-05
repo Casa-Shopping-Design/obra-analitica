@@ -1,0 +1,62 @@
+[
+  {
+    "id_origem": 101,
+    "descricao": "Estudo de lançamento",
+    "data_base": "2024-09-01",
+    "aliquota": 0.04,
+    "vigencia_inicio": "2024-10-01",
+    "linhas": {
+      "vgv_bruto": 39500000,
+      "impostos": 1580000,
+      "custo_terreno": 4200000,
+      "custo_projetos": 650000,
+      "custo_licenciamento": 380000,
+      "custo_construcao": 25200000,
+      "assistencia_tecnica": 380000,
+      "juros_financiamento": 1100000,
+      "estoque": 0,
+      "despesas_comerciais": 1975000,
+      "despesas_administrativas": 1185000
+    }
+  },
+  {
+    "id_origem": 102,
+    "descricao": "Estudo de lançamento",
+    "data_base": "2024-09-01",
+    "aliquota": 0.0632,
+    "vigencia_inicio": "2024-10-01",
+    "linhas": {
+      "vgv_bruto": 25000000,
+      "impostos": 1000000,
+      "custo_terreno": 2600000,
+      "custo_projetos": 420000,
+      "custo_licenciamento": 250000,
+      "custo_construcao": 16800000,
+      "assistencia_tecnica": 250000,
+      "juros_financiamento": 900000,
+      "estoque": 0,
+      "despesas_comerciais": 1250000,
+      "despesas_administrativas": 750000
+    }
+  },
+  {
+    "id_origem": 103,
+    "descricao": "Estudo de lançamento",
+    "data_base": "2024-09-01",
+    "aliquota": 0.04,
+    "vigencia_inicio": "2024-10-01",
+    "linhas": {
+      "vgv_bruto": 8400000,
+      "impostos": 336000,
+      "custo_terreno": 700000,
+      "custo_projetos": 150000,
+      "custo_licenciamento": 90000,
+      "custo_construcao": 6000000,
+      "assistencia_tecnica": 90000,
+      "juros_financiamento": 250000,
+      "estoque": 0,
+      "despesas_comerciais": 420000,
+      "despesas_administrativas": 250000
+    }
+  }
+]
