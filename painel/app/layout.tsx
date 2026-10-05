@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, IBM_Plex_Sans, Source_Serif_4 } from "next/font/google";
+import { IBM_Plex_Mono, IBM_Plex_Sans, IBM_Plex_Sans_Condensed } from "next/font/google";
 import { connection } from "next/server";
 import "./globals.css";
 
 // As fontes são baixadas no build e servidas pelo próprio painel, então a CSP fica em font-src 'self'.
 const fonteTexto = IBM_Plex_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--fonte-texto" });
-const fonteTitulo = Source_Serif_4({ subsets: ["latin"], weight: ["600"], variable: "--fonte-titulo" });
+const fonteTitulo = IBM_Plex_Sans_Condensed({ subsets: ["latin"], weight: ["600"], variable: "--fonte-titulo" });
 const fonteNumero = IBM_Plex_Mono({ subsets: ["latin"], weight: ["500"], variable: "--fonte-numero", preload: false });
 
 export const metadata: Metadata = {
