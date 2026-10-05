@@ -80,10 +80,12 @@ export async function concluirPergunta(supabase: Cliente, conclusao: ConclusaoPe
   return !error;
 }
 
+// perfil é o valor cru lido pela rota; o validador monta o catálogo permitido a partir dele.
 export async function executarConsultaValidada(
   sqlGerado: string,
   idRequisicao: string,
   idPergunta: number,
+  perfil: string | null,
   uso?: UsoModelo,
   complementarUso?: ComplementoUso,
 ): Promise<ResultadoExecucao> {
@@ -107,7 +109,7 @@ export async function executarConsultaValidada(
 
   const conclusaoBase = { idPergunta, sqlGerado, linhas: null, duracaoMs: null, uso };
 
-  const validacao = validarSql(sqlGerado);
+  const validacao = validarSql(sqlGerado, perfil);
   if (!validacao.ok) {
     anotar("warn", "consulta recusada pelo validador", "recusada", { motivo: validacao.motivo });
     await concluirPergunta(supabase, { ...conclusaoBase, resultado: "recusada" }, campos);

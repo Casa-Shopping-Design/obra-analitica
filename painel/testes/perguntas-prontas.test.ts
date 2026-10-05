@@ -1,12 +1,28 @@
 import { describe, expect, it } from "vitest";
-import { catalogoViews } from "../lib/catalogo-views";
+import { catalogoDoPerfil, catalogoViews } from "../lib/catalogo-views";
 import { tiposAlerta } from "../lib/alertas";
-import { buscarPerguntaPronta, perguntasProntas, rotulosAlerta } from "../lib/perguntas-prontas";
+import { rotuloLinha } from "../lib/dre";
+import {
+  buscarPerguntaPronta,
+  perguntasProntas,
+  perguntasProntasDoPerfil,
+  rotulosAlerta,
+  type PerguntaPronta,
+} from "../lib/perguntas-prontas";
 import { validarSql } from "../lib/validador-sql";
 
 const colunasPorView = new Map(catalogoViews.map((view) => [view.nome, new Set(view.colunas)]));
 const viewsDoSql = (sql: string) =>
   [...sql.matchAll(/\b(?:from|join)\s+([a-z_]+\.[a-z_]+)/gi)].map((referencia) => referencia[1].toLowerCase());
+const primeiroPerfil = (pergunta: PerguntaPronta) => pergunta.perfis?.[0] ?? null;
+
+const perguntasDre = [
+  "tendencia-lucro-obras",
+  "linha-mais-desvia-parque",
+  "margem-perdida-obras",
+  "receita-a-apropriar-obras",
+  "imposto-a-gerar-obras",
+];
 
 describe("perguntas prontas", () => {
   it("tem ids únicos", () => {
@@ -20,12 +36,14 @@ describe("perguntas prontas", () => {
   });
 
   it.each(perguntasProntas.map((pergunta) => [pergunta.id, pergunta] as const))(
-    "%s passa no validador de SQL e só lê views do catálogo",
+    "%s passa no validador de SQL com o primeiro perfil dela e só lê views do catálogo desse perfil",
     (_id, pergunta) => {
-      expect(validarSql(pergunta.sql).ok).toBe(true);
+      expect(validarSql(pergunta.sql, primeiroPerfil(pergunta)).ok).toBe(true);
       const views = viewsDoSql(pergunta.sql).filter((nome) => nome !== "app.centro_custo");
       expect(views.length).toBeGreaterThan(0);
       views.forEach((nome) => expect(colunasPorView.has(nome)).toBe(true));
+      const doPerfil = new Set(catalogoDoPerfil(primeiroPerfil(pergunta)).map((view) => view.nome));
+      views.forEach((nome) => expect(doPerfil).toContain(nome));
     },
   );
 
@@ -64,17 +82,60 @@ describe("perguntas prontas", () => {
   });
 
   it("dá rótulo a todo tipo de alerta, igual ao case do sql da pergunta de atenção", () => {
-    const sql = buscarPerguntaPronta("obras-pedem-atencao")!.sql;
+    const sql = buscarPerguntaPronta("obras-pedem-atencao", null)!.sql;
     const casos = [...sql.matchAll(/when '([a-z_]+)' then '([^']+)'/g)].map(([, tipo, rotulo]) => [tipo, rotulo]);
     expect(Object.fromEntries(casos)).toEqual(rotulosAlerta);
     expect(Object.keys(rotulosAlerta).sort()).toEqual([...tiposAlerta].sort());
   });
 
   it("busca pelo id e ignora id fora da lista", () => {
-    expect(buscarPerguntaPronta("exposicao-maxima")?.pergunta).toBe(
+    expect(buscarPerguntaPronta("exposicao-maxima", null)?.pergunta).toBe(
       "Quanto dinheiro próprio cada obra precisa no pior momento?",
     );
-    expect(buscarPerguntaPronta("'; drop table app.tenant; --")).toBeUndefined();
-    expect(buscarPerguntaPronta(undefined)).toBeUndefined();
+    expect(buscarPerguntaPronta("'; drop table app.tenant; --", "diretor")).toBeUndefined();
+    expect(buscarPerguntaPronta(undefined, "diretor")).toBeUndefined();
+  });
+});
+
+describe("perguntas prontas sobre viabilidade, tendência e imposto", () => {
+  it("as cinco perguntas leem as views de DRE e de imposto", () => {
+    const views = new Set(perguntasDre.flatMap((id) => viewsDoSql(buscarPerguntaPronta(id, "diretor")!.sql)));
+    expect(views).toEqual(new Set(["marts.dre_viabilidade", "marts.dre_resumo_obra", "marts.imposto_obra"]));
+  });
+
+  it.each(["diretor", "financeiro", "leitura"])("aparecem para %s", (perfil) => {
+    const ids = perguntasProntasDoPerfil(perfil).map((pergunta) => pergunta.id);
+    expect(ids).toEqual(expect.arrayContaining(perguntasDre));
+    expect(ids).toHaveLength(perguntasProntas.length);
+  });
+
+  it.each(["gerente_obra", "comercial", null])("não aparecem para %s, nem por id", (perfil) => {
+    const ids = perguntasProntasDoPerfil(perfil).map((pergunta) => pergunta.id);
+    perguntasDre.forEach((id) => {
+      expect(ids).not.toContain(id);
+      expect(buscarPerguntaPronta(id, perfil)).toBeUndefined();
+    });
+    expect(ids).toHaveLength(perguntasProntas.length - perguntasDre.length);
+    expect(ids).toContain("exposicao-maxima");
+  });
+
+  it("o validador recusa o SQL delas para o gerente, mesmo que o id chegasse à consulta", () => {
+    perguntasDre.forEach((id) => {
+      expect(validarSql(buscarPerguntaPronta(id, "diretor")!.sql, "gerente_obra").ok).toBe(false);
+    });
+  });
+
+  it("dá à linha da DRE o mesmo rótulo da tela, igual ao case do sql da pergunta da Parque", () => {
+    const sql = buscarPerguntaPronta("linha-mais-desvia-parque", "diretor")!.sql;
+    const casos = [...sql.matchAll(/when '([a-z_]+)' then '([^']+)'/g)].map(([, linha, rotulo]) => [linha, rotulo]);
+    expect(casos).toHaveLength(11);
+    casos.forEach(([linha, rotulo]) => expect(rotuloLinha(linha)).toBe(rotulo));
+  });
+
+  it("formata fração como percentual, nunca como real", () => {
+    const colunas = perguntasDre.flatMap((id) => [...buscarPerguntaPronta(id, "diretor")!.colunas]);
+    const fracoes = colunas.filter((coluna) => /pct|margem|aliquota/.test(coluna.chave));
+    expect(fracoes.length).toBeGreaterThan(0);
+    fracoes.forEach((coluna) => expect(coluna.formato).toBe("percentual"));
   });
 });

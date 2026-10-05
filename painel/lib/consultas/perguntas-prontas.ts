@@ -1,6 +1,7 @@
 import "server-only";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
 import { ErroConsulta } from "@/lib/consultas/posicao";
+import { rotuloLinha } from "@/lib/dre";
 import { rotulosAlerta, type IdPerguntaPronta } from "@/lib/perguntas-prontas";
 
 export type LinhaResposta = Record<string, string | number | null>;
@@ -276,6 +277,72 @@ const consultas: Record<IdPerguntaPronta, ConsultaPergunta> = {
     );
     const comNome = await incluirNomeObra(supabase, linhas);
     return comNome.sort((a, b) => porObra(a, b) || String(a.tipologia).localeCompare(String(b.tipologia), "pt-BR"));
+  },
+
+  // As cinco abaixo leem views que o RLS abre só a diretor, financeiro e leitura; a tela já filtra pelo perfil
+  // e, se a consulta chegar aqui por outro caminho, volta vazia.
+  async "tendencia-lucro-obras"(supabase) {
+    return lerLinhas(
+      await supabase
+        .schema("marts")
+        .from("dre_viabilidade")
+        .select("obra, viabilidade, tendencia, desvio, desvio_pct")
+        .eq("linha", "lucro_operacional")
+        .order("desvio")
+        .limit(limiteLinhas),
+    );
+  },
+
+  async "linha-mais-desvia-parque"(supabase) {
+    const linhas = lerLinhas(
+      await supabase
+        .schema("marts")
+        .from("dre_viabilidade")
+        .select("obra, linha, viabilidade, tendencia, desvio")
+        .ilike("obra", "%parque%")
+        .eq("linha_de_total", false)
+        .eq("desvio_favoravel", false)
+        .limit(limiteLinhas),
+    );
+    // O cliente não ordena por abs(); são no máximo onze linhas por obra, ordenadas aqui sem mudar valor.
+    return linhas
+      .sort((a, b) => Math.abs(Number(b.desvio)) - Math.abs(Number(a.desvio)))
+      .slice(0, 3)
+      .map((linha) => ({ ...linha, linha: rotuloLinha(String(linha.linha)) }));
+  },
+
+  async "margem-perdida-obras"(supabase) {
+    return lerLinhas(
+      await supabase
+        .schema("marts")
+        .from("dre_resumo_obra")
+        .select("obra, margem_operacional_viabilidade, margem_operacional_tendencia, desvio_margem_operacional")
+        .order("desvio_margem_operacional")
+        .limit(limiteLinhas),
+    );
+  },
+
+  async "receita-a-apropriar-obras"(supabase) {
+    return lerLinhas(
+      await supabase
+        .schema("marts")
+        .from("dre_viabilidade")
+        .select("obra, apropriado, a_apropriar, a_contratar")
+        .eq("linha", "vgv_bruto")
+        .order("obra")
+        .limit(limiteLinhas),
+    );
+  },
+
+  async "imposto-a-gerar-obras"(supabase) {
+    return lerLinhas(
+      await supabase
+        .schema("marts")
+        .from("imposto_obra")
+        .select("obra, aliquota, imposto_receita_a_apropriar, imposto_vgv_estoque, imposto_a_realizar")
+        .order("imposto_a_realizar", { ascending: false })
+        .limit(limiteLinhas),
+    );
   },
 };
 

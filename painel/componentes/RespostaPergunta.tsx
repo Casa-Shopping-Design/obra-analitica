@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { formatarData, formatarReal } from "@/lib/formatar";
+import { formatarData, formatarPercentual, formatarReal } from "@/lib/formatar";
 import type { LinhaResposta } from "@/lib/consultas/perguntas-prontas";
 import type { ColunaResposta, PerguntaPronta } from "@/lib/perguntas-prontas";
 
@@ -14,6 +14,8 @@ function formatarCelula(valor: string | number | null | undefined, coluna: Colun
       return formatarReal(Number(valor));
     case "inteiro":
       return formatoInteiro.format(Number(valor));
+    case "percentual":
+      return formatarPercentual(Number(valor));
     case "area":
       return `${formatoArea.format(Number(valor))} m²`;
     case "data":

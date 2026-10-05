@@ -7,8 +7,9 @@ import {
   responderPerguntaPronta,
   type RespostaPerguntaPronta,
 } from "@/lib/consultas/perguntas-prontas";
+import { lerPerfilAtual } from "@/lib/consultas/perfil";
 import { mensagens } from "@/lib/mensagens";
-import { buscarPerguntaPronta, perguntasProntas, type IdPerguntaPronta } from "@/lib/perguntas-prontas";
+import { buscarPerguntaPronta, perguntasProntasDoPerfil, type IdPerguntaPronta } from "@/lib/perguntas-prontas";
 import { formatarData } from "@/lib/formatar";
 
 export const metadata: Metadata = { title: "Assistente" };
@@ -70,8 +71,8 @@ function HistoricoPerguntas({ historico }: { historico: Historico | null }) {
   );
 }
 
-// A pergunta escolhida vem na URL só como id; qualquer valor fora da lista é ignorado
-// e nunca chega a uma consulta.
+// A pergunta escolhida vem na URL só como id; qualquer valor fora da lista do perfil é ignorado
+// e nunca chega a uma consulta. Perfil que não deu para ler vê só as perguntas sem restrição.
 export default async function PaginaAssistente({
   searchParams,
 }: {
@@ -79,7 +80,9 @@ export default async function PaginaAssistente({
 }) {
   const { pergunta: idPedido } = await searchParams;
   const idTexto = typeof idPedido === "string" ? idPedido : undefined;
-  const pergunta = buscarPerguntaPronta(idTexto);
+  const perfil = await lerPerfilAtual().catch(() => null);
+  const perguntasDoPerfil = perguntasProntasDoPerfil(perfil);
+  const pergunta = buscarPerguntaPronta(idTexto, perfil);
   const [resposta, historico] = await Promise.all([pergunta ? responder(pergunta.id) : null, lerHistorico()]);
 
   return (
@@ -96,7 +99,7 @@ export default async function PaginaAssistente({
         <fieldset className="flex flex-col gap-2">
           <legend className="mb-2 font-semibold">Perguntas prontas</legend>
           <div className="grid gap-2 md:grid-cols-2">
-            {perguntasProntas.map((opcao) => {
+            {perguntasDoPerfil.map((opcao) => {
               const escolhida = opcao.id === pergunta?.id;
               return (
                 <button

@@ -63,10 +63,10 @@ describe("catálogo das views novas", () => {
     expect(nomes).not.toContain("marts.resumo_venda_estoque");
   });
 
-  it("todo exemplo passa pelo validador", () => {
+  it("todo exemplo passa pelo validador com um perfil que lê a view", () => {
     for (const view of catalogoViews) {
       for (const exemplo of view.exemplos) {
-        expect(validarSql(exemplo.sql), exemplo.pergunta).toMatchObject({ ok: true });
+        expect(validarSql(exemplo.sql, view.perfis?.[0] ?? null), exemplo.pergunta).toMatchObject({ ok: true });
       }
     }
   });
@@ -95,6 +95,18 @@ describe("catalogoDoPerfil", () => {
       expect(nomesDe("comercial")).not.toContain(nome);
       expect(nomesDe(null)).not.toContain(nome);
     }
+  });
+
+  it("deixa o gerente de obra sem nenhuma view de resultado e o perfil leitura com todas", () => {
+    const viewsResultado = [
+      "marts.dre_viabilidade", "marts.dre_resumo_obra", "marts.dre_resumo_carteira", "marts.tendencia_resultado_mensal",
+      "marts.imposto_obra",
+    ];
+    const gerente = catalogoDoPerfil("gerente_obra").map((view) => view.nome);
+    const leitura = catalogoDoPerfil("leitura").map((view) => view.nome);
+    expect(gerente).not.toEqual(expect.arrayContaining(viewsResultado));
+    viewsResultado.forEach((nome) => expect(gerente).not.toContain(nome));
+    expect(leitura).toEqual(expect.arrayContaining(viewsResultado));
   });
 
   it("mantém as views sem restrição para qualquer perfil", () => {
