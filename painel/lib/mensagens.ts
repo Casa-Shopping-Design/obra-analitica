@@ -89,4 +89,10 @@ export const mensagens = {
     semAliquota: "Nenhuma alíquota informada ainda. Sem ela, a DRE mostra os impostos realizados como zero.",
     avisoAliquota: "Alíquota informada pela construtora. O APO não apura imposto.",
   },
+  imposto: {
+    indisponivel: "Não foi possível carregar a gestão de imposto agora. Recarregue a página em alguns minutos.",
+    semAliquota:
+      "Esta obra ainda não tem estudo de viabilidade com alíquota de imposto informada. Peça ao diretor ou ao financeiro para cadastrar.",
+    restrita: "O seu perfil não abre a gestão de imposto. Peça ao diretor da construtora para liberar.",
+  },
 } as const;

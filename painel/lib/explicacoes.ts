@@ -90,6 +90,21 @@ export const explicacoes = {
     "Custo das vendas que já entrou no resultado até o último mês fechado, como o ERP fecha no mapa imobiliário. Não é o que foi pago.",
   recebido_acumulado:
     "Tudo o que já entrou em caixa, do comprador e do banco, nas obras com estudo. É caixa, não receita apropriada.",
+  vgv_total_imposto:
+    "VGV de hoje da obra: unidades vendidas pelo valor do contrato mais o estoque pelo preço de tabela atual. É a tendência do VGV bruto na DRE.",
+  imposto_receita_apropriada:
+    "Alíquota informada sobre a receita que já entrou no resultado pelo andamento da obra, até o último mês fechado no ERP.",
+  imposto_recebimento: "Alíquota informada sobre tudo o que já entrou em caixa, do comprador e do banco.",
+  imposto_diferido:
+    "Imposto sobre os recebimentos menos imposto sobre a receita apropriada. Negativo quando a receita apropriada passou do que já entrou em caixa.",
+  imposto_vgv_estoque: "Alíquota informada sobre as unidades em estoque, pelo preço de tabela de hoje.",
+  imposto_receita_a_apropriar:
+    "Alíquota informada sobre as vendas assinadas que ainda não entraram no resultado.",
+  imposto_vgv_total: "Alíquota informada sobre o VGV total. É a tendência da linha de impostos na DRE de viabilidade.",
+  imposto_a_realizar:
+    "Imposto sobre a receita a apropriar mais o imposto sobre o estoque: o que ainda vai incidir até o fim da obra.",
+  aliquota_imposto:
+    "Alíquota única informada pela diretoria para a obra e aplicada sobre todas as bases desta tela. Não separa os tributos nem segue regra de regime.",
 } as const;
 
 export type ChaveExplicacao = keyof typeof explicacoes;

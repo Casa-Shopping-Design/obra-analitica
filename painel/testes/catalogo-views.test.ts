@@ -22,6 +22,7 @@ const viewsNovas: Record<string, string> = {
   "marts.dre_resumo_obra": "0030_dre_viabilidade.sql",
   "marts.dre_resumo_carteira": "0031_dre_resumo_carteira.sql",
   "marts.tendencia_resultado_mensal": "0033_posicao_dre_mensal.sql",
+  "marts.imposto_obra": "0034_imposto_obra.sql",
 };
 
 // Trecho da migration entre o create view e o próximo create ou grant no começo de linha.
@@ -35,7 +36,7 @@ function definicaoView(arquivo: string, nome: string): string {
 }
 
 describe("catálogo das views novas", () => {
-  it("tem as views das migrations 0018, 0019, 0024, 0026, 0027, 0030, 0031 e 0033", () => {
+  it("tem as views das migrations 0018, 0019, 0024, 0026, 0027, 0030, 0031, 0033 e 0034", () => {
     const nomes = catalogoViews.map((view) => view.nome);
     for (const nome of Object.keys(viewsNovas)) expect(nomes).toContain(nome);
   });
@@ -81,10 +82,11 @@ describe("catalogoDoPerfil", () => {
     expect(nomesDe(null)).not.toContain("marts.conferencia_origem");
   });
 
-  it("deixa a DRE de viabilidade, os resumos dela e a tendência mensal para diretor, financeiro e leitura", () => {
+  it("deixa a DRE de viabilidade, os resumos dela, a tendência mensal e o imposto para diretor, financeiro e leitura", () => {
     const nomesDe = (perfil: string | null) => catalogoDoPerfil(perfil).map((view) => view.nome);
     for (const nome of [
       "marts.dre_viabilidade", "marts.dre_resumo_obra", "marts.dre_resumo_carteira", "marts.tendencia_resultado_mensal",
+      "marts.imposto_obra",
     ]) {
       expect(nomesDe("diretor")).toContain(nome);
       expect(nomesDe("financeiro")).toContain(nome);
@@ -100,8 +102,8 @@ describe("catalogoDoPerfil", () => {
     expect(catalogoDoPerfil("gerente_obra").map((view) => view.nome)).toEqual(
       expect.arrayContaining(["marts.repasse_banco", "marts.leads_origem"]),
     );
-    // Cinco views restritas: conferência com o ERP, DRE de viabilidade, os resumos dela por obra e da carteira e a
-    // tendência mensal.
-    expect(catalogoDoPerfil(null)).toHaveLength(catalogoViews.length - 5);
+    // Seis views restritas: conferência com o ERP, DRE de viabilidade, os resumos dela por obra e da carteira,
+    // a tendência mensal e a gestão de imposto.
+    expect(catalogoDoPerfil(null)).toHaveLength(catalogoViews.length - 6);
   });
 });
