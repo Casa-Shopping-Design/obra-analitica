@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AvisoTelaObra, CabecalhoTelaObra } from "@/componentes/CabecalhoTelaObra";
+import { ExplicacaoIndicador } from "@/componentes/ExplicacaoIndicador";
+import { GraficoTendencia } from "@/componentes/GraficoTendencia";
 import { TabelaDre } from "@/componentes/TabelaDre";
 import { podeVerConferencia } from "@/lib/consultas/conferencia";
-import { listarDreObra, podeVerDre } from "@/lib/consultas/dre";
+import { listarDreObra, listarTendenciaMensal, podeVerDre } from "@/lib/consultas/dre";
 import { mensagensOrigem } from "@/lib/consultas/resumo-origem";
 import { buscarObra, idObraValido } from "@/lib/consultas/unidades";
 import { notaDre, prepararLinhasDre } from "@/lib/dre";
@@ -15,8 +17,13 @@ const tela = "DRE de viabilidade";
 
 async function carregar(id: string) {
   try {
-    const [obra, dre] = await Promise.all([buscarObra(id), listarDreObra(id)]);
-    return { obra, dre };
+    // A série falha sozinha: sem ela a DRE do mês continua de pé.
+    const [obra, dre, serie] = await Promise.all([
+      buscarObra(id),
+      listarDreObra(id),
+      listarTendenciaMensal(id).catch(() => null),
+    ]);
+    return { obra, dre, serie };
   } catch {
     return null;
   }
@@ -52,7 +59,32 @@ export default async function PaginaDreObra({ params }: PageProps<"/obras/[id]/d
           </Link>
         </p>
       )}
-      {dados.dre ? <TabelaDre linhas={prepararLinhasDre(dados.dre.linhas)} /> : <p>{mensagens.dre.semEstudo}</p>}
+      {dados.dre ? (
+        <>
+          <section
+            aria-labelledby="titulo-tendencia-mensal"
+            className="flex flex-col gap-4 rounded-xl border border-borda bg-superficie p-5"
+          >
+            <div className="flex flex-col gap-1">
+              <h2 id="titulo-tendencia-mensal" className="flex items-center gap-1.5 font-serif text-2xl font-semibold">
+                Margem operacional mês a mês
+                <ExplicacaoIndicador chave="tendencia_margem_mensal" rotulo="Margem operacional mês a mês" />
+              </h2>
+              <p className="text-sm text-suave">Até 24 meses. O mês corrente muda a cada carga; os anteriores ficam como foram gravados.</p>
+            </div>
+            {dados.serie === null ? (
+              <p role="alert" className="text-alerta">
+                {mensagens.dre.serieIndisponivel}
+              </p>
+            ) : (
+              <GraficoTendencia pontos={dados.serie} />
+            )}
+          </section>
+          <TabelaDre linhas={prepararLinhasDre(dados.dre.linhas)} />
+        </>
+      ) : (
+        <p>{mensagens.dre.semEstudo}</p>
+      )}
     </>
   );
 }

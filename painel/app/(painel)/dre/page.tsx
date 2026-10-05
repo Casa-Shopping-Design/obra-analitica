@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ExplicacaoIndicador } from "@/componentes/ExplicacaoIndicador";
-import { listarResumoDre, podeVerDre } from "@/lib/consultas/dre";
+import { MiniaturaTendencia } from "@/componentes/GraficoTendencia";
+import { listarResumoDre, listarTendenciaCarteira, podeVerDre } from "@/lib/consultas/dre";
 import {
   formatarMesAno,
   percentualOuSemBase,
@@ -12,6 +13,7 @@ import {
 } from "@/lib/dre";
 import type { ChaveExplicacao } from "@/lib/explicacoes";
 import { mensagens } from "@/lib/mensagens";
+import { agruparSeriePorObra, type PontoTendencia } from "@/lib/serie-tendencia";
 
 export const metadata: Metadata = { title: "DRE de viabilidade" };
 
@@ -20,6 +22,15 @@ const titulo = "DRE de viabilidade";
 async function carregar(): Promise<ResumoDre[] | null> {
   try {
     return await listarResumoDre();
+  } catch {
+    return null;
+  }
+}
+
+// Sem a série a lista continua; cada linha diz que a miniatura não carregou.
+async function carregarSeries(): Promise<Map<string, PontoTendencia[]> | null> {
+  try {
+    return agruparSeriePorObra(await listarTendenciaCarteira());
   } catch {
     return null;
   }
@@ -35,6 +46,7 @@ const colunas: { rotulo: string; explicacao: ChaveExplicacao }[] = [
   { rotulo: "Margem no estudo", explicacao: "margem_operacional_viabilidade" },
   { rotulo: "Margem na tendência", explicacao: "margem_operacional_tendencia" },
   { rotulo: "Desvio da margem", explicacao: "desvio_margem_operacional" },
+  { rotulo: "Margem mês a mês", explicacao: "tendencia_margem_mensal" },
 ];
 
 const celula = "px-3 py-3 text-right align-top whitespace-nowrap";
@@ -51,7 +63,7 @@ export default async function PaginaDre() {
     );
   }
 
-  const linhas = await carregar();
+  const [linhas, series] = await Promise.all([carregar(), carregarSeries()]);
 
   return (
     <>
@@ -66,16 +78,23 @@ export default async function PaginaDre() {
         <>
           <p className="max-w-3xl text-suave">
             Margem operacional de cada obra no estudo de viabilidade e na tendência, que soma o realizado ao que
-            ainda falta. O nome da obra abre a DRE completa.
+            ainda falta. A miniatura mostra os últimos meses: linha cheia é a tendência, tracejada é o estudo. O
+            nome da obra abre a DRE completa.
           </p>
+          {series === null && (
+            <p role="alert" className="text-alerta">
+              {mensagens.dre.serieIndisponivel}
+            </p>
+          )}
           <section aria-labelledby="titulo-resumo-dre">
             <h2 id="titulo-resumo-dre" className="sr-only">
               Margem operacional por obra
             </h2>
             <div className="relative overflow-x-auto rounded-xl border border-borda bg-superficie">
-              <table className="w-full min-w-[640px] border-collapse text-sm tabular-nums">
+              <table className="w-full min-w-[800px] border-collapse text-sm tabular-nums">
                 <caption className="sr-only">
-                  Margem operacional de cada obra no estudo, na tendência e o desvio em pontos percentuais.
+                  Margem operacional de cada obra no estudo, na tendência, o desvio em pontos percentuais e a margem da
+                  tendência nos últimos meses.
                 </caption>
                 <thead>
                   <tr className="text-suave">
@@ -120,6 +139,13 @@ export default async function PaginaDre() {
                       <td className={celula}>{percentualOuSemBase(linha.margemOperacionalTendencia)}</td>
                       <td className={`${celula} ${corSituacao[situacaoDesvioMargem(linha.desvioMargemOperacional)]}`}>
                         {textoDesvioPontos(linha.desvioMargemOperacional)}
+                      </td>
+                      <td className="w-40 px-3 py-3 text-right align-top">
+                        {series === null ? (
+                          <span className="text-xs text-suave">indisponível</span>
+                        ) : (
+                          <MiniaturaTendencia pontos={series.get(linha.centroCustoId) ?? []} />
+                        )}
                       </td>
                     </tr>
                   ))}

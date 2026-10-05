@@ -9,4 +9,5 @@ export const cores = {
   suave: "#52605c",
   texto: "#16211f",
   menu: "#0b4357",
+  referencia: "#7a8580",
 };

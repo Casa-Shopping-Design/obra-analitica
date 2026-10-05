@@ -73,6 +73,8 @@ export const explicacoes = {
   margem_operacional_tendencia: "Lucro operacional da tendência sobre o VGV líquido da tendência.",
   desvio_margem_operacional:
     "Margem na tendência menos margem no estudo, em pontos percentuais. Abaixo do estudo quer dizer que a obra vai render menos que o previsto.",
+  tendencia_margem_mensal:
+    "A margem operacional que a carga gravou em cada mês. A linha cheia é a tendência daquele mês; a tracejada é o estudo vigente no mesmo mês. A série começa no mês da primeira carga.",
   vgv_bruto_resultado:
     "VGV de hoje das obras com estudo de viabilidade: unidades vendidas pelo valor do contrato mais o estoque pelo preço de tabela atual. É a tendência do VGV bruto na DRE.",
   pct_vendido_resultado: "VGV vendido sobre o VGV de hoje, só nas obras com estudo de viabilidade. Contrato distratado não entra.",

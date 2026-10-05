@@ -20,6 +20,15 @@ import {
   type VersaoEstudo,
 } from "@/lib/dre";
 import { hojeEmBrasilia } from "@/lib/estudo-digitado";
+import {
+  inicioJanela,
+  lerLinhaTendenciaObra,
+  lerPontoTendencia,
+  mesesNaSerie,
+  recortarSerie,
+  type LinhaTendenciaObra,
+  type PontoTendencia,
+} from "@/lib/serie-tendencia";
 
 export type DreObra = { cabecalho: CabecalhoDre; linhas: LinhaDre[] };
 
@@ -124,4 +133,32 @@ export async function buscarResumoCarteira(): Promise<ResumoCarteiraDre | null> 
     .maybeSingle<Record<string, unknown>>();
   if (error) throw new ErroConsulta(error.code);
   return data ? lerResumoCarteiraDre(data) : null;
+}
+
+// Os últimos 24 meses gravados da obra, do mais antigo ao mais recente; vazio antes da primeira carga.
+export async function listarTendenciaMensal(centroCustoId: string): Promise<PontoTendencia[]> {
+  const supabase = await criarClienteServidor();
+  const { data, error } = await supabase
+    .schema("marts")
+    .from("tendencia_resultado_mensal")
+    .select("competencia, margem_operacional_viabilidade, margem_operacional_tendencia")
+    .eq("centro_custo_id", centroCustoId)
+    .order("competencia", { ascending: false })
+    .limit(mesesNaSerie);
+  if (error) throw new ErroConsulta(error.code);
+  return recortarSerie((data as Record<string, unknown>[]).map(lerPontoTendencia));
+}
+
+// Uma consulta para todas as obras da lista; o RLS filtra tenant e obra, e a janela corta o histórico antigo.
+export async function listarTendenciaCarteira(): Promise<LinhaTendenciaObra[]> {
+  const supabase = await criarClienteServidor();
+  const { data, error } = await supabase
+    .schema("marts")
+    .from("tendencia_resultado_mensal")
+    .select("centro_custo_id, competencia, margem_operacional_viabilidade, margem_operacional_tendencia")
+    .gte("competencia", inicioJanela())
+    .order("centro_custo_id")
+    .order("competencia");
+  if (error) throw new ErroConsulta(error.code);
+  return (data as Record<string, unknown>[]).map(lerLinhaTendenciaObra);
 }

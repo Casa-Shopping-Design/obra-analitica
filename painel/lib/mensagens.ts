@@ -74,6 +74,8 @@ export const mensagens = {
     semEstudo: "Esta obra ainda não tem estudo de viabilidade cadastrado.",
     semObras: "Nenhuma obra tem estudo de viabilidade cadastrado ainda.",
     restrita: "O seu perfil não abre a DRE de viabilidade. Peça ao diretor da construtora para liberar.",
+    serieVazia: "A série começa no mês da primeira carga.",
+    serieIndisponivel: "Não foi possível carregar a série mensal agora. Recarregue a página em alguns minutos.",
   },
   estudo: {
     gravado: "Estudo gravado. A DRE de viabilidade já usa a versão nova.",
