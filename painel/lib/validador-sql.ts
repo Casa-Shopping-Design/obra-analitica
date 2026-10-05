@@ -9,14 +9,27 @@ import {
   type SelectStatement,
   type Statement,
 } from "pgsql-ast-parser";
-import { catalogoViews } from "./catalogo-views";
+import { catalogoDoPerfil } from "./catalogo-views";
 
 export type ResultadoValidacao = { ok: true; sql: string } | { ok: false; motivo: string };
 
 export const limiteLinhasConsulta = 500;
 
-// app.centro_custo entra para a consulta trocar o id da obra pelo nome.
-const relacoesPermitidas = new Set([...catalogoViews.map((view) => view.nome), "app.centro_custo"]);
+// As relações vêm do catálogo do perfil de quem pergunta (correção C4 do plano APO): o gerente não chega à DRE
+// nem pelo SQL gerado. Sem perfil lido vale o catálogo sem as views restritas. app.centro_custo entra para a
+// consulta trocar o id da obra pelo nome. Um conjunto por perfil, montado uma vez.
+const relacoesPorPerfil = new Map<string | null, ReadonlySet<string>>();
+
+function relacoesPermitidasDoPerfil(perfil: string | null): ReadonlySet<string> {
+  const guardado = relacoesPorPerfil.get(perfil);
+  if (guardado) return guardado;
+  const relacoes = new Set([...catalogoDoPerfil(perfil).map((view) => view.nome), "app.centro_custo"]);
+  relacoesPorPerfil.set(perfil, relacoes);
+  return relacoes;
+}
+
+// As CTEs mudam a cada with; as relações do catálogo valem para a instrução inteira.
+type Escopo = { relacoes: ReadonlySet<string>; ctes: ReadonlySet<string> };
 
 // Lista fechada: função fora dela pode ler ou mudar estado da sessão (set_config troca os claims que o RLS lê,
 // query_to_xml roda SQL em texto), então só entra o que agrega, calcula ou formata.
@@ -53,11 +66,11 @@ function verificarTipo(tipo: DataTypeDef): void {
   if (tipo.schema || !tiposPermitidos.has(tipo.name.toLowerCase())) recusar(`tipo nao permitido: ${tipo.name}`);
 }
 
-function verificarOrdenacao(ordens: OrderByStatement[] | null | undefined, ctes: ReadonlySet<string>): void {
-  ordens?.forEach((ordem) => verificarExpressao(ordem.by, ctes));
+function verificarOrdenacao(ordens: OrderByStatement[] | null | undefined, escopo: Escopo): void {
+  ordens?.forEach((ordem) => verificarExpressao(ordem.by, escopo));
 }
 
-function verificarExpressao(expressao: Expr | null | undefined, ctes: ReadonlySet<string>): void {
+function verificarExpressao(expressao: Expr | null | undefined, escopo: Escopo): void {
   if (!expressao) return;
   switch (expressao.type) {
     case "ref":
@@ -74,110 +87,111 @@ function verificarExpressao(expressao: Expr | null | undefined, ctes: ReadonlySe
       return verificarTipo(expressao.dataType);
     case "cast":
       verificarTipo(expressao.to);
-      return verificarExpressao(expressao.operand, ctes);
+      return verificarExpressao(expressao.operand, escopo);
     case "binary":
       if (expressao.opSchema) recusar("operador qualificado por schema");
-      verificarExpressao(expressao.left, ctes);
-      return verificarExpressao(expressao.right, ctes);
+      verificarExpressao(expressao.left, escopo);
+      return verificarExpressao(expressao.right, escopo);
     case "unary":
       if (expressao.opSchema) recusar("operador qualificado por schema");
-      return verificarExpressao(expressao.operand, ctes);
+      return verificarExpressao(expressao.operand, escopo);
     case "ternary":
-      [expressao.value, expressao.lo, expressao.hi].forEach((parte) => verificarExpressao(parte, ctes));
+      [expressao.value, expressao.lo, expressao.hi].forEach((parte) => verificarExpressao(parte, escopo));
       return;
     case "member":
-      return verificarExpressao(expressao.operand, ctes);
+      return verificarExpressao(expressao.operand, escopo);
     case "arrayIndex":
-      verificarExpressao(expressao.array, ctes);
-      return verificarExpressao(expressao.index, ctes);
+      verificarExpressao(expressao.array, escopo);
+      return verificarExpressao(expressao.index, escopo);
     case "list":
     case "array":
-      expressao.expressions.forEach((item) => verificarExpressao(item, ctes));
+      expressao.expressions.forEach((item) => verificarExpressao(item, escopo));
       return;
     case "extract":
-      return verificarExpressao(expressao.from, ctes);
+      return verificarExpressao(expressao.from, escopo);
     case "substring":
-      [expressao.value, expressao.from, expressao.for].forEach((parte) => verificarExpressao(parte, ctes));
+      [expressao.value, expressao.from, expressao.for].forEach((parte) => verificarExpressao(parte, escopo));
       return;
     case "overlay":
-      [expressao.value, expressao.placing, expressao.from, expressao.for].forEach((parte) => verificarExpressao(parte, ctes));
+      [expressao.value, expressao.placing, expressao.from, expressao.for].forEach((parte) => verificarExpressao(parte, escopo));
       return;
     case "case":
-      verificarExpressao(expressao.value, ctes);
+      verificarExpressao(expressao.value, escopo);
       expressao.whens.forEach(({ when, value }) => {
-        verificarExpressao(when, ctes);
-        verificarExpressao(value, ctes);
+        verificarExpressao(when, escopo);
+        verificarExpressao(value, escopo);
       });
-      return verificarExpressao(expressao.else, ctes);
+      return verificarExpressao(expressao.else, escopo);
     case "call": {
       const { function: funcao } = expressao;
       if (funcao.schema || !funcoesPermitidas.has(funcao.name.toLowerCase())) recusar(`funcao nao permitida: ${funcao.name}`);
-      expressao.args.forEach((argumento) => verificarExpressao(argumento, ctes));
-      verificarExpressao(expressao.filter, ctes);
-      verificarOrdenacao(expressao.orderBy, ctes);
-      if (expressao.withinGroup) verificarExpressao(expressao.withinGroup.by, ctes);
-      expressao.over?.partitionBy?.forEach((parte) => verificarExpressao(parte, ctes));
-      return verificarOrdenacao(expressao.over?.orderBy, ctes);
+      expressao.args.forEach((argumento) => verificarExpressao(argumento, escopo));
+      verificarExpressao(expressao.filter, escopo);
+      verificarOrdenacao(expressao.orderBy, escopo);
+      if (expressao.withinGroup) verificarExpressao(expressao.withinGroup.by, escopo);
+      expressao.over?.partitionBy?.forEach((parte) => verificarExpressao(parte, escopo));
+      return verificarOrdenacao(expressao.over?.orderBy, escopo);
     }
     case "array select":
-      return verificarInstrucao(expressao.select, ctes);
+      return verificarInstrucao(expressao.select, escopo);
     case "select":
     case "union":
     case "union all":
     case "values":
     case "with":
-      return verificarInstrucao(expressao, ctes);
+      return verificarInstrucao(expressao, escopo);
     default:
       recusar(`construcao nao permitida: ${expressao.type}`);
   }
 }
 
-function verificarOrigem(origem: From, ctes: ReadonlySet<string>): void {
+function verificarOrigem(origem: From, escopo: Escopo): void {
   if (origem.type === "table") {
     const { schema, name } = origem.name;
-    if (schema ? !relacoesPermitidas.has(`${schema}.${name}`) : !ctes.has(name)) {
+    if (schema ? !escopo.relacoes.has(`${schema}.${name}`) : !escopo.ctes.has(name)) {
       recusar(`relacao fora do catalogo: ${schema ? `${schema}.` : ""}${name}`);
     }
   } else if (origem.type === "statement") {
-    verificarInstrucao(origem.statement, ctes);
+    verificarInstrucao(origem.statement, escopo);
   } else {
     recusar("funcao no from");
   }
-  verificarExpressao(origem.join?.on, ctes);
+  verificarExpressao(origem.join?.on, escopo);
 }
 
-function verificarSelect(select: SelectFromStatement, ctes: ReadonlySet<string>): void {
+function verificarSelect(select: SelectFromStatement, escopo: Escopo): void {
   if (select.for || select.skip) recusar("select com trava de linha");
-  select.columns?.forEach((coluna) => verificarExpressao(coluna.expr, ctes));
-  select.from?.forEach((origem) => verificarOrigem(origem, ctes));
-  verificarExpressao(select.where, ctes);
-  select.groupBy?.forEach((grupo) => verificarExpressao(grupo, ctes));
-  verificarExpressao(select.having, ctes);
-  verificarOrdenacao(select.orderBy, ctes);
-  if (Array.isArray(select.distinct)) select.distinct.forEach((item) => verificarExpressao(item, ctes));
-  verificarExpressao(select.limit?.limit, ctes);
-  verificarExpressao(select.limit?.offset, ctes);
+  select.columns?.forEach((coluna) => verificarExpressao(coluna.expr, escopo));
+  select.from?.forEach((origem) => verificarOrigem(origem, escopo));
+  verificarExpressao(select.where, escopo);
+  select.groupBy?.forEach((grupo) => verificarExpressao(grupo, escopo));
+  verificarExpressao(select.having, escopo);
+  verificarOrdenacao(select.orderBy, escopo);
+  if (Array.isArray(select.distinct)) select.distinct.forEach((item) => verificarExpressao(item, escopo));
+  verificarExpressao(select.limit?.limit, escopo);
+  verificarExpressao(select.limit?.offset, escopo);
 }
 
 // Cada CTE enxerga as anteriores; nome de CTE só vale sem schema, então "staging.x" nunca vira CTE.
-function verificarInstrucao(instrucao: Statement, ctes: ReadonlySet<string>): void {
+function verificarInstrucao(instrucao: Statement, escopo: Escopo): void {
   switch (instrucao.type) {
     case "select":
-      return verificarSelect(instrucao, ctes);
+      return verificarSelect(instrucao, escopo);
     case "union":
     case "union all":
-      verificarInstrucao(instrucao.left, ctes);
-      return verificarInstrucao(instrucao.right, ctes);
+      verificarInstrucao(instrucao.left, escopo);
+      return verificarInstrucao(instrucao.right, escopo);
     case "values":
-      instrucao.values.forEach((linha) => linha.forEach((valor) => verificarExpressao(valor, ctes)));
+      instrucao.values.forEach((linha) => linha.forEach((valor) => verificarExpressao(valor, escopo)));
       return;
     case "with": {
-      const visiveis = new Set(ctes);
+      const visiveis = new Set(escopo.ctes);
+      const interno: Escopo = { relacoes: escopo.relacoes, ctes: visiveis };
       instrucao.bind.forEach(({ alias, statement }) => {
-        verificarInstrucao(statement, visiveis);
+        verificarInstrucao(statement, interno);
         visiveis.add(alias.name);
       });
-      return verificarInstrucao(instrucao.in, visiveis);
+      return verificarInstrucao(instrucao.in, interno);
     }
     default:
       recusar(`instrucao nao permitida: ${instrucao.type}`);
@@ -219,18 +233,20 @@ function analisar(sql: string): Statement {
   return instrucoes[0];
 }
 
-function serializar(sql: string): string {
+function serializar(sql: string, relacoes: ReadonlySet<string>): string {
   const instrucao = analisar(sql);
-  verificarInstrucao(instrucao, new Set());
+  verificarInstrucao(instrucao, { relacoes, ctes: new Set() });
   return toSql.statement(aplicarLimite(instrucao as SelectStatement));
 }
 
 // O(t) no tamanho do texto: um parse e uma caminhada na árvore, repetidos uma vez sobre o texto gerado.
 // A segunda volta prova que o SQL reescrito é lido do mesmo jeito; o banco executa só esse texto.
-export function validarSql(sql: string): ResultadoValidacao {
+// perfil é o valor cru de app.perfil_atual (ou do claim), nunca o nome de exibição.
+export function validarSql(sql: string, perfil: string | null = null): ResultadoValidacao {
   try {
-    const reescrito = serializar(sql);
-    if (serializar(reescrito) !== reescrito) recusar("sql reescrito nao e estavel");
+    const relacoes = relacoesPermitidasDoPerfil(perfil);
+    const reescrito = serializar(sql, relacoes);
+    if (serializar(reescrito, relacoes) !== reescrito) recusar("sql reescrito nao e estavel");
     return { ok: true, sql: reescrito };
   } catch (erro) {
     if (erro instanceof ConsultaRecusada) return { ok: false, motivo: erro.message };

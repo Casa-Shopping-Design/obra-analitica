@@ -3,18 +3,38 @@ import { criarClienteServidor } from "@/lib/supabase/servidor";
 import { ErroConsulta } from "@/lib/consultas/posicao";
 import { lerPerfilAtual } from "@/lib/consultas/perfil";
 import {
+  lerAliquotaVigente,
   lerCabecalhoDre,
+  lerEstudoVigente,
   lerLinhaDre,
   lerResumoCarteiraDre,
   lerResumoDre,
+  lerVersaoEstudo,
   perfilVeDre,
+  type AliquotaVigente,
   type CabecalhoDre,
+  type EstudoVigente,
   type LinhaDre,
   type ResumoCarteiraDre,
   type ResumoDre,
+  type VersaoEstudo,
 } from "@/lib/dre";
+import { hojeEmBrasilia } from "@/lib/estudo-digitado";
+import {
+  inicioJanela,
+  lerLinhaTendenciaObra,
+  lerPontoTendencia,
+  mesesNaSerie,
+  recortarSerie,
+  type LinhaTendenciaObra,
+  type PontoTendencia,
+} from "@/lib/serie-tendencia";
 
 export type DreObra = { cabecalho: CabecalhoDre; linhas: LinhaDre[] };
+
+export const versoesPorPagina = 20;
+
+export type PaginaVersoes = { versoes: VersaoEstudo[]; total: number; pagina: number };
 
 export async function podeVerDre(): Promise<boolean> {
   return perfilVeDre(await lerPerfilAtual());
@@ -52,6 +72,54 @@ export async function listarDreObra(centroCustoId: string): Promise<DreObra | nu
   return { cabecalho: lerCabecalhoDre(linhas[0]), linhas: linhas.map(lerLinhaDre) };
 }
 
+// Uma consulta: o estudo vigente com as onze linhas embutidas pela chave estrangeira. O índice parcial da
+// vigente atende o filtro. Nulo para obra sem estudo ou fora do perfil.
+export async function buscarEstudoVigente(centroCustoId: string): Promise<EstudoVigente | null> {
+  const supabase = await criarClienteServidor();
+  const { data, error } = await supabase
+    .schema("app")
+    .from("estudo_viabilidade")
+    .select("id, versao, descricao, data_base, estudo_viabilidade_linha(linha, valor)")
+    .eq("centro_custo_id", centroCustoId)
+    .eq("situacao", "vigente")
+    .maybeSingle<Record<string, unknown>>();
+  if (error) throw new ErroConsulta(error.code);
+  return data ? lerEstudoVigente(data) : null;
+}
+
+// Da mais nova para a mais antiga, 20 por página, com o total contado na mesma consulta.
+export async function listarVersoesEstudo(centroCustoId: string, pagina = 1): Promise<PaginaVersoes> {
+  const supabase = await criarClienteServidor();
+  const inicio = (pagina - 1) * versoesPorPagina;
+  const { data, error, count } = await supabase
+    .schema("app")
+    .from("estudo_viabilidade")
+    .select("versao, descricao, data_base, situacao, criado_em, criado_por", { count: "exact" })
+    .eq("centro_custo_id", centroCustoId)
+    .order("versao", { ascending: false })
+    .range(inicio, inicio + versoesPorPagina - 1);
+  if (error) throw new ErroConsulta(error.code);
+  return { versoes: (data as Record<string, unknown>[]).map(lerVersaoEstudo), total: count ?? 0, pagina };
+}
+
+// A mesma regra da view: maior vigência até hoje e, no empate, a gravada por último.
+export async function buscarAliquotaVigente(centroCustoId: string): Promise<AliquotaVigente | null> {
+  const supabase = await criarClienteServidor();
+  const { data, error } = await supabase
+    .schema("app")
+    .from("aliquota_imposto_obra")
+    .select("aliquota, vigencia_inicio")
+    .eq("centro_custo_id", centroCustoId)
+    .lte("vigencia_inicio", hojeEmBrasilia())
+    .order("vigencia_inicio", { ascending: false })
+    .order("criado_em", { ascending: false })
+    .order("id", { ascending: false })
+    .limit(1)
+    .maybeSingle<Record<string, unknown>>();
+  if (error) throw new ErroConsulta(error.code);
+  return data ? lerAliquotaVigente(data) : null;
+}
+
 // Uma linha por tenant, somada no banco sobre as obras com estudo que o RLS libera; nulo para quem não é
 // diretor nem financeiro, e aí a visão geral esconde a faixa.
 export async function buscarResumoCarteira(): Promise<ResumoCarteiraDre | null> {
@@ -65,4 +133,32 @@ export async function buscarResumoCarteira(): Promise<ResumoCarteiraDre | null> 
     .maybeSingle<Record<string, unknown>>();
   if (error) throw new ErroConsulta(error.code);
   return data ? lerResumoCarteiraDre(data) : null;
+}
+
+// Os últimos 24 meses gravados da obra, do mais antigo ao mais recente; vazio antes da primeira carga.
+export async function listarTendenciaMensal(centroCustoId: string): Promise<PontoTendencia[]> {
+  const supabase = await criarClienteServidor();
+  const { data, error } = await supabase
+    .schema("marts")
+    .from("tendencia_resultado_mensal")
+    .select("competencia, margem_operacional_viabilidade, margem_operacional_tendencia")
+    .eq("centro_custo_id", centroCustoId)
+    .order("competencia", { ascending: false })
+    .limit(mesesNaSerie);
+  if (error) throw new ErroConsulta(error.code);
+  return recortarSerie((data as Record<string, unknown>[]).map(lerPontoTendencia));
+}
+
+// Uma consulta para todas as obras da lista; o RLS filtra tenant e obra, e a janela corta o histórico antigo.
+export async function listarTendenciaCarteira(): Promise<LinhaTendenciaObra[]> {
+  const supabase = await criarClienteServidor();
+  const { data, error } = await supabase
+    .schema("marts")
+    .from("tendencia_resultado_mensal")
+    .select("centro_custo_id, competencia, margem_operacional_viabilidade, margem_operacional_tendencia")
+    .gte("competencia", inicioJanela())
+    .order("centro_custo_id")
+    .order("competencia");
+  if (error) throw new ErroConsulta(error.code);
+  return (data as Record<string, unknown>[]).map(lerLinhaTendenciaObra);
 }

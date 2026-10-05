@@ -26,6 +26,9 @@ export type CamposLog = {
   linhas?: number;
   motivo?: string;
   tipo_erro?: string;
+  // Gravação do estudo: a obra e a versão criada, nunca o valor digitado.
+  centro_custo_id?: string | null;
+  versao?: number;
 };
 
 const registrador = pino({

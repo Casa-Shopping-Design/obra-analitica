@@ -209,6 +209,28 @@ export const catalogoViews: ViewCatalogo[] = [
     ],
     perfis: ["diretor", "financeiro", "leitura"],
   },
+  {
+    nome: "marts.tendencia_resultado_mensal",
+    descricao: "Serie mensal da DRE de viabilidade: uma linha por obra e competencia (primeiro dia do mes), gravada pela carga a cada mes. vgv_liquido, custo_vendas, despesas e lucro_operacional vem nas versoes _viabilidade (o estudo vigente naquele mes) e _tendencia (apropriado mais o que falta, se nada mudar). margem_operacional_viabilidade e margem_operacional_tendencia sao o lucro operacional sobre o VGV liquido da mesma coluna, em fracao (0,1 = 10%). A serie comeca no mes da primeira carga; para o valor de hoje use marts.dre_resumo_obra. Diretor, financeiro e leitura consultam.",
+    colunas: ["centro_custo_id", "obra", "competencia", "vgv_liquido_viabilidade", "vgv_liquido_tendencia", "custo_vendas_viabilidade", "custo_vendas_tendencia", "despesas_viabilidade", "despesas_tendencia", "lucro_operacional_viabilidade", "lucro_operacional_tendencia", "margem_operacional_viabilidade", "margem_operacional_tendencia", "gravado_em"],
+    exemplos: [
+      { pergunta: "Como a margem operacional da Parque das Aguas andou nos ultimos 12 meses?", sql: "select competencia, margem_operacional_viabilidade, margem_operacional_tendencia from marts.tendencia_resultado_mensal where obra ilike '%parque%' and competencia >= date_trunc('month', current_date) - interval '11 months' order by competencia" },
+      { pergunta: "Qual a tendencia de lucro operacional de cada obra mes a mes?", sql: "select obra, competencia, lucro_operacional_viabilidade, lucro_operacional_tendencia from marts.tendencia_resultado_mensal order by obra, competencia" },
+      { pergunta: "Em que mes a margem da tendencia da Aurora ficou mais baixa?", sql: "select competencia, margem_operacional_tendencia from marts.tendencia_resultado_mensal where obra ilike '%aurora%' order by margem_operacional_tendencia limit 1" },
+    ],
+    perfis: ["diretor", "financeiro", "leitura"],
+  },
+  {
+    nome: "marts.imposto_obra",
+    descricao: "Gestao de imposto por obra: uma linha por obra com estudo de viabilidade vigente e aliquota de imposto informada; obra sem aliquota nao aparece. aliquota e a fracao vigente (0,0632 = 6,32%), aplicada igual sobre todas as bases, sem regra de regime; aliquota_vigencia_inicio e aliquota_informada_em dizem desde quando vale e quando foi gravada. Bases: vgv_total (VGV de hoje, vendido mais estoque), receita_apropriada (receita contabil pelo POC ate a competencia), receita_a_apropriar (vendido ainda nao apropriado), vgv_estoque (estoque a vender) e recebido_acumulado (caixa recebido do comprador e do banco). Cada imposto_ e a aliquota vezes a base do mesmo nome; imposto_recebimento usa recebido_acumulado. imposto_diferido e imposto_recebimento menos imposto_receita_apropriada, negativo quando a receita apropriada passou do recebido. imposto_a_realizar e imposto_receita_a_apropriar mais imposto_vgv_estoque. imposto_viabilidade e a linha impostos do estudo. Sao estimativas pela aliquota informada, nao a apuracao do contador nem imposto pago. Diretor, financeiro e leitura consultam.",
+    colunas: ["centro_custo_id", "obra", "competencia", "aliquota", "aliquota_vigencia_inicio", "aliquota_informada_em", "vgv_total", "receita_apropriada", "receita_a_apropriar", "vgv_estoque", "recebido_acumulado", "imposto_receita_apropriada", "imposto_recebimento", "imposto_diferido", "imposto_vgv_estoque", "imposto_receita_a_apropriar", "imposto_vgv_total", "imposto_a_realizar", "imposto_viabilidade"],
+    exemplos: [
+      { pergunta: "Quanto de imposto ainda falta incidir em cada obra?", sql: "select obra, aliquota, imposto_receita_a_apropriar, imposto_vgv_estoque, imposto_a_realizar from marts.imposto_obra order by imposto_a_realizar desc" },
+      { pergunta: "Qual o imposto diferido sobre contas a receber de cada obra?", sql: "select obra, imposto_recebimento, imposto_receita_apropriada, imposto_diferido from marts.imposto_obra order by imposto_diferido" },
+      { pergunta: "O imposto sobre o VGV total passa do previsto no estudo?", sql: "select obra, aliquota, imposto_vgv_total, imposto_viabilidade, imposto_vgv_total - imposto_viabilidade as diferenca from marts.imposto_obra order by diferenca desc" },
+    ],
+    perfis: ["diretor", "financeiro", "leitura"],
+  },
 ];
 
 // Catalogo que vai para o prompt e para o validador de quem pergunta. perfil e o valor cru de app.perfil_atual.

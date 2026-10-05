@@ -54,17 +54,18 @@ async function lerPergunta(request: Request): Promise<string | null> {
   }
 }
 
-// Até duas gerações: a segunda recebe o motivo da recusa. O validador é o mesmo que o executor usa.
-async function gerarSqlValido(cliente: ClienteModelo, pergunta: string) {
-  const primeira: SqlGerado = await gerarSql(cliente, pergunta);
+// Até duas gerações: a segunda recebe o motivo da recusa. O validador é o mesmo que o executor usa, com o
+// mesmo perfil.
+async function gerarSqlValido(cliente: ClienteModelo, pergunta: string, perfil: string | null) {
+  const primeira: SqlGerado = await gerarSql(cliente, pergunta, perfil);
   if (!primeira.ok) return { geracao: primeira, valido: false, uso: primeira.uso };
-  const validacao = validarSql(primeira.sql);
+  const validacao = validarSql(primeira.sql, perfil);
   if (validacao.ok) return { geracao: primeira, valido: true, uso: primeira.uso };
 
-  const segunda = await gerarSql(cliente, pergunta, validacao.motivo);
+  const segunda = await gerarSql(cliente, pergunta, perfil, validacao.motivo);
   const uso = somar(primeira.uso, segunda.uso);
   if (!segunda.ok) return { geracao: primeira, valido: false, uso };
-  return { geracao: segunda, valido: validarSql(segunda.sql).ok, uso };
+  return { geracao: segunda, valido: validarSql(segunda.sql, perfil).ok, uso };
 }
 
 function responderErro(status: number, erro: string, idRequisicao: string): Response {
@@ -101,9 +102,12 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   const { data: dadosToken } = await supabase.auth.getClaims();
-  const appMetadata = dadosToken?.claims?.app_metadata as { tenant_id?: string; perfil?: string } | undefined;
+  const appMetadata = dadosToken?.claims?.app_metadata as { tenant_id?: string } | undefined;
   campos.tenant_id = appMetadata?.tenant_id ?? null;
-  const diretor = appMetadata?.perfil === "diretor";
+  // Perfil cru do claim ou de app.perfil_atual, nunca o nome de exibição: é ele que escolhe o catálogo do
+  // prompt e do validador. Sem perfil lido, o catálogo fica sem as views restritas.
+  const perfil = nivel.perfilLido ? nivel.perfil : null;
+  const diretor = perfil === "diretor";
 
   // Sem tenant a reserva da pergunta não grava, e pergunta sem registro não conta no limite:
   // cada tentativa gastaria chamadas ao modelo sem teto. O banco é consultado só quando o claim falta.
@@ -150,9 +154,9 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   try {
-    const { geracao, valido, uso } = await gerarSqlValido(cliente, pergunta);
+    const { geracao, valido, uso } = await gerarSqlValido(cliente, pergunta, perfil);
     if (!geracao.ok) {
-      await executarConsultaValidada("", idRequisicao, idPergunta, uso);
+      await executarConsultaValidada("", idRequisicao, idPergunta, perfil, uso);
       anotar("fora_do_catalogo");
       return responderErro(422, mensagens.assistente.foraDoCatalogo, idRequisicao);
     }
@@ -170,7 +174,14 @@ export async function POST(request: Request): Promise<Response> {
       }
     };
 
-    const execucao = await executarConsultaValidada(geracao.sql, idRequisicao, idPergunta, uso, valido ? complementar : undefined);
+    const execucao = await executarConsultaValidada(
+      geracao.sql,
+      idRequisicao,
+      idPergunta,
+      perfil,
+      uso,
+      valido ? complementar : undefined,
+    );
     if (!execucao.ok) {
       if (execucao.falha === "recusada") {
         anotar("recusada");
@@ -188,7 +199,7 @@ export async function POST(request: Request): Promise<Response> {
       return responderErro(502, mensagens.assistente.execucao, idRequisicao);
     }
 
-    const validacao = validarSql(geracao.sql);
+    const validacao = validarSql(geracao.sql, perfil);
     anotar("ok", { linhas: execucao.totalLinhas });
     return Response.json(
       {

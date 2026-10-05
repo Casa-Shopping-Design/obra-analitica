@@ -2,7 +2,8 @@
 
 /* Paleta das cores do logo APO: petróleo no menu, verde é dinheiro que entra, grafite é o que sai,
    vermelho vivo só em alerta. O verde claro do repasse tem contraste 2,41 sobre branco, então só preenche
-   gráfico e nunca vira texto. */
+   gráfico e nunca vira texto. O cinza de referência marca o estudo nos gráficos de linha: claro o bastante
+   para a linha da tendência se destacar, com contraste 3,82 sobre branco; também não vira texto. */
 @theme {
   --color-fundo: #f3f5f1;
   --color-superficie: #ffffff;
@@ -19,6 +20,7 @@
   --color-saida: #4a4543;
   --color-atencao: #8a5a0b;
   --color-alerta: #b3261e;
+  --color-referencia: #7a8580;
 
   --font-sans: var(--fonte-texto), ui-sans-serif, system-ui, sans-serif;
   /* O nome font-serif ficou para não mexer em 22 arquivos; a fonte dos títulos é sem serifa. */

@@ -6,7 +6,7 @@ import {
   formatosColuna,
   modeloAssistente,
   montarMensagemGeracao,
-  sistemaGeracaoSql,
+  montarSistemaGeracaoSql,
   type FormatoColunaLivre,
 } from "@/lib/assistente/prompt";
 
@@ -71,13 +71,18 @@ function lerSaida(texto: string | null): { sql: string; formatos: FormatoDevolvi
   }
 }
 
-// Uma chamada: catálogo em cache no bloco de sistema, pergunta como dado na mensagem do usuário.
+// Uma chamada: catálogo do perfil em cache no bloco de sistema, pergunta como dado na mensagem do usuário.
 // Sql vazio quer dizer que o catálogo não responde à pergunta.
-export async function gerarSql(cliente: ClienteModelo, pergunta: string, motivoRecusa?: string): Promise<SqlGerado> {
+export async function gerarSql(
+  cliente: ClienteModelo,
+  pergunta: string,
+  perfil: string | null,
+  motivoRecusa?: string,
+): Promise<SqlGerado> {
   const resposta = await cliente.messages.create({
     model: modeloAssistente,
     max_tokens: 4000,
-    system: [{ type: "text", text: sistemaGeracaoSql, cache_control: { type: "ephemeral" } }],
+    system: [{ type: "text", text: montarSistemaGeracaoSql(perfil), cache_control: { type: "ephemeral" } }],
     output_config: { effort: "low", format: { type: "json_schema", schema: esquemaSaida } },
     messages: [{ role: "user", content: montarMensagemGeracao(pergunta, motivoRecusa) }],
   });

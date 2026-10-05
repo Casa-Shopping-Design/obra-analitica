@@ -59,17 +59,17 @@ export function montarTabela(linhas: readonly LinhaConsulta[], formatos: readonl
     if (!formatoPorColuna.has(coluna)) formatoPorColuna.set(coluna, "texto");
   });
 
-  // Decimal e percentual não existem na tabela das perguntas prontas: seguem já formatados, como texto.
+  // Decimal não existe na tabela das perguntas prontas: segue já formatado, como texto.
   const colunas: ColunaResposta[] = [...formatoPorColuna].map(([chave, formato]) => ({
     chave,
     rotulo: rotular(chave),
-    formato: formato === "decimal" || formato === "percentual" ? "texto" : formato,
+    formato: formato === "decimal" ? "texto" : formato,
   }));
   const linhasTabela = linhas.map((linha) => {
     const celulas: LinhaResposta = {};
     formatoPorColuna.forEach((formato, chave) => {
       const valor = linha[chave];
-      if (formato === "decimal" || formato === "percentual") celulas[chave] = formatarValor(valor, formato);
+      if (formato === "decimal") celulas[chave] = formatarValor(valor, formato);
       else celulas[chave] = typeof valor === "number" || valor === null ? valor : String(valor ?? "");
     });
     return celulas;

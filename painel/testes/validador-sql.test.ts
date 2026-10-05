@@ -42,8 +42,9 @@ describe("validador de SQL: consultas do catálogo e perguntas prontas", () => {
   const exemplos = catalogoViews.flatMap((view) => view.exemplos.map((exemplo) => [exemplo.pergunta, exemplo.sql] as const));
   const prontas = perguntasProntas.map((pergunta) => [pergunta.id, pergunta.sql] as const);
 
+  // O diretor lê o catálogo inteiro; o que cada perfil não lê é testado no bloco de catálogo por perfil.
   it.each([...exemplos, ...prontas])("aceita %s", (_nome, sql) => {
-    expect(validarSql(sql)).toMatchObject({ ok: true });
+    expect(validarSql(sql, "diretor")).toMatchObject({ ok: true });
   });
 
   it.each(["marts.estoque_obra", "marts.estoque_tipologia", "marts.posicao_carteira", "marts.alertas_obra"])(
@@ -62,6 +63,54 @@ describe("validador de SQL: consultas do catálogo e perguntas prontas", () => {
 
   it("aceita agregação com filter (where ...), que o catálogo pode usar", () => {
     expect(validarSql("select count(*) filter (where vendas > 0) from marts.vso_mensal").ok).toBe(true);
+  });
+});
+
+describe("validador de SQL: catálogo por perfil (correção C4)", () => {
+  const lucro = "select obra, viabilidade, tendencia, desvio from marts.dre_viabilidade where linha = 'lucro_operacional'";
+  const viewsResultado = [
+    "marts.dre_viabilidade",
+    "marts.dre_resumo_obra",
+    "marts.dre_resumo_carteira",
+    "marts.tendencia_resultado_mensal",
+    "marts.imposto_obra",
+  ];
+
+  it.each(["diretor", "financeiro", "leitura"])("aceita a DRE para %s", (perfil) => {
+    expect(validarSql(lucro, perfil)).toMatchObject({ ok: true });
+  });
+
+  it.each(["gerente_obra", "comercial"])("recusa a DRE para %s, como view fora do catálogo dele", (perfil) => {
+    expect(validarSql(lucro, perfil)).toEqual({ ok: false, motivo: "relacao fora do catalogo: marts.dre_viabilidade" });
+  });
+
+  it("sem perfil lido vale o catálogo sem as views restritas", () => {
+    expect(validarSql(lucro).ok).toBe(false);
+    expect(validarSql(lucro, null).ok).toBe(false);
+    expect(validarSql("select obra, exposicao_maxima from marts.posicao_financeira_obra").ok).toBe(true);
+  });
+
+  it.each(viewsResultado)("gerente não lê %s nem escondida em CTE, subconsulta ou join", (view) => {
+    expect(validarSql(`select * from ${view}`, "gerente_obra").ok).toBe(false);
+    expect(validarSql(`with d as (select * from ${view}) select * from d`, "gerente_obra").ok).toBe(false);
+    expect(validarSql(`select (select count(*) from ${view}) as n from marts.vso_mensal`, "gerente_obra").ok).toBe(false);
+    expect(
+      validarSql(`select * from marts.vso_mensal v join ${view} d on d.centro_custo_id = v.centro_custo_id`, "gerente_obra").ok,
+    ).toBe(false);
+    expect(validarSql(`select * from ${view}`, "leitura").ok).toBe(true);
+  });
+
+  it("a soma da coluna inteira da DRE passa no validador: quem avisa que não se soma é a descrição do catálogo", () => {
+    expect(validarSql("select sum(tendencia) from marts.dre_viabilidade", "diretor").ok).toBe(true);
+    const descricao = catalogoViews.find((view) => view.nome === "marts.dre_viabilidade")!.descricao;
+    expect(descricao).toContain("nunca some a coluna inteira");
+  });
+
+  it("a tabela do estudo fica fora do catálogo de todo perfil", () => {
+    for (const perfil of ["diretor", "financeiro", "leitura", "gerente_obra", null]) {
+      expect(validarSql("select * from app.estudo_viabilidade", perfil).ok).toBe(false);
+      expect(validarSql("select * from app.posicao_dre_mensal", perfil).ok).toBe(false);
+    }
   });
 });
 

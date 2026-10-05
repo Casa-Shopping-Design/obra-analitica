@@ -1,6 +1,6 @@
 // Leitura, rótulos e textos da DRE de viabilidade (marts.dre_viabilidade e marts.dre_resumo_obra, migration
 // 0030). Sem acesso ao banco e sem conta: totais, diferenças e percentuais chegam prontos da view.
-import { numeroOuNulo, numeroOuZero } from "./consultas/resumo-origem";
+import { numeroOuNulo, numeroOuZero, perfilVeConferencia } from "./consultas/resumo-origem";
 import type { ChaveExplicacao } from "./explicacoes";
 import { formatarData, formatarDecimal, formatarPercentual, formatarReal } from "./formatar";
 
@@ -25,6 +25,23 @@ export const linhasResultado = [
 ] as const;
 
 export type LinhaResultado = (typeof linhasResultado)[number];
+
+// As onze que o estudo digita (digitavel em marts.linha_resultado), na ordem da view. As outras seis são totais.
+export const linhasDigitaveis = [
+  "vgv_bruto",
+  "impostos",
+  "custo_terreno",
+  "custo_projetos",
+  "custo_licenciamento",
+  "custo_construcao",
+  "assistencia_tecnica",
+  "juros_financiamento",
+  "estoque",
+  "despesas_comerciais",
+  "despesas_administrativas",
+] as const satisfies readonly LinhaResultado[];
+
+export type LinhaDigitavel = (typeof linhasDigitaveis)[number];
 
 const rotulosLinha: Record<LinhaResultado, string> = {
   vgv_bruto: "VGV bruto",
@@ -54,8 +71,75 @@ export function perfilVeDre(perfil: string | null | undefined): boolean {
   return perfisDre.some((permitido) => permitido === perfil);
 }
 
+// Grava quem vê a conferência com o ERP (diretor e financeiro), e só com o segundo fator confirmado na
+// sessão. O banco repete as duas conferências dentro de app.gravar_viabilidade.
+export function sessaoGravaEstudo(perfil: string | null | undefined, aal: string | null | undefined): boolean {
+  return perfilVeConferencia(perfil) && aal === "aal2";
+}
+
 export function rotuloLinha(linha: string): string {
   return (rotulosLinha as Record<string, string>)[linha] ?? linha;
+}
+
+export type EstudoVigente = {
+  id: string;
+  versao: number;
+  descricao: string | null;
+  dataBase: string;
+  linhas: Record<LinhaDigitavel, number>;
+};
+
+export type VersaoEstudo = {
+  versao: number;
+  descricao: string | null;
+  dataBase: string;
+  situacao: string;
+  criadoEm: string;
+  criadoPor: string | null;
+};
+
+export type AliquotaVigente = { aliquota: number; vigenciaInicio: string };
+
+// Linha que faltar no banco (não acontece: a função grava as onze) aparece como zero no formulário.
+export function lerEstudoVigente(linha: Record<string, unknown>): EstudoVigente {
+  const valores = Array.isArray(linha.estudo_viabilidade_linha) ? (linha.estudo_viabilidade_linha as Record<string, unknown>[]) : [];
+  const porLinha = new Map(valores.map((valor) => [String(valor.linha), numeroOuZero(valor.valor)]));
+  const linhas = Object.fromEntries(linhasDigitaveis.map((chave) => [chave, porLinha.get(chave) ?? 0])) as Record<
+    LinhaDigitavel,
+    number
+  >;
+  return {
+    id: String(linha.id),
+    versao: numeroOuZero(linha.versao),
+    descricao: typeof linha.descricao === "string" && linha.descricao !== "" ? linha.descricao : null,
+    dataBase: String(linha.data_base),
+    linhas,
+  };
+}
+
+export function lerVersaoEstudo(linha: Record<string, unknown>): VersaoEstudo {
+  return {
+    versao: numeroOuZero(linha.versao),
+    descricao: typeof linha.descricao === "string" && linha.descricao !== "" ? linha.descricao : null,
+    dataBase: String(linha.data_base),
+    situacao: String(linha.situacao),
+    criadoEm: String(linha.criado_em),
+    criadoPor: typeof linha.criado_por === "string" ? linha.criado_por : null,
+  };
+}
+
+export function lerAliquotaVigente(linha: Record<string, unknown>): AliquotaVigente {
+  return { aliquota: numeroOuZero(linha.aliquota), vigenciaInicio: String(linha.vigencia_inicio) };
+}
+
+// A tabela guarda só o id de quem gravou; o painel não lê nome de outro usuário do Auth.
+export function textoAutorVersao(versao: VersaoEstudo, usuarioId: string): string {
+  if (versao.criadoPor === null) return "carga inicial";
+  return versao.criadoPor === usuarioId ? "você" : "outro usuário";
+}
+
+export function textoSituacaoVersao(situacao: string): string {
+  return situacao === "vigente" ? "vigente" : "substituída";
 }
 
 export type LinhaDre = {

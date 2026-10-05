@@ -74,5 +74,25 @@ export const mensagens = {
     semEstudo: "Esta obra ainda não tem estudo de viabilidade cadastrado.",
     semObras: "Nenhuma obra tem estudo de viabilidade cadastrado ainda.",
     restrita: "O seu perfil não abre a DRE de viabilidade. Peça ao diretor da construtora para liberar.",
+    serieVazia: "A série começa no mês da primeira carga.",
+    serieIndisponivel: "Não foi possível carregar a série mensal agora. Recarregue a página em alguns minutos.",
+  },
+  estudo: {
+    gravado: "Estudo gravado. A DRE de viabilidade já usa a versão nova.",
+    aliquotaGravada: "Alíquota gravada. A DRE de viabilidade já calcula os impostos com ela.",
+    valorInvalido:
+      "Confira os campos: valores só com números e vírgula para os centavos, sem sinal; alíquota de 0 a 20%; data de hoje ou anterior; descrição com até 120 caracteres.",
+    semPermissao: "Só diretor e financeiro, com o segundo fator confirmado, gravam o estudo e a alíquota desta obra.",
+    indisponivel: "Não foi possível gravar agora. Tente de novo em alguns minutos.",
+    limite: "Esta obra já recebeu 20 versões do estudo hoje. Tente de novo amanhã.",
+    semVersoes: "Nenhuma versão gravada ainda. A primeira gravação cria a versão 1.",
+    semAliquota: "Nenhuma alíquota informada ainda. Sem ela, a DRE mostra os impostos realizados como zero.",
+    avisoAliquota: "Alíquota informada pela construtora. O APO não apura imposto.",
+  },
+  imposto: {
+    indisponivel: "Não foi possível carregar a gestão de imposto agora. Recarregue a página em alguns minutos.",
+    semAliquota:
+      "Esta obra ainda não tem estudo de viabilidade com alíquota de imposto informada. Peça ao diretor ou ao financeiro para cadastrar.",
+    restrita: "O seu perfil não abre a gestão de imposto. Peça ao diretor da construtora para liberar.",
   },
 } as const;

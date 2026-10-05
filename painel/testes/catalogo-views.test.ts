@@ -21,6 +21,8 @@ const viewsNovas: Record<string, string> = {
   "marts.dre_viabilidade": "0030_dre_viabilidade.sql",
   "marts.dre_resumo_obra": "0030_dre_viabilidade.sql",
   "marts.dre_resumo_carteira": "0031_dre_resumo_carteira.sql",
+  "marts.tendencia_resultado_mensal": "0033_posicao_dre_mensal.sql",
+  "marts.imposto_obra": "0034_imposto_obra.sql",
 };
 
 // Trecho da migration entre o create view e o próximo create ou grant no começo de linha.
@@ -34,7 +36,7 @@ function definicaoView(arquivo: string, nome: string): string {
 }
 
 describe("catálogo das views novas", () => {
-  it("tem as views das migrations 0018, 0019, 0024, 0026, 0027, 0030 e 0031", () => {
+  it("tem as views das migrations 0018, 0019, 0024, 0026, 0027, 0030, 0031, 0033 e 0034", () => {
     const nomes = catalogoViews.map((view) => view.nome);
     for (const nome of Object.keys(viewsNovas)) expect(nomes).toContain(nome);
   });
@@ -61,10 +63,10 @@ describe("catálogo das views novas", () => {
     expect(nomes).not.toContain("marts.resumo_venda_estoque");
   });
 
-  it("todo exemplo passa pelo validador", () => {
+  it("todo exemplo passa pelo validador com um perfil que lê a view", () => {
     for (const view of catalogoViews) {
       for (const exemplo of view.exemplos) {
-        expect(validarSql(exemplo.sql), exemplo.pergunta).toMatchObject({ ok: true });
+        expect(validarSql(exemplo.sql, view.perfis?.[0] ?? null), exemplo.pergunta).toMatchObject({ ok: true });
       }
     }
   });
@@ -80,9 +82,12 @@ describe("catalogoDoPerfil", () => {
     expect(nomesDe(null)).not.toContain("marts.conferencia_origem");
   });
 
-  it("deixa a DRE de viabilidade e os resumos dela para diretor, financeiro e leitura", () => {
+  it("deixa a DRE de viabilidade, os resumos dela, a tendência mensal e o imposto para diretor, financeiro e leitura", () => {
     const nomesDe = (perfil: string | null) => catalogoDoPerfil(perfil).map((view) => view.nome);
-    for (const nome of ["marts.dre_viabilidade", "marts.dre_resumo_obra", "marts.dre_resumo_carteira"]) {
+    for (const nome of [
+      "marts.dre_viabilidade", "marts.dre_resumo_obra", "marts.dre_resumo_carteira", "marts.tendencia_resultado_mensal",
+      "marts.imposto_obra",
+    ]) {
       expect(nomesDe("diretor")).toContain(nome);
       expect(nomesDe("financeiro")).toContain(nome);
       expect(nomesDe("leitura")).toContain(nome);
@@ -92,12 +97,25 @@ describe("catalogoDoPerfil", () => {
     }
   });
 
+  it("deixa o gerente de obra sem nenhuma view de resultado e o perfil leitura com todas", () => {
+    const viewsResultado = [
+      "marts.dre_viabilidade", "marts.dre_resumo_obra", "marts.dre_resumo_carteira", "marts.tendencia_resultado_mensal",
+      "marts.imposto_obra",
+    ];
+    const gerente = catalogoDoPerfil("gerente_obra").map((view) => view.nome);
+    const leitura = catalogoDoPerfil("leitura").map((view) => view.nome);
+    expect(gerente).not.toEqual(expect.arrayContaining(viewsResultado));
+    viewsResultado.forEach((nome) => expect(gerente).not.toContain(nome));
+    expect(leitura).toEqual(expect.arrayContaining(viewsResultado));
+  });
+
   it("mantém as views sem restrição para qualquer perfil", () => {
     expect(catalogoDoPerfil("leitura").map((view) => view.nome)).toContain("marts.repasse_obra");
     expect(catalogoDoPerfil("gerente_obra").map((view) => view.nome)).toEqual(
       expect.arrayContaining(["marts.repasse_banco", "marts.leads_origem"]),
     );
-    // Quatro views restritas: conferência com o ERP, DRE de viabilidade e os resumos da DRE por obra e da carteira.
-    expect(catalogoDoPerfil(null)).toHaveLength(catalogoViews.length - 4);
+    // Seis views restritas: conferência com o ERP, DRE de viabilidade, os resumos dela por obra e da carteira,
+    // a tendência mensal e a gestão de imposto.
+    expect(catalogoDoPerfil(null)).toHaveLength(catalogoViews.length - 6);
   });
 });

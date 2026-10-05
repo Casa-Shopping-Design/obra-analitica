@@ -35,7 +35,7 @@ const tokens = lerTokens(textoCss);
 describe("paleta APO", () => {
   it("cores-grafico.ts repete os valores de globals.css", () => {
     const chaves = Object.keys(cores) as (keyof typeof cores)[];
-    expect(chaves).toHaveLength(9);
+    expect(chaves).toHaveLength(10);
     for (const chave of chaves) {
       expect(tokens[chave], chave).toBe(cores[chave].toLowerCase());
     }
@@ -65,5 +65,14 @@ describe("paleta APO", () => {
     const calculado = contraste(tokens.repasse, tokens.superficie);
     expect(arredondar(calculado)).toBe(2.41);
     expect(calculado).toBeLessThan(4.5);
+  });
+
+  it("o cinza de referência serve para linha de gráfico e não para texto", () => {
+    const sobreSuperficie = contraste(tokens.referencia, tokens.superficie);
+    const sobreFundo = contraste(tokens.referencia, tokens.fundo);
+    expect(arredondar(sobreSuperficie)).toBe(3.82);
+    expect(arredondar(sobreFundo)).toBe(3.48);
+    expect(Math.min(sobreSuperficie, sobreFundo)).toBeGreaterThanOrEqual(3);
+    expect(sobreSuperficie).toBeLessThan(4.5);
   });
 });

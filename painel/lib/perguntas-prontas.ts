@@ -3,8 +3,9 @@
 // devolver exatamente o que este sql devolveria. Mudou um, muda o outro.
 
 import type { TipoAlerta } from "./alertas";
+import { perfisDre } from "./dre";
 
-export type FormatoColuna = "texto" | "real" | "inteiro" | "mes" | "data" | "area";
+export type FormatoColuna = "texto" | "real" | "inteiro" | "percentual" | "mes" | "data" | "area";
 
 export type ColunaResposta = { chave: string; rotulo: string; formato: FormatoColuna };
 
@@ -14,7 +15,11 @@ export type PerguntaPronta = {
   sql: string;
   colunas: readonly ColunaResposta[];
   semResultado: string;
+  // Sem perfis, qualquer perfil vê a pergunta; com perfis, só eles. Mesmo critério do catálogo das views.
+  perfis?: readonly string[];
 };
+
+const semObraDre = "Nenhuma obra com estudo de viabilidade liberada para o seu perfil.";
 
 export const perguntasProntas = [
   {
@@ -218,6 +223,74 @@ export const perguntasProntas = [
     ],
     semResultado: "Nenhuma unidade cadastrada nas obras liberadas para o seu perfil.",
   },
+  {
+    id: "tendencia-lucro-obras",
+    pergunta: "Qual a tendência do lucro de cada obra contra o estudo?",
+    sql: "select obra, viabilidade, tendencia, desvio, desvio_pct from marts.dre_viabilidade where linha = 'lucro_operacional' order by desvio",
+    colunas: [
+      { chave: "obra", rotulo: "Obra", formato: "texto" },
+      { chave: "viabilidade", rotulo: "Lucro no estudo", formato: "real" },
+      { chave: "tendencia", rotulo: "Lucro na tendência", formato: "real" },
+      { chave: "desvio", rotulo: "Desvio", formato: "real" },
+      { chave: "desvio_pct", rotulo: "Desvio %", formato: "percentual" },
+    ],
+    semResultado: semObraDre,
+    perfis: perfisDre,
+  },
+  {
+    id: "linha-mais-desvia-parque",
+    pergunta: "Em que linha a Parque das Águas mais desvia do estudo?",
+    sql: "select obra, case linha when 'vgv_bruto' then 'VGV bruto' when 'impostos' then 'Impostos' when 'custo_terreno' then 'Custo do terreno' when 'custo_projetos' then 'Projetos' when 'custo_licenciamento' then 'Licenciamento' when 'custo_construcao' then 'Construção' when 'assistencia_tecnica' then 'Assistência técnica' when 'juros_financiamento' then 'Juros do financiamento' when 'estoque' then 'Estoque' when 'despesas_comerciais' then 'Despesas comerciais' when 'despesas_administrativas' then 'Despesas administrativas' end as linha, viabilidade, tendencia, desvio from marts.dre_viabilidade where obra ilike '%parque%' and linha_de_total = false and desvio_favoravel = false order by abs(desvio) desc limit 3",
+    colunas: [
+      { chave: "obra", rotulo: "Obra", formato: "texto" },
+      { chave: "linha", rotulo: "Linha da DRE", formato: "texto" },
+      { chave: "viabilidade", rotulo: "Estudo", formato: "real" },
+      { chave: "tendencia", rotulo: "Tendência", formato: "real" },
+      { chave: "desvio", rotulo: "Desvio", formato: "real" },
+    ],
+    semResultado: "A Parque das Águas não tem linha desfavorável ao estudo, ou não está liberada para o seu perfil.",
+    perfis: perfisDre,
+  },
+  {
+    id: "margem-perdida-obras",
+    pergunta: "Qual obra perdeu mais margem contra o estudo?",
+    sql: "select obra, margem_operacional_viabilidade, margem_operacional_tendencia, desvio_margem_operacional from marts.dre_resumo_obra order by desvio_margem_operacional",
+    colunas: [
+      { chave: "obra", rotulo: "Obra", formato: "texto" },
+      { chave: "margem_operacional_viabilidade", rotulo: "Margem no estudo", formato: "percentual" },
+      { chave: "margem_operacional_tendencia", rotulo: "Margem na tendência", formato: "percentual" },
+      { chave: "desvio_margem_operacional", rotulo: "Desvio da margem", formato: "percentual" },
+    ],
+    semResultado: semObraDre,
+    perfis: perfisDre,
+  },
+  {
+    id: "receita-a-apropriar-obras",
+    pergunta: "Quanto falta apropriar de receita em cada obra?",
+    sql: "select obra, apropriado, a_apropriar, a_contratar from marts.dre_viabilidade where linha = 'vgv_bruto' order by obra",
+    colunas: [
+      { chave: "obra", rotulo: "Obra", formato: "texto" },
+      { chave: "apropriado", rotulo: "Receita apropriada", formato: "real" },
+      { chave: "a_apropriar", rotulo: "Vendido a apropriar", formato: "real" },
+      { chave: "a_contratar", rotulo: "Estoque a vender", formato: "real" },
+    ],
+    semResultado: semObraDre,
+    perfis: perfisDre,
+  },
+  {
+    id: "imposto-a-gerar-obras",
+    pergunta: "Quanto de imposto cada obra ainda vai gerar?",
+    sql: "select obra, aliquota, imposto_receita_a_apropriar, imposto_vgv_estoque, imposto_a_realizar from marts.imposto_obra order by imposto_a_realizar desc",
+    colunas: [
+      { chave: "obra", rotulo: "Obra", formato: "texto" },
+      { chave: "aliquota", rotulo: "Alíquota informada", formato: "percentual" },
+      { chave: "imposto_receita_a_apropriar", rotulo: "Sobre o vendido a apropriar", formato: "real" },
+      { chave: "imposto_vgv_estoque", rotulo: "Sobre o estoque", formato: "real" },
+      { chave: "imposto_a_realizar", rotulo: "Imposto a realizar", formato: "real" },
+    ],
+    semResultado: "Nenhuma obra com alíquota de imposto informada liberada para o seu perfil.",
+    perfis: perfisDre,
+  },
 ] as const satisfies readonly PerguntaPronta[];
 
 // Rótulo de cada tipo de marts.alertas_obra na pergunta "obras-pedem-atencao". Tem de ser igual ao case do sql dela.
@@ -232,6 +305,13 @@ export const rotulosAlerta: Record<TipoAlerta, string> = {
 type PerguntaDoCatalogo = (typeof perguntasProntas)[number];
 export type IdPerguntaPronta = PerguntaDoCatalogo["id"];
 
-export function buscarPerguntaPronta(id: string | undefined): PerguntaDoCatalogo | undefined {
-  return perguntasProntas.find((pergunta) => pergunta.id === id);
+// perfil é o valor cru de app.perfil_atual; sem perfil lido ficam só as perguntas sem restrição.
+export function perguntasProntasDoPerfil(perfil: string | null): readonly PerguntaDoCatalogo[] {
+  return perguntasProntas.filter(
+    (pergunta) => !("perfis" in pergunta) || (perfil !== null && pergunta.perfis.some((permitido) => permitido === perfil)),
+  );
+}
+
+export function buscarPerguntaPronta(id: string | undefined, perfil: string | null): PerguntaDoCatalogo | undefined {
+  return perguntasProntasDoPerfil(perfil).find((pergunta) => pergunta.id === id);
 }
