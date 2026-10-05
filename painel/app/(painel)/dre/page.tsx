@@ -3,9 +3,15 @@ import Link from "next/link";
 import { ExplicacaoIndicador } from "@/componentes/ExplicacaoIndicador";
 import { podeVerConferencia } from "@/lib/consultas/conferencia";
 import { listarResumoDre } from "@/lib/consultas/dre";
-import { formatarMesAno, situacaoDesvioMargem, textoDesvioPontos, type ResumoDre, type SituacaoDesvio } from "@/lib/dre";
+import {
+  formatarMesAno,
+  percentualOuSemBase,
+  situacaoDesvioMargem,
+  textoDesvioPontos,
+  type ResumoDre,
+  type SituacaoDesvio,
+} from "@/lib/dre";
 import type { ChaveExplicacao } from "@/lib/explicacoes";
-import { formatarPercentual } from "@/lib/formatar";
 import { mensagens } from "@/lib/mensagens";
 
 export const metadata: Metadata = { title: "DRE de viabilidade" };
@@ -18,10 +24,6 @@ async function carregar(): Promise<ResumoDre[] | null> {
   } catch {
     return null;
   }
-}
-
-function percentualOu(fracao: number | null): string {
-  return fracao === null ? "sem base" : formatarPercentual(fracao);
 }
 
 const corSituacao: Record<SituacaoDesvio, string> = {
@@ -115,8 +117,8 @@ export default async function PaginaDre() {
                           Realizado até {formatarMesAno(linha.competencia)}, estudo versão {linha.estudoVersao}
                         </span>
                       </th>
-                      <td className={celula}>{percentualOu(linha.margemOperacionalViabilidade)}</td>
-                      <td className={celula}>{percentualOu(linha.margemOperacionalTendencia)}</td>
+                      <td className={celula}>{percentualOuSemBase(linha.margemOperacionalViabilidade)}</td>
+                      <td className={celula}>{percentualOuSemBase(linha.margemOperacionalTendencia)}</td>
                       <td className={`${celula} ${corSituacao[situacaoDesvioMargem(linha.desvioMargemOperacional)]}`}>
                         {textoDesvioPontos(linha.desvioMargemOperacional)}
                       </td>

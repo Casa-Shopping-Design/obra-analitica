@@ -20,6 +20,7 @@ const viewsNovas: Record<string, string> = {
   "marts.comparativo_obras": "0027_comparativo_obras.sql",
   "marts.dre_viabilidade": "0030_dre_viabilidade.sql",
   "marts.dre_resumo_obra": "0030_dre_viabilidade.sql",
+  "marts.dre_resumo_carteira": "0031_dre_resumo_carteira.sql",
 };
 
 // Trecho da migration entre o create view e o próximo create ou grant no começo de linha.
@@ -33,7 +34,7 @@ function definicaoView(arquivo: string, nome: string): string {
 }
 
 describe("catálogo das views novas", () => {
-  it("tem as views das migrations 0018, 0019, 0024, 0026, 0027 e 0030", () => {
+  it("tem as views das migrations 0018, 0019, 0024, 0026, 0027, 0030 e 0031", () => {
     const nomes = catalogoViews.map((view) => view.nome);
     for (const nome of Object.keys(viewsNovas)) expect(nomes).toContain(nome);
   });
@@ -79,9 +80,9 @@ describe("catalogoDoPerfil", () => {
     expect(nomesDe(null)).not.toContain("marts.conferencia_origem");
   });
 
-  it("deixa a DRE de viabilidade e o resumo dela só para diretor e financeiro", () => {
+  it("deixa a DRE de viabilidade e os resumos dela só para diretor e financeiro", () => {
     const nomesDe = (perfil: string | null) => catalogoDoPerfil(perfil).map((view) => view.nome);
-    for (const nome of ["marts.dre_viabilidade", "marts.dre_resumo_obra"]) {
+    for (const nome of ["marts.dre_viabilidade", "marts.dre_resumo_obra", "marts.dre_resumo_carteira"]) {
       expect(nomesDe("diretor")).toContain(nome);
       expect(nomesDe("financeiro")).toContain(nome);
       expect(nomesDe("gerente_obra")).not.toContain(nome);
@@ -94,7 +95,7 @@ describe("catalogoDoPerfil", () => {
     expect(catalogoDoPerfil("gerente_obra").map((view) => view.nome)).toEqual(
       expect.arrayContaining(["marts.repasse_banco", "marts.leads_origem"]),
     );
-    // Três views restritas: conferência com o ERP, DRE de viabilidade e resumo da DRE.
-    expect(catalogoDoPerfil(null)).toHaveLength(catalogoViews.length - 3);
+    // Quatro views restritas: conferência com o ERP, DRE de viabilidade e os resumos da DRE por obra e da carteira.
+    expect(catalogoDoPerfil(null)).toHaveLength(catalogoViews.length - 4);
   });
 });

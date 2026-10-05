@@ -73,6 +73,21 @@ export const explicacoes = {
   margem_operacional_tendencia: "Lucro operacional da tendência sobre o VGV líquido da tendência.",
   desvio_margem_operacional:
     "Margem na tendência menos margem no estudo, em pontos percentuais. Abaixo do estudo quer dizer que a obra vai render menos que o previsto.",
+  vgv_bruto_resultado:
+    "VGV de hoje das obras com estudo de viabilidade: unidades vendidas pelo valor do contrato mais o estoque pelo preço de tabela atual. É a tendência do VGV bruto na DRE.",
+  pct_vendido_resultado: "VGV vendido sobre o VGV de hoje, só nas obras com estudo de viabilidade. Contrato distratado não entra.",
+  poc_resultado:
+    "Receita apropriada sobre o VGV vendido: quanto das vendas já entrou no resultado pelo andamento da obra, até o último mês fechado no ERP.",
+  margem_operacional_viabilidade_carteira:
+    "Lucro operacional do estudo somado sobre o VGV líquido do estudo somado, nas obras com estudo. Não é a média das margens de cada obra.",
+  margem_operacional_tendencia_carteira:
+    "Lucro operacional da tendência somado sobre o VGV líquido da tendência somado. A nota compara com a margem do estudo, em pontos percentuais.",
+  lucro_operacional_tendencia:
+    "VGV líquido menos custo das vendas e despesas, na tendência: o que as obras vão dar no fim se nada mudar.",
+  custo_apropriado:
+    "Custo das vendas que já entrou no resultado até o último mês fechado, como o ERP fecha no mapa imobiliário. Não é o que foi pago.",
+  recebido_acumulado:
+    "Tudo o que já entrou em caixa, do comprador e do banco, nas obras com estudo. É caixa, não receita apropriada.",
 } as const;
 
 export type ChaveExplicacao = keyof typeof explicacoes;

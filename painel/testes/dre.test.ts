@@ -3,9 +3,11 @@ import {
   colunasDre,
   formatarMesAno,
   lerLinhaDre,
+  lerResumoCarteiraDre,
   linhasResultado,
   notaDre,
   percentualComSinal,
+  percentualOuSemBase,
   prepararLinhasDre,
   rotuloLinha,
   situacaoDesvioMargem,
@@ -171,5 +173,35 @@ describe("cabeçalho e mensagens", () => {
     }
     expect(mensagens.dre.semEstudo).toBe("Esta obra ainda não tem estudo de viabilidade cadastrado.");
     expect(mensagens.dre.restrita).toBe("A DRE de viabilidade é restrita a diretor e financeiro.");
+  });
+});
+
+describe("resumo da carteira", () => {
+  it("lê a linha do caso conhecido sem refazer conta e mantém nulo sem base", () => {
+    const resumo = lerResumoCarteiraDre({
+      obras: 2,
+      vgv_bruto_tendencia: "4000.00",
+      vgv_vendido: "3000.00",
+      pct_vendido: "0.7500",
+      receita_apropriada: "1400.00",
+      poc: "0.4667",
+      custo_apropriado: "1000.00",
+      recebido_acumulado: "600.00",
+      lucro_operacional_viabilidade: "988.00",
+      lucro_operacional_tendencia: "1080.00",
+      margem_operacional_viabilidade: "0.2708",
+      margem_operacional_tendencia: "0.2813",
+      desvio_margem_operacional: null,
+    });
+    expect(resumo).toMatchObject({
+      obras: 2,
+      vgvBrutoTendencia: 4000,
+      pctVendido: 0.75,
+      poc: 0.4667,
+      lucroOperacionalTendencia: 1080,
+      margemOperacionalTendencia: 0.2813,
+      desvioMargemOperacional: null,
+    });
+    expect(percentualOuSemBase(null)).toBe("sem base");
   });
 });

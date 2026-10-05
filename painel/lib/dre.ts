@@ -88,6 +88,41 @@ export type ResumoDre = {
   desvioMargemOperacional: number | null;
 };
 
+// Uma linha por tenant de marts.dre_resumo_carteira (migration 0031), já somada e com as frações prontas.
+export type ResumoCarteiraDre = {
+  obras: number;
+  vgvBrutoTendencia: number;
+  vgvVendido: number;
+  pctVendido: number | null;
+  receitaApropriada: number;
+  poc: number | null;
+  custoApropriado: number;
+  recebidoAcumulado: number;
+  lucroOperacionalViabilidade: number;
+  lucroOperacionalTendencia: number;
+  margemOperacionalViabilidade: number | null;
+  margemOperacionalTendencia: number | null;
+  desvioMargemOperacional: number | null;
+};
+
+export function lerResumoCarteiraDre(linha: Record<string, unknown>): ResumoCarteiraDre {
+  return {
+    obras: numeroOuZero(linha.obras),
+    vgvBrutoTendencia: numeroOuZero(linha.vgv_bruto_tendencia),
+    vgvVendido: numeroOuZero(linha.vgv_vendido),
+    pctVendido: numeroOuNulo(linha.pct_vendido),
+    receitaApropriada: numeroOuZero(linha.receita_apropriada),
+    poc: numeroOuNulo(linha.poc),
+    custoApropriado: numeroOuZero(linha.custo_apropriado),
+    recebidoAcumulado: numeroOuZero(linha.recebido_acumulado),
+    lucroOperacionalViabilidade: numeroOuZero(linha.lucro_operacional_viabilidade),
+    lucroOperacionalTendencia: numeroOuZero(linha.lucro_operacional_tendencia),
+    margemOperacionalViabilidade: numeroOuNulo(linha.margem_operacional_viabilidade),
+    margemOperacionalTendencia: numeroOuNulo(linha.margem_operacional_tendencia),
+    desvioMargemOperacional: numeroOuNulo(linha.desvio_margem_operacional),
+  };
+}
+
 export function lerLinhaDre(linha: Record<string, unknown>): LinhaDre {
   return {
     linha: String(linha.linha),
@@ -164,6 +199,10 @@ export function textoSituacao(situacao: SituacaoDesvio): string | null {
   if (situacao === "favoravel") return "favorável";
   if (situacao === "desfavoravel") return "desfavorável";
   return null;
+}
+
+export function percentualOuSemBase(fracao: number | null): string {
+  return fracao === null ? "sem base" : formatarPercentual(fracao);
 }
 
 export function percentualComSinal(fracao: number | null): string {

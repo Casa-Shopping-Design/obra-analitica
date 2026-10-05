@@ -199,6 +199,16 @@ export const catalogoViews: ViewCatalogo[] = [
     ],
     perfis: ["diretor", "financeiro"],
   },
+  {
+    nome: "marts.dre_resumo_carteira",
+    descricao: "Uma linha por tenant com a soma de marts.dre_resumo_obra nas obras com estudo de viabilidade vigente que quem pergunta ve. obras e quantas obras entraram na soma. vgv_bruto_tendencia e o VGV de hoje e pct_vendido e vgv_vendido sobre ele. poc e receita_apropriada sobre vgv_vendido. custo_apropriado e o custo de vendas ja apropriado e recebido_acumulado e o caixa recebido do comprador e do banco. margem_operacional_viabilidade e margem_operacional_tendencia sao o lucro operacional somado sobre o VGV liquido somado, nao a media das margens das obras; desvio_margem_operacional e a diferenca entre elas. Fracoes (0,1 = 10%). So diretor e financeiro consultam.",
+    colunas: ["obras", "vgv_bruto_tendencia", "vgv_vendido", "pct_vendido", "receita_apropriada", "poc", "custo_apropriado", "recebido_acumulado", "lucro_operacional_viabilidade", "lucro_operacional_tendencia", "margem_operacional_viabilidade", "margem_operacional_tendencia", "desvio_margem_operacional"],
+    exemplos: [
+      { pergunta: "Qual a margem operacional da carteira no estudo e na tendencia?", sql: "select obras, margem_operacional_viabilidade, margem_operacional_tendencia, desvio_margem_operacional from marts.dre_resumo_carteira" },
+      { pergunta: "Qual o POC e o percentual vendido somando todas as obras?", sql: "select obras, vgv_bruto_tendencia, pct_vendido, poc from marts.dre_resumo_carteira" },
+    ],
+    perfis: ["diretor", "financeiro"],
+  },
 ];
 
 // Catalogo que vai para o prompt e para o validador de quem pergunta. perfil e o valor cru de app.perfil_atual.

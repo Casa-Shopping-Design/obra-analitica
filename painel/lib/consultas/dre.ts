@@ -1,7 +1,16 @@
 import "server-only";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
 import { ErroConsulta } from "@/lib/consultas/posicao";
-import { lerCabecalhoDre, lerLinhaDre, lerResumoDre, type CabecalhoDre, type LinhaDre, type ResumoDre } from "@/lib/dre";
+import {
+  lerCabecalhoDre,
+  lerLinhaDre,
+  lerResumoCarteiraDre,
+  lerResumoDre,
+  type CabecalhoDre,
+  type LinhaDre,
+  type ResumoCarteiraDre,
+  type ResumoDre,
+} from "@/lib/dre";
 
 export type DreObra = { cabecalho: CabecalhoDre; linhas: LinhaDre[] };
 
@@ -35,4 +44,19 @@ export async function listarDreObra(centroCustoId: string): Promise<DreObra | nu
   const linhas = data as Record<string, unknown>[];
   if (linhas.length === 0) return null;
   return { cabecalho: lerCabecalhoDre(linhas[0]), linhas: linhas.map(lerLinhaDre) };
+}
+
+// Uma linha por tenant, somada no banco sobre as obras com estudo que o RLS libera; nulo para quem não é
+// diretor nem financeiro, e aí a visão geral esconde a faixa.
+export async function buscarResumoCarteira(): Promise<ResumoCarteiraDre | null> {
+  const supabase = await criarClienteServidor();
+  const { data, error } = await supabase
+    .schema("marts")
+    .from("dre_resumo_carteira")
+    .select(
+      "obras, vgv_bruto_tendencia, vgv_vendido, pct_vendido, receita_apropriada, poc, custo_apropriado, recebido_acumulado, lucro_operacional_viabilidade, lucro_operacional_tendencia, margem_operacional_viabilidade, margem_operacional_tendencia, desvio_margem_operacional",
+    )
+    .maybeSingle<Record<string, unknown>>();
+  if (error) throw new ErroConsulta(error.code);
+  return data ? lerResumoCarteiraDre(data) : null;
 }
