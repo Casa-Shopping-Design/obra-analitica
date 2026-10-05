@@ -277,7 +277,7 @@ def montar_html(obras, periodo, painel_url_base, agora):
 <tr><td align="center" style="padding:16px 8px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:{COR_SUPERFICIE};border-radius:8px;">
 <tr><td style="padding:20px 24px;background:{COR_MENU};border-radius:8px 8px 0 0;font-family:{FONTE};">
-<div style="font-size:13px;color:{COR_MENU_TEXTO};letter-spacing:0.5px;">Obra Analítica</div>
+<div style="font-size:13px;color:{COR_MENU_TEXTO};letter-spacing:0.5px;">APO</div>
 <div style="font-size:22px;font-weight:bold;color:{COR_MENU_TEXTO};padding-top:4px;">Resumo da semana</div>
 <div style="font-size:14px;color:{COR_MENU_TEXTO};padding-top:4px;">{escape(data_por_extenso(periodo.hoje))}</div>
 </td></tr>

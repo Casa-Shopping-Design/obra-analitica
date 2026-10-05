@@ -64,7 +64,7 @@ def enviar_pelo_resend(chave_api, remetente, para, assunto_email, html, texto, c
         "Authorization": f"Bearer {chave_api}",
         "Content-Type": "application/json",
         "Idempotency-Key": chave_idempotencia,
-        "User-Agent": "obra-analitica-resumo/1",
+        "User-Agent": "apo-resumo/1",
     })
     for tentativa in range(1, TENTATIVAS + 1):
         try:

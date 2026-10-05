@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { FormularioEntrar } from "@/componentes/FormularioEntrar";
+import { MarcaApo } from "@/componentes/MarcaApo";
 
 export const metadata: Metadata = { title: "Entrar" };
 
@@ -10,7 +11,7 @@ export default function PaginaEntrar() {
         aria-label="Apresentação"
         className="flex flex-col justify-between gap-10 bg-menu px-6 py-10 text-menu-texto md:w-[560px] md:shrink-0 md:px-14 md:py-16"
       >
-        <p className="font-serif text-2xl font-semibold">obra analítica</p>
+        <MarcaApo comAssinatura className="text-2xl" />
         <div className="flex flex-col gap-5">
           <p className="font-serif text-3xl leading-tight font-semibold md:text-4xl">
             Cada obra, o caixa e o estoque numa tela só.

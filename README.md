@@ -1,18 +1,18 @@
-# obra-analitica
+# APO
 
-Ponto de partida do painel financeiro com assistente de IA para construtoras, alimentado pelo ERP de origem. Este repositório guarda a demo que será apresentada a João Braga em outubro de 2026 e serve de base para o MVP.
+APO, Agente da Governança Financeira, mostra ao gestor da construtora a viabilidade, as vendas, os custos e o resultado de cada empreendimento num só lugar, com um assistente de IA que responde em português usando só os números do banco. Os dados vêm do ERP de origem e do CRM de vendas, carregados toda madrugada. Este repositório guarda a demo que será apresentada a João Braga em outubro de 2026 e serve de base para o MVP.
 
 Leia `CONTEXTO.md` antes de qualquer coisa. Ele resume o que foi decidido, o que está aberto e onde estão os documentos completos.
 
 ## Estrutura
 
 ```
-dados/            JSON sintéticos no formato dos endpoints do ERP de origem (gerados, não versionar os grandes)
-scripts/          gerador de dados e carregador para o Supabase
-supabase/         migrations (esquema, RLS, marts) e seed de usuários
-lib/              catálogo de views e validador de SQL do assistente
-docs/             referências aos documentos de escopo, apresentação e plano
-painel/           (a criar no PT-01) Next.js com App Router
+dados/            JSON sintéticos no formato do ERP de origem e do CRM (gerados, não versionar os grandes)
+scripts/          geradores de dados, carregadores, resumo semanal por e-mail e testes Python
+supabase/         migrations (esquema, RLS, marts), seed e testes pgTAP
+painel/           Next.js com App Router; catálogo de views e validador de SQL do assistente em painel/lib
+docs/             decisões (ADR), operação, planos, relatórios e links dos documentos
+.github/          carga noturna, CI e resumo semanal
 ```
 
 ## Como começar

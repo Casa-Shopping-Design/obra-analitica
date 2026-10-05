@@ -9,8 +9,8 @@ const fonteTitulo = Source_Serif_4({ subsets: ["latin"], weight: ["600"], variab
 const fonteNumero = IBM_Plex_Mono({ subsets: ["latin"], weight: ["500"], variable: "--fonte-numero", preload: false });
 
 export const metadata: Metadata = {
-  title: { default: "Obra Analítica", template: "%s | Obra Analítica" },
-  description: "Caixa, obras e estoque da construtora numa tela só.",
+  title: { default: "APO", template: "%s | APO" },
+  description: "Viabilidade, vendas, custos e resultado do empreendimento num só lugar.",
   robots: { index: false, follow: false },
 };
 

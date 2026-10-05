@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { MarcaApo } from "@/componentes/MarcaApo";
 import { caminhosAcesso } from "@/lib/supabase/nivel-acesso";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
 
@@ -14,7 +15,7 @@ export default async function LayoutSeguranca({ children }: LayoutProps<"/segura
         aria-label="Apresentação"
         className="flex flex-col justify-between gap-10 bg-menu px-6 py-10 text-menu-texto md:w-[560px] md:shrink-0 md:px-14 md:py-16"
       >
-        <p className="font-serif text-2xl font-semibold">obra analítica</p>
+        <MarcaApo comAssinatura className="text-2xl" />
         <div className="flex flex-col gap-5">
           <p className="font-serif text-3xl leading-tight font-semibold md:text-4xl">
             Uma senha roubada não pode abrir o caixa da construtora.
