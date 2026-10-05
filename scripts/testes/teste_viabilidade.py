@@ -13,8 +13,9 @@ LINHAS_DIGITAVEIS = {
     "vgv_bruto", "impostos", "custo_terreno", "custo_projetos", "custo_licenciamento", "custo_construcao",
     "assistencia_tecnica", "juros_financiamento", "estoque", "despesas_comerciais", "despesas_administrativas",
 }
-# Lucro operacional conferido a mao no anexo C.7 do plano: VGV menos impostos, custo de vendas e despesas.
-LUCRO_OPERACIONAL = {101: 2_850_000, 102: 780_000, 103: 114_000}
+# Lucro operacional conferido a mao: VGV menos impostos, custo de vendas e despesas. A Torre tem aliquota de
+# 6,32% (lucro presumido); Aurora e Parque, 4% (RET).
+LUCRO_OPERACIONAL = {101: 5_320_000, 102: 3_350_000, 103: 829_120}
 
 
 class TesteArquivoEstudos(unittest.TestCase):
