@@ -5,12 +5,14 @@ chamam a API e gravam no mesmo formato. Os arquivos de dados/complementos e dado
 opcionais: sem eles a demo carrega como antes e as recargas deles nao rodam. Cada endpoint
 e o staging deixam uma linha em app.carga_execucao, que alimenta a data da ultima carga.
 O estudo de viabilidade de dados/viabilidade nao e dado do ERP: vai direto para as tabelas
-de app, so para obra que ainda nao tem estudo.
+de app, so para obra que ainda nao tem estudo. Depois dele a carga guarda a posicao da DRE do
+mes corrente e, so na demo, os onze meses anteriores a partir dos fatores de historico_demo.
 """
 
 import hashlib
 import json
 import os
+from decimal import Decimal
 from pathlib import Path
 
 import psycopg
@@ -43,6 +45,10 @@ ARQUIVOS_COMPLEMENTOS = {
 ARQUIVO_VIABILIDADE = PASTA_DADOS / "viabilidade" / "estudos.json"
 # marts.ultima_carga so considera a carga feita quando esta etapa termina com sucesso.
 ETAPA_STAGING = "staging"
+MESES_HISTORICO_DEMO = 11
+# Impostos acompanham o VGV; as outras linhas repetem a posicao do mes corrente.
+LINHAS_QUE_SEGUEM_O_VGV = ("vgv_bruto", "impostos")
+LINHA_QUE_SEGUE_O_CUSTO = "custo_construcao"
 
 
 def hash_registro(payload):
@@ -183,6 +189,65 @@ def gravar_viabilidade_demo(conexao, tenant, estudos):
     return gravados
 
 
+# Uma instrucao insert ... select no banco; rodar de novo no mesmo mes sobrescreve a mesma linha.
+def registrar_posicao_dre(conexao, tenant):
+    """Guarda a posicao da DRE do mes corrente, como dona do banco, e devolve quantas linhas gravou."""
+    with conexao.cursor() as cur:
+        cur.execute("select app.registrar_posicao_dre(%s)", (tenant,))
+        linhas = cur.fetchone()[0]
+    conexao.commit()
+    print(f"posicao da DRE: {linhas} linhas gravadas no mes corrente")
+    return linhas
+
+
+def fatores_historico_demo(estudos):
+    """Uma tupla (id_origem, meses_antes, fator_vgv, fator_custo) por obra e mes, do mes -11 ao mes -1."""
+    fatores = []
+    for estudo in estudos:
+        historico = estudo.get("historico_demo")
+        if not historico:
+            continue
+        fatores_vgv = historico["vgv_bruto"]
+        fatores_custo = historico["custo_construcao"]
+        if len(fatores_vgv) != MESES_HISTORICO_DEMO or len(fatores_custo) != MESES_HISTORICO_DEMO:
+            raise ValueError(f"historico_demo da obra {estudo['id_origem']} precisa de {MESES_HISTORICO_DEMO} fatores")
+        for posicao, (fator_vgv, fator_custo) in enumerate(zip(fatores_vgv, fatores_custo)):
+            fatores.append((estudo["id_origem"], MESES_HISTORICO_DEMO - posicao,
+                            Decimal(str(fator_vgv)), Decimal(str(fator_custo))))
+    return fatores
+
+
+# O(obras x meses x linhas) numa instrucao so: a posicao do mes corrente cruzada com a lista de fatores.
+def gravar_historico_demo(conexao, tenant, estudos):
+    """So para a demo: os onze meses anteriores saem do mes corrente vezes os fatores; mes ja gravado fica como esta."""
+    fatores = fatores_historico_demo(estudos)
+    if not fatores:
+        return 0
+    obras, meses, fatores_vgv, fatores_custo = (list(coluna) for coluna in zip(*fatores))
+    with conexao.cursor() as cur:
+        cur.execute(
+            "insert into app.posicao_dre_mensal "
+            "(tenant_id, centro_custo_id, competencia, linha, viabilidade, apropriado, a_apropriar, a_contratar, tendencia) "
+            "select p.tenant_id, p.centro_custo_id, (p.competencia - make_interval(months => f.meses_antes))::date, "
+            "  p.linha, p.viabilidade, "
+            "  round(p.apropriado * x.fator, 2), round(p.a_apropriar * x.fator, 2), round(p.a_contratar * x.fator, 2), "
+            "  round(p.apropriado * x.fator, 2) + round(p.a_apropriar * x.fator, 2) + round(p.a_contratar * x.fator, 2) "
+            "from app.posicao_dre_mensal p "
+            "join app.centro_custo cc on cc.id = p.centro_custo_id and cc.tenant_id = p.tenant_id "
+            "join unnest(%s::integer[], %s::integer[], %s::numeric[], %s::numeric[]) "
+            "  as f (id_origem, meses_antes, fator_vgv, fator_custo) on f.id_origem = cc.id_origem "
+            "cross join lateral (select case when p.linha = any(%s::text[]) then f.fator_vgv "
+            "                                when p.linha = %s then f.fator_custo else 1 end as fator) x "
+            "where p.tenant_id = %s and p.competencia = date_trunc('month', current_date)::date "
+            "on conflict do nothing",
+            (obras, meses, fatores_vgv, fatores_custo, list(LINHAS_QUE_SEGUEM_O_VGV), LINHA_QUE_SEGUE_O_CUSTO, tenant),
+        )
+        gravadas = cur.rowcount
+    conexao.commit()
+    print(f"historico da demo: {gravadas} linhas gravadas nos meses anteriores")
+    return gravadas
+
+
 # O(n) no total de registros dos arquivos; uma instrucao de delete e um insert em lote por endpoint.
 def main():
     tenant = os.environ["TENANT_DEMO_ID"]
@@ -211,7 +276,10 @@ def main():
                 com_crm = True
 
         recarregar_staging(conexao, tenant, com_complementos, com_crm)
-        gravar_viabilidade_demo(conexao, tenant, ler_estudos())
+        estudos = ler_estudos()
+        gravar_viabilidade_demo(conexao, tenant, estudos)
+        registrar_posicao_dre(conexao, tenant)
+        gravar_historico_demo(conexao, tenant, estudos)
 
 
 if __name__ == "__main__":
