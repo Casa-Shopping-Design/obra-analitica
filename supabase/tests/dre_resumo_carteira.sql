@@ -1,7 +1,7 @@
 -- Resumo da DRE somado por tenant (migration 0031) com as mesmas Obra Norte e Obra Sul de dre_viabilidade.sql,
 -- caso feito à mão no anexo C.6 do plano APO. Cria os próprios dados.
 --   Soma esperada: VGV de hoje 3000 + 1000, vendido 2000 + 1000, receita apropriada 1000 + 400, custo apropriado
---   800 + 200, recebido 600 + 0, lucro operacional 528 + 460 no estudo e 620 + 460 na tendência, sobre VGV
+--   500 + 200 (o da Norte é o apropriado ao resultado do mapa), recebido 600 + 0, lucro operacional 528 + 460 no estudo e 620 + 460 na tendência, sobre VGV
 --   líquido de 2688 + 960 no estudo e 2880 + 960 na tendência.
 --   O tenant vizinho ganha um estudo, para provar que cada diretor só soma as próprias obras.
 begin;
@@ -76,9 +76,10 @@ from referencia;
 insert into staging.item_orcamento (tenant_id, centro_custo_id, codigo, descricao, valor_total) values
   ('0e000000-0000-4000-8000-0000000000d1', '0c000000-0000-4000-8000-0000000000d1', '01', 'Construção', 1600);
 insert into staging.mapa_imobiliario_mensal (tenant_id, centro_custo_id, competencia, unidades, vgv, poc, recebido_acumulado,
-                                             custo_orcado, custo_incorrido_acumulado, custo_a_incorrer, receita_acumulada)
+                                             custo_orcado, custo_incorrido_acumulado, custo_acumulado, custo_a_incorrer,
+                                             receita_acumulada)
 select '0e000000-0000-4000-8000-0000000000d1'::uuid, '0c000000-0000-4000-8000-0000000000d1'::uuid, menos_1, 4, 3000, 50, 600,
-  1600, 800, 800, 1000
+  1600, 800, 500, 800, 1000
 from referencia;
 insert into app.aliquota_imposto_obra (tenant_id, centro_custo_id, vigencia_inicio, aliquota)
 select '0e000000-0000-4000-8000-0000000000d1'::uuid, '0c000000-0000-4000-8000-0000000000d1'::uuid, menos_3, 0.04
@@ -186,8 +187,8 @@ select results_eq(
 );
 select results_eq(
   $$select receita_apropriada, poc, custo_apropriado, recebido_acumulado from marts.dre_resumo_carteira$$,
-  $$values (1400::numeric, 0.4667::numeric, 1000::numeric, 600::numeric)$$,
-  'receita apropriada 1400, POC 1400 sobre 3000, custo apropriado 1000 e recebido 600'
+  $$values (1400::numeric, 0.4667::numeric, 700::numeric, 600::numeric)$$,
+  'receita apropriada 1400, POC 1400 sobre 3000, custo apropriado 700 e recebido 600'
 );
 select results_eq(
   $$select lucro_operacional_viabilidade, lucro_operacional_tendencia from marts.dre_resumo_carteira$$,

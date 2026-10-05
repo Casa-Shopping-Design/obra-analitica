@@ -57,7 +57,7 @@ export const explicacoes = {
   dre_viabilidade: "O que o estudo de viabilidade vigente previu para a linha. É o número de partida, digitado no estudo.",
   dre_pct_viabilidade: "A linha do estudo sobre o VGV líquido do estudo.",
   dre_apropriado:
-    "O que já entrou no resultado até o último mês fechado: receita pelo andamento da obra e custo incorrido, como o ERP fecha no mapa imobiliário. Não é caixa.",
+    "O que já entrou no resultado até o último mês fechado: receita e custo das unidades vendidas, pelo andamento da obra, como o ERP fecha no mapa imobiliário. Não é caixa.",
   dre_a_apropriar:
     "O que já está contratado e ainda não entrou no resultado: vendas assinadas que faltam apropriar e títulos lançados que faltam incorrer.",
   dre_a_contratar:

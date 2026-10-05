@@ -1,7 +1,8 @@
 -- DRE de viabilidade (migration 0030) com o caso feito à mão do anexo C.6 do plano APO. Cria os próprios dados.
 --   Obra Norte: duas unidades vendidas por 1000 e duas em estoque por 500 (VGV 3000); orçamento 1600; título de
 --   800 pago no mês passado e 300 em aberto no mês que vem; parcela direta de 600 recebida; mapa do ERP do mês
---   passado (receita 1000, custo incorrido 800); alíquota de 4%; estudo com VGV 2800 e construção 1500.
+--   passado (receita 1000, custo incorrido 800, custo apropriado ao resultado 500); alíquota de 4%; estudo com VGV
+--   2800 e construção 1500.
 --   Obra Sul: uma unidade vendida por 1000; orçamento 500; 200 pago e 100 em aberto; sem mapa e sem alíquota.
 --   Tenant vizinho com uma obra, para provar o isolamento.
 begin;
@@ -76,9 +77,10 @@ from referencia;
 insert into staging.item_orcamento (tenant_id, centro_custo_id, codigo, descricao, valor_total) values
   ('0e000000-0000-4000-8000-0000000000d1', '0c000000-0000-4000-8000-0000000000d1', '01', 'Construção', 1600);
 insert into staging.mapa_imobiliario_mensal (tenant_id, centro_custo_id, competencia, unidades, vgv, poc, recebido_acumulado,
-                                             custo_orcado, custo_incorrido_acumulado, custo_a_incorrer, receita_acumulada)
+                                             custo_orcado, custo_incorrido_acumulado, custo_acumulado, custo_a_incorrer,
+                                             receita_acumulada)
 select '0e000000-0000-4000-8000-0000000000d1'::uuid, '0c000000-0000-4000-8000-0000000000d1'::uuid, menos_1, 4, 3000, 50, 600,
-  1600, 800, 800, 1000
+  1600, 800, 500, 800, 1000
 from referencia;
 insert into app.aliquota_imposto_obra (tenant_id, centro_custo_id, vigencia_inicio, aliquota)
 select '0e000000-0000-4000-8000-0000000000d1'::uuid, '0c000000-0000-4000-8000-0000000000d1'::uuid, menos_3, 0.04
@@ -220,25 +222,25 @@ select results_eq(
 select results_eq(
   $$select viabilidade, apropriado, a_apropriar, a_contratar, tendencia, desvio, desvio_pct from marts.dre_viabilidade
     where centro_custo_id = '0c000000-0000-4000-8000-0000000000d1' and linha = 'custo_construcao'$$,
-  $$values (1500::numeric, 800::numeric, 300::numeric, 500::numeric, 1600::numeric, 100::numeric, 0.0667::numeric)$$,
-  'Norte, custo_construcao: incorrido do mapa, lançado menos incorrido, orçado menos lançado'
+  $$values (1500::numeric, 500::numeric, 600::numeric, 500::numeric, 1600::numeric, 100::numeric, 0.0667::numeric)$$,
+  'Norte, custo_construcao: apropriado ao resultado do mapa, lançado menos apropriado, orçado menos lançado'
 );
 select results_eq(
   $$select viabilidade, apropriado, a_apropriar, a_contratar, tendencia, desvio, desvio_pct from marts.dre_viabilidade
     where centro_custo_id = '0c000000-0000-4000-8000-0000000000d1' and linha = 'custo_empreendimento'$$,
-  $$values (1880::numeric, 800::numeric, 300::numeric, 880::numeric, 1980::numeric, 100::numeric, 0.0532::numeric)$$,
+  $$values (1880::numeric, 500::numeric, 600::numeric, 880::numeric, 1980::numeric, 100::numeric, 0.0532::numeric)$$,
   'Norte, custo_empreendimento: terreno, projetos, licenciamento e construção'
 );
 select results_eq(
   $$select viabilidade, apropriado, a_apropriar, a_contratar, tendencia, desvio, desvio_pct from marts.dre_viabilidade
     where centro_custo_id = '0c000000-0000-4000-8000-0000000000d1' and linha = 'custo_vendas'$$,
-  $$values (1980::numeric, 800::numeric, 300::numeric, 980::numeric, 2080::numeric, 100::numeric, 0.0505::numeric)$$,
+  $$values (1980::numeric, 500::numeric, 600::numeric, 980::numeric, 2080::numeric, 100::numeric, 0.0505::numeric)$$,
   'Norte, custo_vendas: empreendimento mais assistência, juros e estoque'
 );
 select results_eq(
   $$select viabilidade, apropriado, a_apropriar, a_contratar, tendencia, desvio, desvio_pct from marts.dre_viabilidade
     where centro_custo_id = '0c000000-0000-4000-8000-0000000000d1' and linha = 'resultado_bruto'$$,
-  $$values (708::numeric, 160::numeric, 660::numeric, -20::numeric, 800::numeric, 92::numeric, 0.1299::numeric)$$,
+  $$values (708::numeric, 460::numeric, 360::numeric, -20::numeric, 800::numeric, 92::numeric, 0.1299::numeric)$$,
   'Norte, resultado_bruto: VGV bruto menos impostos e custo de vendas'
 );
 select results_eq(
@@ -250,7 +252,7 @@ select results_eq(
 select results_eq(
   $$select viabilidade, apropriado, a_apropriar, a_contratar, tendencia, desvio, desvio_pct from marts.dre_viabilidade
     where centro_custo_id = '0c000000-0000-4000-8000-0000000000d1' and linha = 'lucro_operacional'$$,
-  $$values (528::numeric, 160::numeric, 660::numeric, -200::numeric, 620::numeric, 92::numeric, 0.1742::numeric)$$,
+  $$values (528::numeric, 460::numeric, 360::numeric, -200::numeric, 620::numeric, 92::numeric, 0.1742::numeric)$$,
   'Norte, lucro_operacional: resultado bruto menos despesas'
 );
 select results_eq(
@@ -292,7 +294,7 @@ select results_eq(
   $$select pct_vendido, poc, custo_apropriado, recebido_acumulado, margem_operacional_viabilidade, margem_operacional_tendencia,
       desvio_margem_operacional
     from marts.dre_resumo_obra where centro_custo_id = '0c000000-0000-4000-8000-0000000000d1'$$,
-  $$values (0.6667::numeric, 0.5::numeric, 800::numeric, 600::numeric, 0.1964::numeric, 0.2153::numeric, 0.0189::numeric)$$,
+  $$values (0.6667::numeric, 0.5::numeric, 500::numeric, 600::numeric, 0.1964::numeric, 0.2153::numeric, 0.0189::numeric)$$,
   'resumo da Norte: vendido sobre a tendência, POC, custo apropriado, recebido e margens'
 );
 select results_eq(

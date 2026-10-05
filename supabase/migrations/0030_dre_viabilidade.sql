@@ -211,9 +211,10 @@ from (values
 
 grant select on marts.linha_resultado to authenticated;
 
--- Dezessete linhas por obra com estudo vigente. Apropriado é contábil (receita pelo POC e custo incorrido
--- do mapa imobiliário do ERP); sem mapa, o POC é o pago sobre o orçado e o custo vem dos títulos. A tendência
--- do VGV bruto é sempre o vgv_total da posição, e a da construção é o maior entre orçado, lançado e apropriado.
+-- Dezessete linhas por obra com estudo vigente. Apropriado é contábil: receita e custo apropriados ao
+-- resultado pelo POC, do mapa imobiliário do ERP, os dois na base das unidades vendidas. Sem mapa, o POC é
+-- o pago sobre o orçado e o custo vem dos títulos. A tendência do VGV bruto é sempre o vgv_total da
+-- posição, e a da construção é o maior entre orçado, lançado e apropriado.
 -- Linha sem fonte de realizado (terreno, projetos, despesas) fica com a tendência igual ao estudo até a
 -- etapa que liga o saldo contábil. A junção interna com o estudo faz a view herdar a restrição a diretor e
 -- financeiro pelo dado, sem perfil no corpo, o que deixa a carga e o dono do banco lerem com filtro próprio.
@@ -248,7 +249,7 @@ with composicao (total, componente, sinal) as (
   select distinct on (m.tenant_id, m.centro_custo_id)
     m.tenant_id, m.centro_custo_id, m.competencia,
     coalesce(m.receita_acumulada, 0) as receita_acumulada,
-    coalesce(m.custo_incorrido_acumulado, 0) as custo_incorrido_acumulado
+    coalesce(m.custo_acumulado, 0) as custo_acumulado
   from staging.mapa_imobiliario_mensal m
   join estudo e on e.tenant_id = m.tenant_id and e.centro_custo_id = m.centro_custo_id
   order by m.tenant_id, m.centro_custo_id, m.competencia desc
@@ -267,7 +268,7 @@ with composicao (total, componente, sinal) as (
     case when m.competencia is not null then least(m.receita_acumulada, p.vgv_vendido)
          when p.custo_orcado > 0 then round(p.vgv_vendido * least(p.pago / p.custo_orcado, 1), 2)
          else 0 end as vgv_apropriado,
-    case when m.competencia is not null then m.custo_incorrido_acumulado else p.pago end as construcao_apropriado
+    case when m.competencia is not null then m.custo_acumulado else p.pago end as construcao_apropriado
   from estudo e
   join marts.posicao_financeira_obra p on p.tenant_id = e.tenant_id and p.centro_custo_id = e.centro_custo_id
   left join mapa m on m.tenant_id = e.tenant_id and m.centro_custo_id = e.centro_custo_id
