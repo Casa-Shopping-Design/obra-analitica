@@ -1,6 +1,6 @@
 # Contexto do projeto
 
-Atualizado em 03/10/2026. Este arquivo é o resumo para retomar o trabalho em outra sessão.
+Atualizado em 06/10/2026. Este arquivo é o resumo para retomar o trabalho em outra sessão.
 
 ## O que é
 
@@ -90,14 +90,10 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 Plano de 28/09/2026 para carga real do ERP, fila de webhooks e CRM como segunda origem: `docs/plano_origens.md` (grafo N1 a N8, migrations 0016 a 0019). As skills `erp-origem-api` e `crm-vendas-api` ficam em `.claude/skills/`.
 
 
-Situação em 03/10/2026. A `main` está no merge do PR 5 (01/10), com as migrations 0001 a 0029 (não existe 0028). O PT-07 entrou pelo PR 2.
+Situação em 06/10/2026. O APO está no ar em https://obra-analitica.vercel.app, com a `main` no merge do PR 9 (1faf515) e as migrations 0001 a 0034 aplicadas no projeto oficial `xwqwjawlbzvqpkxtqfld` (não existe 0028). Os três sócios entram com o perfil leitura, sem segundo fator, e veem a DRE de viabilidade, o gráfico da tendência e a gestão de imposto. Do plano APO estão publicadas as etapas 1 a 6, 9, 10, 11 e 13.
 
-O projeto Supabase oficial é o `xwqwjawlbzvqpkxtqfld`, na organização Casa Design. Em 01/10 ele tinha as migrations 0001 a 0024 e o seed, sem carga e sem usuários. Os projetos `rxbhxtbjxqlisbrfcbtt` e `obraanalitic` (`ndgwcunpnxhkzapmmvsq`, conta prof.joaosena) não são o oficial: nada se aplica neles.
+Sem commit, no worktree `project-scope-31c6ef`: a 0035 (realizado contábil das linhas fora do orçamento, etapa 7), o saldo contábil da demo no gerador e na carga (etapa 8) e o roteiro, o ensaio e o checklist da etapa 14. A etapa 7 ainda pede a revisão de segurança da regra 16 do plano antes do commit. A etapa 12 (Onde agir agora) espera a pergunta P13 ao Braga.
 
-Falta, na ordem de `docs/operacao/publicar-demo.md`:
-- Dashboard do projeto oficial: senha nova do banco, schemas expostos (`public`, `app`, `marts`), TOTP, hook `app.claims_jwt` e cadastro livre desligado.
-- Migrations 0025 a 0029 e painel novo publicados no mesmo dia, senão o assistente para.
-- Carga da demo, chave de assinatura do assistente e variáveis na Vercel (`casa-design/obra-analitica`); depois, Site URL e Redirect URLs no Supabase.
-- Usuários criados e vinculados. Entrar com `gerente.aurora@demo.com` e ver uma obra só.
-- Trocar a senha do banco do projeto antigo, que apareceu em print.
-- Demo em 16/10/2026.
+Falta, nesta ordem: commit das etapas 7, 8 e 14; `supabase db push` da 0035 antes do merge; merge; Carga noturna por `workflow_dispatch`; conferência e medições no hospedado (seção 9 de `docs/operacao/publicar-demo.md` e `docs/relatorios/ensaio-demo-16-10.md`); ensaio do roteiro `docs/planejamento/roteiro-demo-16-10.md` do começo ao fim. Seguem pendentes trocar a senha do banco, desligar o cadastro livre e confirmar a `ASSISTENTE_CHAVE_ASSINATURA` nas duas pontas.
+
+Demo em 16/10/2026.

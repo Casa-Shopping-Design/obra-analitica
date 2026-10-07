@@ -8,7 +8,10 @@ Parte de dados/cost-centers.json, sales.json, units.json, income.json e building
   em aprovação, de modo que só o Parque das Águas aparece com o pago à frente do físico;
 - inadimplência por faixa de atraso tirada das parcelas vencidas e em aberto de income.json, de modo que o
   total por obra bate com o vencido do comprador da posição financeira. O financiamento (FI) fica de fora,
-  porque o painel o mostra à parte, como repasse atrasado.
+  porque o painel o mostra à parte, como repasse atrasado;
+- saldo contábil mensal por obra das contas de terreno, projetos, licenciamento, garantia, juros e
+  despesas, sem sorteio: o valor do estudo em dados/viabilidade/estudos.json vezes um fator por obra e
+  a fração do mês (parcelas fixas, POC do mapa, VGV vendido ou prazo decorrido até as chaves).
 
 Nenhum registro traz nome, documento ou contato de cliente. Mesmos nomes de campo da API, para que
 o staging leia a demo e a carga real do mesmo jeito.
@@ -17,6 +20,7 @@ o staging leia a demo e a carga real do mesmo jeito.
 import json
 from collections import defaultdict
 from datetime import date, timedelta
+from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
@@ -35,11 +39,40 @@ ARQUIVOS = {
     "real-estate-map": "real-estate-map.json",
     "building-projects/progress-logs/items": "building-projects-progress-logs-items.json",
     "defaulters-receivable-bills/by-aging": "defaulters-receivable-bills-by-aging.json",
+    "accountancy/accountCostCenterBalance": "accountancy-accountCostCenterBalance.json",
 }
+ARQUIVO_ESTUDOS = PASTA_DADOS / "viabilidade" / "estudos.json"
+
+# Plano de contas fictício da demo, todas de natureza devedora, porque a DRE soma o saldo com sinal
+# (devedor positivo). A garantia usa a conta de custo, não a provisão do passivo, que é credora.
+# carregar_demo.py grava este mesmo mapa em app.conta_linha_resultado.
+CONTAS_DEMO = {
+    "1.1.05.01": "custo_terreno",
+    "1.1.05.02": "custo_projetos",
+    "1.1.05.03": "custo_licenciamento",
+    "3.1.02.01": "assistencia_tecnica",
+    "4.2.01.01": "juros_financiamento",
+    "4.1.01.01": "despesas_comerciais",
+    "4.1.02.01": "despesas_administrativas",
+}
+# Desvios da demo: a Aurora gastou mais em projetos; o Parque das Águas, em terreno, projetos e juros.
+# Obra fora do dicionário fica no valor do estudo.
+FATOR_CONTA = {
+    "custo_terreno": {102: Decimal("1.02")},
+    "custo_projetos": {101: Decimal("1.10"), 102: Decimal("1.25")},
+    "juros_financiamento": {102: Decimal("1.15")},
+}
+MESES_PROJETOS = 6
+MES_INICIO_LICENCIAMENTO, MES_FIM_LICENCIAMENTO = 3, 9
+CENTAVO = Decimal("0.01")
 
 
 def ler(nome):
     return json.loads((PASTA_DADOS / nome).read_text(encoding="utf-8"))["data"]
+
+
+def ler_estudos(caminho=ARQUIVO_ESTUDOS):
+    return json.loads(caminho.read_text(encoding="utf-8"))
 
 
 def meses_entre(inicio, fim):
@@ -80,6 +113,21 @@ def custo_incorrido_ate(obra, orcado, mes):
     return orcado * FATOR_CUSTO.get(obra, 1.0) * curva_s(k / len(meses))
 
 
+def carteira_da_obra(id_obra, contratos, unidades):
+    """Contratos e unidades da obra; reserva técnica não entra no VGV."""
+    contratos_obra = [c for c in contratos if c["enterpriseId"] == id_obra]
+    unidades_obra = [u for u in unidades if u["enterpriseId"] == id_obra and u["commercialStock"] != "R"]
+    return contratos_obra, unidades_obra
+
+
+def vendido_e_estoque(contratos_obra, unidades_obra, dia):
+    ativos = [c for c in contratos_obra if ativo_em(c, dia)]
+    vendidas = {c["units"][0]["id"] for c in ativos}
+    vgv_vendido = sum(c["value"] for c in ativos)
+    estoque = sum(u.get("saleValuePrice") or 0 for u in unidades_obra if u["id"] not in vendidas)
+    return vgv_vendido, estoque
+
+
 def vencimentos(contrato, chaves):
     """Cronograma de cada condição, com o valor da parcela; FI só entra com o repasse feito."""
     inicio = date.fromisoformat(contrato["contractDate"])
@@ -108,8 +156,7 @@ def gerar_mapa(obras, contratos, unidades, itens):
     for obra in obras:
         id_obra = obra["id"]
         orcado = dinheiro(sum(i["totalPrice"] for i in itens if i["buildingId"] == id_obra))
-        contratos_obra = [c for c in contratos if c["enterpriseId"] == id_obra]
-        unidades_obra = [u for u in unidades if u["enterpriseId"] == id_obra and u["commercialStock"] != "R"]
+        contratos_obra, unidades_obra = carteira_da_obra(id_obra, contratos, unidades)
         recebiveis = []
         for contrato in contratos_obra:
             cancelamento = contrato.get("cancellationDate")
@@ -119,10 +166,7 @@ def gerar_mapa(obras, contratos, unidades, itens):
         incorrido_anterior, recebido_anterior = 0.0, 0.0
         for mes in meses_entre(INICIO_OBRA, HOJE):
             fim = min(fim_do_mes(mes), HOJE)
-            ativos = [c for c in contratos_obra if ativo_em(c, fim)]
-            vendidas = {c["units"][0]["id"] for c in ativos}
-            vgv_vendido = sum(c["value"] for c in ativos)
-            estoque = sum(u.get("saleValuePrice") or 0 for u in unidades_obra if u["id"] not in vendidas)
+            vgv_vendido, estoque = vendido_e_estoque(contratos_obra, unidades_obra, fim)
             incorrido = custo_incorrido_ate(id_obra, orcado, mes)
             recebido = sum(valor for dia, valor in recebiveis if dia <= fim)
             poc = min(incorrido / orcado, 1.0) if orcado else 0.0
@@ -270,11 +314,71 @@ def gerar_inadimplencia(obras, contratos, parcelas, data_posicao):
     return registros
 
 
-def gerar(obras, contratos, unidades, itens, parcelas, data_posicao):
+def fracao_do_mes(linha, numero_mes, prazo, poc, vendido):
+    """Quanto do valor do estudo a conta acumula no mês numero_mes, contado a partir de 1 em INICIO_OBRA."""
+    if linha == "custo_terreno":
+        return Decimal(1)
+    if linha == "custo_projetos":
+        return Decimal(min(numero_mes, MESES_PROJETOS)) / MESES_PROJETOS
+    if linha == "custo_licenciamento":
+        parcelas = MES_FIM_LICENCIAMENTO - MES_INICIO_LICENCIAMENTO + 1
+        pagas = min(max(numero_mes - MES_INICIO_LICENCIAMENTO + 1, 0), parcelas)
+        return Decimal(pagas) / parcelas
+    if linha == "assistencia_tecnica":
+        return poc
+    if linha == "despesas_comerciais":
+        return vendido
+    return min(Decimal(numero_mes) / prazo, Decimal(1))
+
+
+def saldo_contabil(id_obra, id_empresa, conta, mes, anterior, atual):
+    """Registro no formato do endpoint; débito e crédito são o movimento do mês, nunca negativos."""
+    movimento = atual - anterior
     return {
-        "real-estate-map": gerar_mapa(obras, contratos, unidades, itens),
+        "costCenterId": id_obra, "companyId": id_empresa, "id": int(conta.replace(".", "")), "accountId": conta,
+        "previousBalance": float(anterior), "previousBalanceType": "D",
+        "debitBalance": float(max(movimento, 0)), "creditBalance": float(max(-movimento, 0)),
+        "balanceCarriedForward": float(atual), "balanceCarriedForwardType": "D",
+        "monthYear": f"{mes.month:02d}/{mes.year}",
+    }
+
+
+# O(o x m x (k + c + u)) com o obras, m meses, k contas, c contratos e u unidades: o vendido do mês percorre a
+# carteira da obra, como no mapa. Cerca de 500 registros na demo, sem laço sobre parcelas.
+def gerar_saldos_contabeis(obras, contratos, unidades, mapas, estudos):
+    poc_do_mapa = {(r["enterpriseData"]["enterpriseId"], r["enterpriseData"]["monthYear"]):
+                   Decimal(repr(r["vgvData"]["poc"])) / 100 for r in mapas}
+    estudo_da_obra = {e["id_origem"]: e["linhas"] for e in estudos}
+    registros = []
+    for obra in obras:
+        id_obra = obra["id"]
+        linhas = estudo_da_obra.get(id_obra)
+        if linhas is None:
+            continue
+        contratos_obra, unidades_obra = carteira_da_obra(id_obra, contratos, unidades)
+        prazo = len(list(meses_entre(INICIO_OBRA, CHAVES[id_obra])))
+        anterior = {conta: Decimal(0) for conta in CONTAS_DEMO}
+        for numero_mes, mes in enumerate(meses_entre(INICIO_OBRA, HOJE), start=1):
+            vgv_vendido, estoque = vendido_e_estoque(contratos_obra, unidades_obra, min(fim_do_mes(mes), HOJE))
+            vgv = vgv_vendido + estoque
+            vendido = Decimal(repr(vgv_vendido)) / Decimal(repr(vgv)) if vgv else Decimal(0)
+            poc = poc_do_mapa.get((id_obra, f"{mes.month:02d}/{mes.year}"), Decimal(0))
+            for conta, linha in CONTAS_DEMO.items():
+                fator = FATOR_CONTA.get(linha, {}).get(id_obra, Decimal(1))
+                fracao = fracao_do_mes(linha, numero_mes, prazo, poc, vendido)
+                atual = (Decimal(repr(linhas[linha])) * fator * fracao).quantize(CENTAVO, rounding=ROUND_HALF_UP)
+                registros.append(saldo_contabil(id_obra, obra["idCompany"], conta, mes, anterior[conta], atual))
+                anterior[conta] = atual
+    return registros
+
+
+def gerar(obras, contratos, unidades, itens, parcelas, data_posicao, estudos):
+    mapas = gerar_mapa(obras, contratos, unidades, itens)
+    return {
+        "real-estate-map": mapas,
         "building-projects/progress-logs/items": gerar_medicoes(obras, itens),
         "defaulters-receivable-bills/by-aging": gerar_inadimplencia(obras, contratos, parcelas, data_posicao),
+        "accountancy/accountCostCenterBalance": gerar_saldos_contabeis(obras, contratos, unidades, mapas, estudos),
     }
 
 
@@ -288,7 +392,8 @@ def salvar(endpoint, registros):
 def main():
     PASTA_SAIDA.mkdir(exist_ok=True)
     gerados = gerar(ler("cost-centers.json"), ler("sales.json"), ler("units.json"),
-                    ler("building-cost-estimation-items.json"), ler("income.json"), data_posicao_padrao())
+                    ler("building-cost-estimation-items.json"), ler("income.json"), data_posicao_padrao(),
+                    ler_estudos())
     for endpoint, registros in gerados.items():
         salvar(endpoint, registros)
 

@@ -110,3 +110,42 @@ Settings, Secrets and variables, Actions: `DATABASE_URL` (a mesma do `.env`) e `
 - Gerente da Aurora vê só a Aurora, e a tela Vendas e repasse mostra os cinco bancos.
 - Uma pergunta pronta do assistente responde com número.
 - Rodapé mostra a data da carga e o aviso de dados fictícios.
+
+## 9. Migration 0035 e o saldo contábil da demo
+
+Desde 05/10/2026 o projeto tem as migrations 0001 a 0034 (sem a 0028), os estudos da demo gravados e o painel com a DRE, o gráfico da tendência e a gestão de imposto. A 0035 cria `staging.saldo_contabil_mensal`, o mapa de conta para linha da DRE e a recarga `staging.recarregar_saldo_contabil`, e dá realizado contábil ao terreno, aos projetos, ao licenciamento, à assistência técnica, aos juros e às despesas. O gerador e a carga da demo (etapa 8) passam a produzir e gravar esse saldo.
+
+A ordem importa. A carga nova chama `staging.recarregar_saldo_contabil`; se o código chegar à `main` antes da migration, a Carga noturna falha na recarga do staging.
+
+1. Da pasta principal vinculada ao projeto, com a `main` atualizada e o branch da etapa em mãos, confira as migrations:
+
+```bash
+supabase migration list --linked
+```
+
+A coluna Remote precisa parar na 0034 e a Local, na 0035. Se mostrar outra coisa, pare e confira o projeto vinculado.
+
+2. Aplique a 0035 antes do merge:
+
+```bash
+supabase db push --linked
+```
+
+3. Faça o merge do PR das etapas 7, 8 e 14. A Vercel publica o painel; nenhuma tela muda de contrato com a 0035, então a ordem entre painel e banco não quebra a tela.
+
+4. Em Actions, rode a Carga noturna pelo "Run workflow" (`workflow_dispatch`). O passo "Dados da demo" gera `dados/complementos/accountancy-accountCostCenterBalance.json`, e a carga grava o saldo e o mapa de contas. O estudo de `dados/viabilidade/estudos.json` só entra em obra sem estudo, então os estudos recalibrados em 05/10 não mudam. Rode uma segunda vez e confira que o log diz "mapa de contas: 0 contas novas".
+
+5. No SQL Editor, a conferência da etapa 8. As duas consultas precisam devolver o número ao lado:
+
+```sql
+select count(*) from marts.dre_viabilidade
+where fonte_realizado = 'sem_fonte' and linha <> 'estoque'
+  and tenant_id = '11111111-1111-1111-1111-111111111111';
+-- 0
+
+select count(*) from staging.saldo_contabil_mensal
+where tenant_id = '11111111-1111-1111-1111-111111111111';
+-- 504
+```
+
+6. Entre como sócio e abra `/dre`: a margem na tendência da Parque das Águas passa de 2,1% para 1,6% e a da Aurora de 15,0% para 14,8%; a Torre segue em 7,5%. Os números conferidos no banco local estão em `docs/planejamento/roteiro-demo-16-10.md`; as medições do ensaio vão em `docs/relatorios/ensaio-demo-16-10.md`.

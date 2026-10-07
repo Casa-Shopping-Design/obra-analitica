@@ -172,6 +172,12 @@ CAMPOS_PERMITIDOS = {
         "defaulterInstallments[].fine", "defaulterInstallments[].totalAdditions",
         "defaulterInstallments[].correctedValueWithAdditions",
     ],
+    # Saldo da conta da construtora por centro de custo; id é o código reduzido da conta. Lançamento e lote
+    # não entram, porque o staging lê só o saldo do mês.
+    "accountancy/accountCostCenterBalance": [
+        "costCenterId", "companyId", "id", "accountId", "previousBalance", "previousBalanceType",
+        "debitBalance", "creditBalance", "balanceCarriedForward", "balanceCarriedForwardType", "monthYear",
+    ],
 }
 
 

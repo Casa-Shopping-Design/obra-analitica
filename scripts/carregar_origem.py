@@ -75,6 +75,7 @@ CHAVES = {
     "accounts-statements": Chave(("id",)),
     "defaulters-receivable-bills": Chave(("receivableBillId",)),
     "real-estate-map": Chave(("enterpriseData.enterpriseId", "enterpriseData.monthYear")),
+    "accountancy/accountCostCenterBalance": Chave(("costCenterId", "accountId", "monthYear")),
     "building-projects/progress-logs/items": Chave(("buildingId", "measurementNumber", "buildingUnitId"), grupo=True),
     "defaulters-receivable-bills/by-aging": Chave(("receivableBillId",)),
 }

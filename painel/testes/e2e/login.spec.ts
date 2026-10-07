@@ -103,3 +103,26 @@ test("gerente da Aurora entra sem segundo fator e não vê a Parque das Águas, 
   await expect(paginaGerente.getByText("Parque das Águas")).toHaveCount(0);
   await contextoGerente.close();
 });
+
+test("diretor abre a DRE com as três obras e a gerente vê o aviso de tela restrita", async ({ browser }) => {
+  const contextoDiretor = await browser.newContext();
+  const paginaDiretor = await contextoDiretor.newPage();
+  await entrarComoDiretor(paginaDiretor);
+  await paginaDiretor.goto("/dre");
+  await expect(paginaDiretor.getByRole("heading", { level: 1 })).toHaveText("DRE de viabilidade");
+  for (const obra of ["Residencial Aurora", "Parque das Águas", "Torre Comercial Sul"]) {
+    await expect(paginaDiretor.getByRole("link", { name: obra })).toBeVisible();
+  }
+  await contextoDiretor.close();
+
+  const contextoGerente = await browser.newContext();
+  const paginaGerente = await contextoGerente.newPage();
+  await entrar(paginaGerente, gerente);
+  await paginaGerente.goto("/dre");
+  await expect(paginaGerente.getByRole("heading", { level: 1 })).toHaveText("DRE de viabilidade");
+  await expect(
+    paginaGerente.getByText("O seu perfil não abre a DRE de viabilidade. Peça ao diretor da construtora para liberar."),
+  ).toBeVisible();
+  await expect(paginaGerente.getByRole("link", { name: "Residencial Aurora" })).toHaveCount(0);
+  await contextoGerente.close();
+});
