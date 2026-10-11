@@ -39,7 +39,7 @@ set -a && source /Users/joaosena/Documents/painel-sienge-demo/.env && set +a
 ```
 
 ```bash
-python scripts/gerar_dados_demo.py && python scripts/gerar_dados_complementares.py && python scripts/carregar_demo.py
+python scripts/gerar_dados_demo.py && python scripts/gerar_dados_complementares.py && python scripts/gerar_dados_contabeis.py && python scripts/carregar_demo.py
 ```
 
 O `TENANT_DEMO_ID` vem do `.env` (`11111111-1111-1111-1111-111111111111`). A carga termina com "staging recarregado". O gerador regrava `dados/complementos/defaulters-receivable-bills-by-aging.json` com a data do dia; esse arquivo não entra em commit.

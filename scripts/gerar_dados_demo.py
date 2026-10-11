@@ -17,6 +17,14 @@ HOJE = date(2026, 9, 22)
 INICIO_HISTORICO = date(2024, 10, 1)
 
 EMPRESA = {"id": 1, "name": "Construtora Demo Ltda", "tradeName": "Demo", "cnpj": "12.345.678/0001-90"}
+# Uma SPE por obra, para o balancete por empresa. Contratos, títulos e tabelas seguem com companyId da construtora.
+SPES = [
+    {"id": 11, "name": "Aurora Empreendimento SPE Ltda", "tradeName": "Aurora SPE", "cnpj": "12.345.611/0001-11"},
+    {"id": 12, "name": "Parque das Águas Empreendimento SPE Ltda", "tradeName": "Parque das Águas SPE",
+     "cnpj": "12.345.612/0001-22"},
+    {"id": 13, "name": "Torre Sul Empreendimento SPE Ltda", "tradeName": "Torre Sul SPE", "cnpj": "12.345.613/0001-33"},
+]
+EMPRESA_DA_OBRA = {101: 11, 102: 12, 103: 13}
 
 # Cada obra e ao mesmo tempo centro de custo, empreendimento e obra de orcamento.
 OBRAS = [
@@ -421,8 +429,8 @@ def salvar(nome, conteudo):
 
 def main():
     PASTA_SAIDA.mkdir(exist_ok=True)
-    salvar("companies.json", [EMPRESA])
-    salvar("cost-centers.json", [{"id": o["id"], "name": o["name"], "idCompany": EMPRESA["id"]} for o in OBRAS])
+    salvar("companies.json", [EMPRESA] + SPES)
+    salvar("cost-centers.json", [{"id": o["id"], "name": o["name"], "idCompany": EMPRESA_DA_OBRA[o["id"]]} for o in OBRAS])
     salvar("enterprises.json", [{"id": o["id"], "name": o["name"], "commercialName": o["name"],
                                  "companyId": EMPRESA["id"], "type": "1"} for o in OBRAS])
 

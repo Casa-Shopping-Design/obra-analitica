@@ -10,3 +10,4 @@ __pycache__/
 dados/brutos/
 negocio/
 .DS_Store
+dados/contabil/trial-balance.json

@@ -7,6 +7,9 @@ e o staging deixam uma linha em app.carga_execucao, que alimenta a data da ultim
 O estudo de viabilidade de dados/viabilidade nao e dado do ERP: vai direto para as tabelas
 de app, so para obra que ainda nao tem estudo. Depois dele a carga guarda a posicao da DRE do
 mes corrente e, so na demo, os onze meses anteriores a partir dos fatores de historico_demo.
+A pasta dados/contabil (empresas e balancete mensal das SPEs) tambem e opcional: quando existe, as
+duas listas entram em raw, o staging contabil e recarregado e o de-para conta para linha da demo
+vai para app.mapa_conta_linha, mas so no tenant que ainda nao tem mapa.
 """
 
 import hashlib
@@ -43,6 +46,14 @@ ARQUIVOS_COMPLEMENTOS = {
     "defaulters-receivable-bills/by-aging": "defaulters-receivable-bills-by-aging.json",
 }
 ARQUIVO_VIABILIDADE = PASTA_DADOS / "viabilidade" / "estudos.json"
+PASTA_CONTABIL = PASTA_DADOS / "contabil"
+# endpoint: (arquivo, campo da lista), no formato da resposta do ERP de origem.
+ARQUIVOS_CONTABEIS = {
+    "companies": ("companies.json", "data"),
+    "trial-balance": ("trial-balance.json", "results"),
+}
+ARQUIVO_MAPA_CONTAS = PASTA_CONTABIL / "mapa-contas.json"
+ORIGEM_MAPA_DEMO = "demo"
 # marts.ultima_carga so considera a carga feita quando esta etapa termina com sucesso.
 ETAPA_STAGING = "staging"
 MESES_HISTORICO_DEMO = 11
@@ -123,7 +134,7 @@ def carregar_endpoint(conexao, tenant, endpoint, registros, chave):
     print(f"{endpoint}: {len(registros)} registros lidos, {novos} novos")
 
 
-def recarregar_staging(conexao, tenant, com_complementos, com_crm):
+def recarregar_staging(conexao, tenant, com_complementos, com_crm, com_contabil=False):
     id_execucao = abrir_execucao(conexao, tenant, ETAPA_STAGING)
     try:
         with conexao.cursor() as cur:
@@ -134,12 +145,51 @@ def recarregar_staging(conexao, tenant, com_complementos, com_crm):
             # O CRM liga reserva e repasse ao contrato do ERP, que precisa estar no staging antes.
             if com_crm:
                 cur.execute("select staging.recarregar_crm(%s)", (tenant,))
+            # Empresas e saldos contabeis ligam a obra a SPE pelo centro de custo, que ja esta no staging.
+            if com_contabil:
+                cur.execute("select staging.recarregar_contabil(%s)", (tenant,))
             fechar_execucao_ok(cur, id_execucao, None, None)
         conexao.commit()
     except Exception as erro:
         registrar_falha(conexao, id_execucao, erro)
         raise
     print("staging recarregado")
+
+
+# O(n) no total de registros dos arquivos contabeis; cada registro passa uma vez pela lista de campos permitidos.
+def ler_dados_contabeis(pasta=PASTA_CONTABIL):
+    """Registros de companies e trial-balance ja filtrados, por endpoint; so os arquivos que existem."""
+    contabeis = {}
+    for endpoint, (arquivo, campo_lista) in ARQUIVOS_CONTABEIS.items():
+        caminho = pasta / arquivo
+        if caminho.exists():
+            contabeis[endpoint] = [filtrar_origem(endpoint, r) for r in ler_registros(caminho, campo_lista)]
+    return contabeis
+
+
+def ler_mapa_demo(caminho=ARQUIVO_MAPA_CONTAS):
+    if not caminho.exists():
+        return []
+    return [(item["conta"], item["linha"]) for item in json.loads(caminho.read_text(encoding="utf-8"))]
+
+
+# Uma consulta de existencia e um insert em lote; o mapa so cresce por versoes, entao quem ja tem mapa fica como esta.
+def gravar_mapa_demo(conexao, tenant, itens):
+    """Grava o de-para da demo so no tenant sem nenhuma versao de mapa, para a carga nao sobrescrever edicao do painel."""
+    if not itens:
+        return 0
+    with conexao.cursor() as cur:
+        cur.execute("select exists (select 1 from app.mapa_conta_linha where tenant_id = %s)", (tenant,))
+        if cur.fetchone()[0]:
+            print("mapa de contas: o tenant ja tem mapa, nada gravado")
+            return 0
+        cur.executemany(
+            "insert into app.mapa_conta_linha (tenant_id, conta, linha, origem) values (%s, %s, %s, %s)",
+            [(tenant, conta, linha, ORIGEM_MAPA_DEMO) for conta, linha in itens],
+        )
+    conexao.commit()
+    print(f"mapa de contas: {len(itens)} itens gravados")
+    return len(itens)
 
 
 def ler_estudos(caminho=ARQUIVO_VIABILIDADE):
@@ -275,7 +325,12 @@ def main():
                 carregar_endpoint(conexao, tenant, endpoint, registros, chave_crm)
                 com_crm = True
 
-        recarregar_staging(conexao, tenant, com_complementos, com_crm)
+        contabeis = ler_dados_contabeis()
+        for endpoint, registros in contabeis.items():
+            carregar_endpoint(conexao, tenant, endpoint, registros, chave_origem)
+
+        recarregar_staging(conexao, tenant, com_complementos, com_crm, com_contabil=bool(contabeis))
+        gravar_mapa_demo(conexao, tenant, ler_mapa_demo())
         estudos = ler_estudos()
         gravar_viabilidade_demo(conexao, tenant, estudos)
         registrar_posicao_dre(conexao, tenant)

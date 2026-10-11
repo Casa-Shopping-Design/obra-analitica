@@ -5,6 +5,24 @@
    "name": "Construtora Demo Ltda",
    "tradeName": "Demo",
    "cnpj": "12.345.678/0001-90"
+  },
+  {
+   "id": 11,
+   "name": "Aurora Empreendimento SPE Ltda",
+   "tradeName": "Aurora SPE",
+   "cnpj": "12.345.611/0001-11"
+  },
+  {
+   "id": 12,
+   "name": "Parque das Águas Empreendimento SPE Ltda",
+   "tradeName": "Parque das Águas SPE",
+   "cnpj": "12.345.612/0001-22"
+  },
+  {
+   "id": 13,
+   "name": "Torre Sul Empreendimento SPE Ltda",
+   "tradeName": "Torre Sul SPE",
+   "cnpj": "12.345.613/0001-33"
   }
  ]
 }

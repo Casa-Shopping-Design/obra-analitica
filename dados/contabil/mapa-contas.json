@@ -1,0 +1,282 @@
+[
+ {
+  "conta": "1.1.1.01.0001",
+  "linha": "caixa"
+ },
+ {
+  "conta": "1.1.1.02",
+  "linha": "bancos"
+ },
+ {
+  "conta": "1.1.1.03",
+  "linha": "aplicacoes_financeiras"
+ },
+ {
+  "conta": "1.1.2.01.0001",
+  "linha": "receber_incorporacao"
+ },
+ {
+  "conta": "1.1.2.02.0001",
+  "linha": "receber_ajustes_pdd"
+ },
+ {
+  "conta": "1.1.3.01.0001",
+  "linha": "estoque_imoveis_construcao"
+ },
+ {
+  "conta": "1.1.3.02.0001",
+  "linha": "estoque_almoxarifado"
+ },
+ {
+  "conta": "1.1.4.01.0001",
+  "linha": "adiantamentos_terceiros"
+ },
+ {
+  "conta": "1.1.4.02.0001",
+  "linha": "impostos_recuperar"
+ },
+ {
+  "conta": "1.1.4.03.0001",
+  "linha": "depositos_judiciais"
+ },
+ {
+  "conta": "1.1.4.04.0001",
+  "linha": "corretagem_apropriar"
+ },
+ {
+  "conta": "1.1.4.04.0002",
+  "linha": "corretagem_apropriada"
+ },
+ {
+  "conta": "1.1.4.05.0001",
+  "linha": "seguro_apropriar"
+ },
+ {
+  "conta": "1.2.1.01.0001",
+  "linha": "imobilizado"
+ },
+ {
+  "conta": "1.2.1.02.0001",
+  "linha": "depreciacao_acumulada"
+ },
+ {
+  "conta": "2.1.1.01",
+  "linha": "fornecedores"
+ },
+ {
+  "conta": "2.1.1.01.0001",
+  "linha": "fornecedores"
+ },
+ {
+  "conta": "2.1.2.01.0001",
+  "linha": "salarios_pagar"
+ },
+ {
+  "conta": "2.1.3",
+  "linha": "impostos_pagar"
+ },
+ {
+  "conta": "2.1.4.01.0001",
+  "linha": "taxa_administracao_pagar"
+ },
+ {
+  "conta": "2.1.5.01.0001",
+  "linha": "obrigacoes_terreno"
+ },
+ {
+  "conta": "2.1.6.01.0001",
+  "linha": "adiantamento_clientes"
+ },
+ {
+  "conta": "2.1.7.01.0001",
+  "linha": "provisao_assistencia_tecnica"
+ },
+ {
+  "conta": "2.1.8.01.0001",
+  "linha": "dividendos_pagar"
+ },
+ {
+  "conta": "2.1.8.02.0001",
+  "linha": "dividendos_pagar_participantes"
+ },
+ {
+  "conta": "2.1.8.03.0001",
+  "linha": "dividendos_pagar_ostensivos"
+ },
+ {
+  "conta": "2.2.1.01.0001",
+  "linha": "emprestimos_bancarios"
+ },
+ {
+  "conta": "2.2.2.01.0001",
+  "linha": "mutuo_pagar"
+ },
+ {
+  "conta": "2.2.3.01.0001",
+  "linha": "saldo_pagar_terreno"
+ },
+ {
+  "conta": "2.3.1.01.0001",
+  "linha": "aporte_capital"
+ },
+ {
+  "conta": "2.3.1.02.0001",
+  "linha": "capital_especial"
+ },
+ {
+  "conta": "2.3.2.01.0001",
+  "linha": "lucros_acumulados"
+ },
+ {
+  "conta": "2.3.2.02.0001",
+  "linha": "reserva_legal"
+ },
+ {
+  "conta": "2.3.2.03.0001",
+  "linha": "lucros_acumulados"
+ },
+ {
+  "conta": "3.1.1.01.0001",
+  "linha": "receita_vendas_incorporacao"
+ },
+ {
+  "conta": "3.1.1.02.0001",
+  "linha": "juros_tabela_price"
+ },
+ {
+  "conta": "3.1.2.01.0001",
+  "linha": "ganho_distrato"
+ },
+ {
+  "conta": "3.1.2.02.0001",
+  "linha": "receita_servicos"
+ },
+ {
+  "conta": "3.1.2.03.0001",
+  "linha": "outras_receitas"
+ },
+ {
+  "conta": "3.2.1.01.0001",
+  "linha": "impostos_vendas"
+ },
+ {
+  "conta": "3.2.1.02.0001",
+  "linha": "vendas_canceladas_abatimentos"
+ },
+ {
+  "conta": "3.2.1.03.0001",
+  "linha": "perdas_vendas_canceladas"
+ },
+ {
+  "conta": "3.3.1.01.0001",
+  "linha": "receitas_financeiras"
+ },
+ {
+  "conta": "3.3.2.01.0001",
+  "linha": "despesas_financeiras"
+ },
+ {
+  "conta": "4.1.1.01.0001",
+  "linha": "custo_unidades_vendidas"
+ },
+ {
+  "conta": "4.1.1.02.0001",
+  "linha": "custo_assistencia_tecnica"
+ },
+ {
+  "conta": "4.1.1.03.0001",
+  "linha": "outros_custos"
+ },
+ {
+  "conta": "4.1.1.04.0001",
+  "linha": "juros_financiamento_obra"
+ },
+ {
+  "conta": "4.2.1.01.0001",
+  "linha": "corretagem"
+ },
+ {
+  "conta": "4.2.1.02.0001",
+  "linha": "publicidade"
+ },
+ {
+  "conta": "4.3.1",
+  "linha": "outras_despesas"
+ },
+ {
+  "conta": "4.3.1.01",
+  "linha": "despesas_administrativas"
+ },
+ {
+  "conta": "4.3.1.02.0001",
+  "linha": "sentencas"
+ },
+ {
+  "conta": "4.3.1.03.0001",
+  "linha": "servicos_terceiros_despesa"
+ },
+ {
+  "conta": "4.3.1.04.0001",
+  "linha": "despesas_tributarias"
+ },
+ {
+  "conta": "4.3.1.05.0001",
+  "linha": "taxa_administracao_central"
+ },
+ {
+  "conta": "4.3.1.06.0001",
+  "linha": "depreciacao"
+ },
+ {
+  "conta": "4.4.1.01.0001",
+  "linha": "irpj_csll"
+ },
+ {
+  "conta": "5.1.1.01.0001",
+  "linha": "custo_terreno"
+ },
+ {
+  "conta": "5.1.2.01.0001",
+  "linha": "custo_projetos"
+ },
+ {
+  "conta": "5.1.3.01.0001",
+  "linha": "custo_legalizacao"
+ },
+ {
+  "conta": "5.2.1.01.0001",
+  "linha": "materiais_aplicados"
+ },
+ {
+  "conta": "5.2.1.02.0001",
+  "linha": "salarios_proventos"
+ },
+ {
+  "conta": "5.2.1.03.0001",
+  "linha": "encargos_sociais"
+ },
+ {
+  "conta": "5.2.1.04.0001",
+  "linha": "encargos_complementares"
+ },
+ {
+  "conta": "5.2.1.05.0001",
+  "linha": "servicos_terceiros_obra"
+ },
+ {
+  "conta": "5.2.1.06.0001",
+  "linha": "gastos_gerais_obra"
+ },
+ {
+  "conta": "5.9.2.01.0001",
+  "linha": "transferencia_custo_estoque"
+ },
+ {
+  "conta": "6.1.1.01.0001",
+  "linha": "apuracao_resultado"
+ },
+ {
+  "conta": "6.1.2.01.0001",
+  "linha": "saldo_abertura"
+ }
+]
