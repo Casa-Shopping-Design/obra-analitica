@@ -141,6 +141,9 @@ class RepositorioFalso:
         return {e: {"lidos": lote.lidos[e], "novos": novos[e], "substituidos": substituidos[e]}
                 for e in set(lote.lidos) | set(substituidos)}
 
+    def ler_empresas_contabeis(self, tenant):
+        return {p.get("companyId") for (t, e, _), (_, p) in self.raw.items() if t == tenant and e == "trial-balance"}
+
     def recarregar(self, tenant):
         self.recargas += 1
 
