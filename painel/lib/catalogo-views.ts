@@ -231,6 +231,53 @@ export const catalogoViews: ViewCatalogo[] = [
     ],
     perfis: ["diretor", "financeiro", "leitura"],
   },
+  {
+    nome: "marts.fontes_usos_mensal",
+    descricao: "Fontes e Usos por empresa (SPE) e mes, com as linhas, a ordem e os rotulos da planilha da construtora. Uma linha por empresa, competencia (primeiro dia do mes) e linha do relatorio. Sinal: valor positivo e fonte de recurso e negativo e uso (credito menos debito); so o bloco de caixa (caixa_equivalentes, bancos, aplicacoes_financeiras, caixa) tem o saldo devedor positivo. valor_mes e o movimento do mes; valor_acumulado e a posicao no fim do mes desde o inicio da contabilidade, como na planilha. Totais: fontes_operacionais, usos_operacionais, fluxo_operacional (NCG), fontes_financeiras, usos_financeiros, fluxo_financeiro, saldo_liquido e caixa_equivalentes; grupos comecam com grupo_ (grupo_lucros_acumulados, grupo_recursos_terceiros, grupo_recursos_aplicados e outros). tipo e conta, grupo ou total; nivel 0 e total, 1 grupo, 2 conta. Totais e grupos ja vem calculados: filtre sempre por linha e nunca some a coluna inteira nem some um total ou grupo com as linhas que o compoem, senao o valor sai em dobro. Para achar a empresa use empresa ilike. Diretor, financeiro e leitura consultam.",
+    colunas: ["empresa_id", "empresa", "competencia", "linha", "rotulo", "ordem", "tipo", "nivel", "valor_mes", "valor_acumulado"],
+    exemplos: [
+      { pergunta: "Quanto a Aurora tinha em caixa no fim de cada mes deste ano?", sql: "select empresa, competencia, valor_acumulado as caixa_equivalentes from marts.fontes_usos_mensal where empresa ilike '%aurora%' and linha = 'caixa_equivalentes' and competencia >= date_trunc('year', current_date) order by competencia" },
+      { pergunta: "Qual o fluxo de caixa operacional de cada empresa no ultimo mes carregado?", sql: "select empresa, competencia, valor_mes as fluxo_operacional_mes, valor_acumulado as fluxo_operacional_acumulado from marts.fontes_usos_mensal where linha = 'fluxo_operacional' and competencia = (select max(competencia) from marts.fontes_usos_mensal) order by empresa" },
+    ],
+    perfis: ["diretor", "financeiro", "leitura"],
+  },
+  {
+    nome: "marts.dre_societaria_mensal",
+    descricao: "DRE societaria por empresa (SPE) e mes, com as linhas, a ordem e os rotulos da aba DRE da planilha da construtora, calculada sem o zeramento mensal do resultado. Uma linha por empresa, competencia (primeiro dia do mes) e linha do relatorio. Sinal: credito menos debito, entao receita e positiva e custo, despesa, deducao e imposto sao negativos. valor_mes e o resultado do mes; valor_acumulado e o resultado desde o inicio da contabilidade, como na planilha. Totais: receita_bruta, receita_liquida, margem_contribuicao, lucro_operacional, lucro_antes_impostos e lucro_liquido; grupos: grupo_receita_vendas, grupo_outras_receitas, grupo_deducoes, grupo_custos, grupo_despesas_vendas, grupo_despesas_fixas e grupo_efeitos_financeiros; irpj_csll e linha de conta sem grupo. tipo e conta, grupo ou total; nivel 0 e total, 1 grupo, 2 conta. Totais e grupos ja vem calculados: filtre sempre por linha e nunca some a coluna inteira nem some um total ou grupo com as linhas que o compoem. Nao e a DRE de viabilidade das obras (marts.dre_viabilidade). Diretor, financeiro e leitura consultam.",
+    colunas: ["empresa_id", "empresa", "competencia", "linha", "rotulo", "ordem", "tipo", "nivel", "valor_mes", "valor_acumulado"],
+    exemplos: [
+      { pergunta: "Qual o lucro liquido de cada empresa mes a mes neste ano?", sql: "select empresa, competencia, valor_mes as lucro_liquido_mes from marts.dre_societaria_mensal where linha = 'lucro_liquido' and competencia >= date_trunc('year', current_date) order by empresa, competencia" },
+      { pergunta: "Qual a receita liquida acumulada da Torre Comercial Sul?", sql: "select empresa, competencia, valor_acumulado as receita_liquida from marts.dre_societaria_mensal where empresa ilike '%torre%' and linha = 'receita_liquida' order by competencia desc limit 1" },
+    ],
+    perfis: ["diretor", "financeiro", "leitura"],
+  },
+  {
+    nome: "marts.custo_incorrido_mensal",
+    descricao: "Custo incorrido por empresa (SPE) e mes, com as linhas da aba CUSTO INCORRIDO da planilha da construtora. Uma linha por empresa, competencia (primeiro dia do mes) e linha do relatorio. Sinal: debito menos credito, entao custo e positivo. valor_mes e o custo do mes; valor_acumulado e o custo desde o inicio da contabilidade, como na planilha. custo_incorrido e o total de custo_terreno, custo_projetos, custo_legalizacao e grupo_custo_construcao (materiais_aplicados, salarios_proventos, encargos_sociais, encargos_complementares, servicos_terceiros_obra e gastos_gerais_obra). transferencia_custo_vendas_estoque e o total de custo_unidades_vendidas (custo das unidades vendidas) e estoque_imoveis_construcao. tipo e conta, grupo ou total; nivel 0 e total, 1 grupo, 2 conta. Totais e grupos ja vem calculados: filtre sempre por linha e nunca some a coluna inteira nem some um total ou grupo com as linhas que o compoem. Diretor, financeiro e leitura consultam.",
+    colunas: ["empresa_id", "empresa", "competencia", "linha", "rotulo", "ordem", "tipo", "nivel", "valor_mes", "valor_acumulado"],
+    exemplos: [
+      { pergunta: "Quanto a Parque das Aguas ja gastou em custo de construcao?", sql: "select empresa, competencia, valor_acumulado as custo_construcao from marts.custo_incorrido_mensal where empresa ilike '%parque%' and linha = 'grupo_custo_construcao' order by competencia desc limit 1" },
+    ],
+    perfis: ["diretor", "financeiro", "leitura"],
+  },
+  {
+    nome: "marts.controle_fontes_usos",
+    descricao: "Conferencia das Fontes e Usos por empresa e mes, na posicao acumulada no fim do mes (competencia e o primeiro dia do mes). saldo_liquido_acumulado e o saldo liquido do fluxo de caixa (fontes menos usos) e caixa_equivalentes_acumulado e o caixa e equivalentes de caixa; diferenca_identidade e a diferenca entre os dois e e zero quando todas as contas estao mapeadas. lucros_acumulados e o grupo Lucros Acumulados do balanco e lucro_liquido_dre e o lucro liquido acumulado da DRE societaria; ajuste_exercicios_anteriores e a diferenca entre os dois, mostrada como linha propria e nao corrigida. contas_sem_mapa e quantas contas com saldo ou movimento estao sem linha de relatorio e movimento_sem_mapa e o movimento delas em reais. A view nao tem o nome da empresa: faca join com marts.empresa_resumo por empresa_id. Diretor e financeiro consultam.",
+    colunas: ["empresa_id", "competencia", "saldo_liquido_acumulado", "caixa_equivalentes_acumulado", "diferenca_identidade", "lucros_acumulados", "lucro_liquido_dre", "ajuste_exercicios_anteriores", "contas_sem_mapa", "movimento_sem_mapa"],
+    exemplos: [
+      { pergunta: "Alguma empresa nao fecha as Fontes e Usos com o caixa no ultimo mes?", sql: "select r.nome, c.competencia, c.diferenca_identidade, c.contas_sem_mapa from marts.controle_fontes_usos c join marts.empresa_resumo r on r.empresa_id = c.empresa_id where c.competencia = r.ultima_competencia and c.diferenca_identidade <> 0 order by r.nome" },
+    ],
+    perfis: ["diretor", "financeiro"],
+  },
+  {
+    nome: "marts.empresa_resumo",
+    descricao: "Uma linha por empresa (SPE ou holding) que quem pergunta ve, com o resumo das Fontes e Usos e da DRE societaria no ultimo mes carregado. nome e a razao social e nome_fantasia o nome de uso. obras e quantas obras do painel pertencem a empresa (zero na holding). primeira_competencia e ultima_competencia sao o primeiro e o ultimo mes com contabilidade carregada, nulas antes da primeira carga. caixa_equivalentes, fluxo_operacional e lucro_liquido sao acumulados ate ultima_competencia, como na planilha. diferenca_identidade e o saldo liquido do fluxo de caixa contra o caixa (zero quando fecha) e contas_sem_mapa e quantas contas com saldo ou movimento estao sem linha de relatorio. Use para os numeros de hoje e para achar a empresa pelo nome (nome ilike ou nome_fantasia ilike); para a serie mes a mes use as views mensais. Diretor, financeiro e leitura consultam.",
+    colunas: ["empresa_id", "nome", "nome_fantasia", "obras", "primeira_competencia", "ultima_competencia", "caixa_equivalentes", "fluxo_operacional", "lucro_liquido", "diferenca_identidade", "contas_sem_mapa"],
+    exemplos: [
+      { pergunta: "Quanto cada empresa tem em caixa hoje?", sql: "select nome, ultima_competencia, caixa_equivalentes from marts.empresa_resumo order by caixa_equivalentes desc" },
+    ],
+    perfis: ["diretor", "financeiro", "leitura"],
+  },
 ];
 
 // Catalogo que vai para o prompt e para o validador de quem pergunta. perfil e o valor cru de app.perfil_atual.

@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { catalogoDoPerfil, catalogoViews } from "../lib/catalogo-views";
@@ -114,8 +114,79 @@ describe("catalogoDoPerfil", () => {
     expect(catalogoDoPerfil("gerente_obra").map((view) => view.nome)).toEqual(
       expect.arrayContaining(["marts.repasse_banco", "marts.leads_origem"]),
     );
-    // Seis views restritas: conferência com o ERP, DRE de viabilidade, os resumos dela por obra e da carteira,
-    // a tendência mensal e a gestão de imposto.
-    expect(catalogoDoPerfil(null)).toHaveLength(catalogoViews.length - 6);
+    // Onze views restritas: conferência com o ERP, DRE de viabilidade, os resumos dela por obra e da carteira,
+    // a tendência mensal, a gestão de imposto e as cinco da visão por empresa.
+    expect(catalogoDoPerfil(null)).toHaveLength(catalogoViews.length - 11);
+  });
+});
+
+const viewsEmpresa = [
+  "marts.fontes_usos_mensal",
+  "marts.dre_societaria_mensal",
+  "marts.custo_incorrido_mensal",
+  "marts.empresa_resumo",
+];
+const colunasMensais = ["empresa_id", "empresa", "competencia", "linha", "rotulo", "ordem", "tipo", "nivel", "valor_mes", "valor_acumulado"];
+
+// As views da visão por empresa saem das migrations 0036 a 0038, escritas em paralelo; enquanto não existem,
+// o teste de colunas contra o SQL fica pulado e o contrato abaixo segura os nomes.
+function migrationDaView(nome: string): string | null {
+  const arquivos = readdirSync(migrations).filter((arquivo) => /^003[6-9]_.*\.sql$/.test(arquivo));
+  return arquivos.find((arquivo) => readFileSync(join(migrations, arquivo), "utf8").includes(`view ${nome} `)) ?? null;
+}
+
+describe("catálogo da visão por empresa", () => {
+  const nomesDe = (perfil: string | null) => catalogoDoPerfil(perfil).map((view) => view.nome);
+
+  it("deixa as views mensais e o resumo para diretor, financeiro e leitura, nunca para o gerente", () => {
+    for (const nome of viewsEmpresa) {
+      expect(nomesDe("diretor")).toContain(nome);
+      expect(nomesDe("financeiro")).toContain(nome);
+      expect(nomesDe("leitura")).toContain(nome);
+      expect(nomesDe("gerente_obra")).not.toContain(nome);
+      expect(nomesDe("comercial")).not.toContain(nome);
+      expect(nomesDe(null)).not.toContain(nome);
+    }
+  });
+
+  it("deixa o controle das Fontes e Usos só para diretor e financeiro", () => {
+    expect(nomesDe("diretor")).toContain("marts.controle_fontes_usos");
+    expect(nomesDe("financeiro")).toContain("marts.controle_fontes_usos");
+    expect(nomesDe("leitura")).not.toContain("marts.controle_fontes_usos");
+    expect(nomesDe("gerente_obra")).not.toContain("marts.controle_fontes_usos");
+    expect(validarSql("select * from marts.controle_fontes_usos", "leitura").ok).toBe(false);
+    expect(validarSql("select * from marts.controle_fontes_usos", "financeiro").ok).toBe(true);
+  });
+
+  it("descreve as três views mensais com as colunas do contrato", () => {
+    for (const nome of viewsEmpresa.slice(0, 3)) {
+      expect(catalogoViews.find((view) => view.nome === nome)!.colunas).toEqual(colunasMensais);
+    }
+  });
+
+  it("avisa nas views mensais para filtrar por linha e não somar total com linha, e diz o sinal", () => {
+    for (const nome of viewsEmpresa.slice(0, 3)) {
+      const descricao = catalogoViews.find((view) => view.nome === nome)!.descricao;
+      expect(descricao).toContain("filtre sempre por linha");
+      expect(descricao).toContain("nunca some a coluna inteira");
+      expect(descricao).toMatch(/Sinal:/);
+    }
+    expect(catalogoViews.find((view) => view.nome === "marts.fontes_usos_mensal")!.descricao).toContain(
+      "valor positivo e fonte",
+    );
+  });
+
+  it("não cita o ERP de origem pelo nome", () => {
+    const textos = catalogoViews.filter((view) => [...viewsEmpresa, "marts.controle_fontes_usos"].includes(view.nome));
+    for (const view of textos) expect(JSON.stringify(view)).not.toMatch(/sienge/i);
+  });
+
+  it.each([...viewsEmpresa, "marts.controle_fontes_usos"])("%s só descreve colunas que existem na migration, quando ela já existe", (nome) => {
+    const arquivo = migrationDaView(nome);
+    if (arquivo === null) return;
+    const definicao = definicaoView(arquivo, nome);
+    for (const coluna of catalogoViews.find((view) => view.nome === nome)!.colunas) {
+      expect(definicao, `${nome}.${coluna}`).toMatch(new RegExp(`\\b${coluna}\\b`));
+    }
   });
 });
