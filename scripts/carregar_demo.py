@@ -5,8 +5,10 @@ chamam a API e gravam no mesmo formato. Os arquivos de dados/complementos e dado
 opcionais: sem eles a demo carrega como antes e as recargas deles nao rodam. Cada endpoint
 e o staging deixam uma linha em app.carga_execucao, que alimenta a data da ultima carga.
 O estudo de viabilidade de dados/viabilidade nao e dado do ERP: vai direto para as tabelas
-de app, so para obra que ainda nao tem estudo. Depois dele a carga guarda a posicao da DRE do
-mes corrente e, so na demo, os onze meses anteriores a partir dos fatores de historico_demo.
+de app, so para obra que ainda nao tem estudo. O mapa de conta contabil para linha da DRE
+tambem nao e: com complementos, a carga grava o da demo. Depois deles a carga guarda a posicao
+da DRE do mes corrente e, so na demo, os onze meses anteriores a partir dos fatores de
+historico_demo.
 A pasta dados/contabil (empresas e balancete mensal das SPEs) tambem e opcional: quando existe, as
 duas listas entram em raw, o staging contabil e recarregado e o de-para conta para linha da demo
 vai para app.mapa_conta_linha, mas so no tenant que ainda nao tem mapa.
@@ -26,6 +28,7 @@ from carregar_crm import ENDPOINTS as ENDPOINTS_CRM
 from carregar_crm import chave_registro as chave_crm
 from carregar_crm import filtrar_campos as filtrar_crm
 from carregar_origem import chave_origem
+from gerar_dados_complementares import CONTAS_DEMO
 
 load_dotenv()
 
@@ -44,6 +47,7 @@ ARQUIVOS_COMPLEMENTOS = {
     "real-estate-map": "real-estate-map.json",
     "building-projects/progress-logs/items": "building-projects-progress-logs-items.json",
     "defaulters-receivable-bills/by-aging": "defaulters-receivable-bills-by-aging.json",
+    "accountancy/accountCostCenterBalance": "accountancy-accountCostCenterBalance.json",
 }
 ARQUIVO_VIABILIDADE = PASTA_DADOS / "viabilidade" / "estudos.json"
 PASTA_CONTABIL = PASTA_DADOS / "contabil"
@@ -142,6 +146,7 @@ def recarregar_staging(conexao, tenant, com_complementos, com_crm, com_contabil=
             cur.execute("select staging.recarregar_precos(%s)", (tenant,))
             if com_complementos:
                 cur.execute("select staging.recarregar_complementos(%s)", (tenant,))
+                cur.execute("select staging.recarregar_saldo_contabil(%s)", (tenant,))
             # O CRM liga reserva e repasse ao contrato do ERP, que precisa estar no staging antes.
             if com_crm:
                 cur.execute("select staging.recarregar_crm(%s)", (tenant,))
@@ -239,6 +244,22 @@ def gravar_viabilidade_demo(conexao, tenant, estudos):
     return gravados
 
 
+# Uma instrucao com unnest, sete contas na demo.
+def gravar_mapa_contas_demo(conexao, tenant, contas=CONTAS_DEMO):
+    """Conta ja mapeada fica como esta, para nao desfazer um mapa que o contador tenha corrigido."""
+    with conexao.cursor() as cur:
+        cur.execute(
+            "insert into app.conta_linha_resultado (tenant_id, conta, linha) "
+            "select %s, c.conta, c.linha from unnest(%s::text[], %s::text[]) as c (conta, linha) "
+            "on conflict do nothing",
+            (tenant, list(contas), list(contas.values())),
+        )
+        gravadas = cur.rowcount
+    conexao.commit()
+    print(f"mapa de contas: {gravadas} contas novas")
+    return gravadas
+
+
 # Uma instrucao insert ... select no banco; rodar de novo no mesmo mes sobrescreve a mesma linha.
 def registrar_posicao_dre(conexao, tenant):
     """Guarda a posicao da DRE do mes corrente, como dona do banco, e devolve quantas linhas gravou."""
@@ -333,6 +354,9 @@ def main():
         gravar_mapa_demo(conexao, tenant, ler_mapa_demo())
         estudos = ler_estudos()
         gravar_viabilidade_demo(conexao, tenant, estudos)
+        # Antes da posicao do mes, que ja le o apropriado das contas mapeadas.
+        if com_complementos:
+            gravar_mapa_contas_demo(conexao, tenant)
         registrar_posicao_dre(conexao, tenant)
         gravar_historico_demo(conexao, tenant, estudos)
 
