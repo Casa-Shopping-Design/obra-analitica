@@ -32,7 +32,7 @@ jobs:
       - run: npx next typegen
       - run: npx tsc --noEmit
       - run: npx vitest run
-      - run: npm audit --audit-level=moderate
+      - run: node scripts/auditar-dependencias.mjs
 
   banco_e_ponta_a_ponta:
     name: pgTAP e Playwright no Supabase local

@@ -15,6 +15,7 @@ import gerar_dados_complementares as gerador  # noqa: E402
 import gerar_dados_demo  # noqa: E402
 from api_falsa import ApiFalsa  # noqa: E402
 from campos_permitidos import filtrar  # noqa: E402
+from carregar_demo import gravar_mapa_contas_demo, gravar_viabilidade_demo  # noqa: E402
 from carregar_origem import PLANO_BULK, RepositorioBanco, executar  # noqa: E402
 from teste_carregar_origem import HOJE, OPCOES, TENANT, Origem, RepositorioFalso, banco_local, cliente_para  # noqa: E402
 
@@ -24,6 +25,7 @@ for nome in ("cliente_origem", "carregar_origem"):
 MAPA = "real-estate-map"
 ITENS = "building-projects/progress-logs/items"
 AGING = "defaulters-receivable-bills/by-aging"
+SALDO = "accountancy/accountCostCenterBalance"
 NOME_CLIENTE = "Cliente Inadimplente Teste"
 
 
@@ -118,7 +120,7 @@ class TesteGerador(unittest.TestCase):
         cls.parcelas = gerador.ler("income.json")
         cls.data_posicao = posicao_gravada()
         cls.gerados = gerador.gerar(cls.obras, cls.contratos, gerador.ler("units.json"), cls.itens,
-                                    cls.parcelas, cls.data_posicao)
+                                    cls.parcelas, cls.data_posicao, gerador.ler_estudos())
 
     def test_arquivos_gravados_sao_os_do_gerador(self):
         for endpoint, registros in self.gerados.items():
@@ -238,6 +240,89 @@ class TesteGerador(unittest.TestCase):
         self.assertEqual(registros[0]["defaulterInstallments"][0]["daysOfDelay"], 21)
 
 
+def dinheiro(valor):
+    return Decimal(repr(valor))
+
+
+class TesteSaldoContabil(unittest.TestCase):
+    """Valores esperados tirados de dados/viabilidade/estudos.json e dos fatores do gerador."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.registros = gerador.gerar(gerador.ler("cost-centers.json"), gerador.ler("sales.json"),
+                                      gerador.ler("units.json"), gerador.ler("building-cost-estimation-items.json"),
+                                      gerador.ler("income.json"), posicao_gravada(), gerador.ler_estudos())[SALDO]
+        cls.serie = defaultdict(list)
+        for registro in cls.registros:
+            cls.serie[(registro["costCenterId"], registro["accountId"])].append(registro)
+
+    def saldos(self, obra, conta):
+        return [dinheiro(r["balanceCarriedForward"]) for r in self.serie[(obra, conta)]]
+
+    def test_um_registro_por_obra_conta_e_mes_de_10_2024_a_09_2026(self):
+        self.assertEqual(len(self.registros), 3 * 7 * 24)
+        chaves = {(r["costCenterId"], r["accountId"], r["monthYear"]) for r in self.registros}
+        self.assertEqual(len(chaves), len(self.registros))
+        meses = [r["monthYear"] for r in self.serie[(101, "1.1.05.01")]]
+        self.assertEqual((meses[0], meses[-1], len(meses)), ("10/2024", "09/2026", 24))
+
+    def test_aurora_terreno_inteiro_desde_o_primeiro_mes(self):
+        self.assertEqual(self.saldos(101, "1.1.05.01"), [Decimal("3200000.00")] * 24)
+
+    def test_aurora_projetos_em_seis_parcelas_com_dez_por_cento_acima_do_estudo(self):
+        projetos = self.saldos(101, "1.1.05.02")
+        self.assertEqual(projetos[0], Decimal("100833.33"))
+        self.assertEqual(projetos[5:], [Decimal("605000.00")] * 19)
+
+    def test_parque_terreno_projetos_e_juros_acima_do_estudo(self):
+        self.assertEqual(self.saldos(102, "1.1.05.01")[-1], Decimal("1224000.00"))
+        self.assertEqual(self.saldos(102, "1.1.05.02")[-1], Decimal("375000.00"))
+        # 400.000 x 1,15 x 24 dos 29 meses até as chaves de 02/2027.
+        self.assertEqual(self.saldos(102, "4.2.01.01")[-1], Decimal("380689.66"))
+
+    def test_licenciamento_do_terceiro_ao_nono_mes(self):
+        licenciamento = self.saldos(101, "1.1.05.03")
+        self.assertEqual(licenciamento[:2], [Decimal("0.00")] * 2)
+        self.assertEqual(licenciamento[2], Decimal("42857.14"))
+        self.assertLess(licenciamento[7], Decimal("300000.00"))
+        self.assertEqual(licenciamento[8:], [Decimal("300000.00")] * 16)
+
+    def test_torre_entregue_fecha_juros_e_administrativas_no_estudo(self):
+        self.assertEqual(self.saldos(103, "4.2.01.01")[-1], Decimal("120000.00"))
+        self.assertEqual(self.saldos(103, "4.1.02.01")[-1], Decimal("100000.00"))
+        self.assertEqual(self.saldos(103, "3.1.02.01")[-1], Decimal("50000.00"))
+
+    def test_saldo_anterior_mais_debito_menos_credito_da_o_saldo_final(self):
+        for (obra, conta), registros in self.serie.items():
+            anterior = Decimal("0")
+            for registro in registros:
+                self.assertEqual(dinheiro(registro["previousBalance"]), anterior, (obra, conta, registro["monthYear"]))
+                final = (dinheiro(registro["previousBalance"]) + dinheiro(registro["debitBalance"])
+                         - dinheiro(registro["creditBalance"]))
+                self.assertEqual(final, dinheiro(registro["balanceCarriedForward"]), (obra, conta, registro["monthYear"]))
+                self.assertGreaterEqual(min(registro["debitBalance"], registro["creditBalance"]), 0)
+                self.assertEqual((registro["previousBalanceType"], registro["balanceCarriedForwardType"]), ("D", "D"))
+                anterior = final
+
+    def test_nenhuma_conta_passa_do_estudo_fora_dos_fatores(self):
+        estudos = {e["id_origem"]: e["linhas"] for e in gerador.ler_estudos()}
+        for (obra, conta), registros in self.serie.items():
+            linha = gerador.CONTAS_DEMO[conta]
+            fator = gerador.FATOR_CONTA.get(linha, {}).get(obra, Decimal(1))
+            teto = (Decimal(repr(estudos[obra][linha])) * fator).quantize(Decimal("0.01"))
+            self.assertLessEqual(max(dinheiro(r["balanceCarriedForward"]) for r in registros), teto, (obra, conta))
+
+    def test_filtro_de_campos_nao_tira_nada_do_registro(self):
+        for registro in self.registros:
+            self.assertEqual(filtrar(SALDO, registro), registro)
+
+    def test_mapa_de_contas_so_usa_linhas_fora_do_orcamento(self):
+        permitidas = {"custo_terreno", "custo_projetos", "custo_licenciamento", "assistencia_tecnica",
+                      "juros_financiamento", "estoque", "despesas_comerciais", "despesas_administrativas"}
+        self.assertLessEqual(set(gerador.CONTAS_DEMO.values()), permitidas)
+        self.assertEqual(len(set(gerador.CONTAS_DEMO.values())), len(gerador.CONTAS_DEMO))
+
+
 class TesteCargaComplementos(unittest.TestCase):
     def rodar(self, origem, repositorio, hoje=HOJE, rotas=None):
         with ApiFalsa(rest=origem.rest(), bulk=origem.bulk(), rotas={**ROTAS, **(rotas or {})}) as api:
@@ -344,12 +429,12 @@ class TesteBancoLocalComplementos(unittest.TestCase):
                                  (self.tenant, obra["id"], obra["name"]))
 
     def tearDown(self):
-        for tabela in ("mapa_imobiliario_mensal", "medicao_obra", "inadimplencia"):
+        for tabela in ("mapa_imobiliario_mensal", "medicao_obra", "inadimplencia", "saldo_contabil_mensal"):
             self.conexao.execute(f"delete from staging.{tabela} where tenant_id = %s", (self.tenant,))
         self.conexao.execute("delete from app.tenant where id = %s", (self.tenant,))
         self.conexao.close()
 
-    def test_demo_carrega_e_marts_batem_com_o_gerador(self):
+    def gravar_raw(self):
         from carregar_origem import hash_registro
         for endpoint, arquivo in gerador.ARQUIVOS.items():
             registros = json.loads((gerador.PASTA_SAIDA / arquivo).read_text(encoding="utf-8"))["data"]
@@ -357,6 +442,9 @@ class TesteBancoLocalComplementos(unittest.TestCase):
                 cur.executemany(
                     "insert into raw.registro (tenant_id, endpoint, payload, hash_registro) values (%s, %s, %s, %s)",
                     [(self.tenant, endpoint, json.dumps(r), hash_registro(r)) for r in registros])
+
+    def test_demo_carrega_e_marts_batem_com_o_gerador(self):
+        self.gravar_raw()
         RepositorioBanco(self.conexao).recarregar(self.tenant)
 
         def um(sql):
@@ -371,6 +459,29 @@ class TesteBancoLocalComplementos(unittest.TestCase):
         self.assertEqual(um("select count(*) from marts.inadimplencia_faixa where tenant_id = %s"), 12)
         fisico = um("select max(pct_fisico) from marts.execucao_fisica_obra where tenant_id = %s")
         self.assertTrue(0 < fisico <= 1)
+
+    def test_saldo_contabil_chega_na_dre_da_aurora(self):
+        self.gravar_raw()
+        RepositorioBanco(self.conexao).recarregar(self.tenant)
+        for _ in range(2):
+            self.conexao.execute("select staging.recarregar_saldo_contabil(%s)", (self.tenant,))
+        self.assertEqual(self.conexao.execute(
+            "select count(*) from staging.saldo_contabil_mensal where tenant_id = %s", (self.tenant,)).fetchone()[0],
+            3 * 7 * 24)
+        gravar_viabilidade_demo(self.conexao, self.tenant, gerador.ler_estudos())
+        self.assertEqual(gravar_mapa_contas_demo(self.conexao, self.tenant), 7)
+        self.assertEqual(gravar_mapa_contas_demo(self.conexao, self.tenant), 0)
+
+        consulta = self.conexao.execute(
+            "select d.linha, d.apropriado, d.tendencia, d.desvio, d.fonte_realizado from marts.dre_viabilidade d "
+            "join app.centro_custo cc on cc.id = d.centro_custo_id "
+            "where d.tenant_id = %s and cc.id_origem = 101", (self.tenant,))
+        linhas = {linha: tuple(medidas) for linha, *medidas in consulta.fetchall()}
+        self.assertEqual(linhas["custo_terreno"], (Decimal("3200000.00"), Decimal("3200000.00"), 0, "contabil"))
+        self.assertEqual(linhas["custo_projetos"],
+                         (Decimal("605000.00"), Decimal("605000.00"), Decimal("55000.00"), "contabil"))
+        sem_fonte = [linha for linha, (_, _, _, fonte) in linhas.items() if fonte == "sem_fonte"]
+        self.assertEqual(sem_fonte, ["estoque"])
 
 
 if __name__ == "__main__":
