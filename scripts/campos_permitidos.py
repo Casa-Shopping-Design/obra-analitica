@@ -21,10 +21,11 @@ CAMPOS_PERMITIDOS = {
     ],
     "units": [
         "id", "enterpriseId", "contractId", "indexerId", "name", "propertyType", "commercialStock",
-        "deliveryDate", "privateArea", "commonArea", "terrainArea", "usableArea", "floor",
-        "indexedQuantity", "saleValuePrice", "saleValueDate", "tablePricesID",
-        "evaluation.saleValuePrice", "evaluation.saleValueDate",
-        "specialValues[].tablePricesID", "specialValues[].indexedQuantity",
+        "deliveryDate", "scheduledDeliveryDate", "privateArea", "commonArea", "terrainArea", "usableArea", "floor",
+        "indexedQuantity", "evaluation.saleValuePrice", "evaluation.saleValueDate",
+        "specialValues[].tablePricesId", "specialValues[].indexedQuantity",
+        # Formato antigo, com o valor no nível da unidade; a demo e bases mais antigas ainda mandam assim.
+        "saleValuePrice", "saleValueDate", "tablePricesID", "tablePricesId",
     ],
     "sales": [
         "id", "enterpriseId", "receivableBillId", "refundBillId", "number", "situation", "value",
@@ -171,6 +172,17 @@ CAMPOS_PERMITIDOS = {
         "defaulterInstallments[].proRata", "defaulterInstallments[].interest",
         "defaulterInstallments[].fine", "defaulterInstallments[].totalAdditions",
         "defaulterInstallments[].correctedValueWithAdditions",
+    ],
+    # CNPJ aqui é da empresa do grupo (SPE ou holding), não de pessoa.
+    "companies": ["id", "name", "tradeName", "cnpj"],
+    # thirdParties fica de fora: traz nome e código de cliente e fornecedor. initialPeriod e
+    # desconsiderClosingBalance dizem o mês e a passagem do balancete; o carregador acrescenta.
+    "trial-balance": [
+        "companyId", "reducedCode", "accountGroup", "account", "accountName", "accountType", "debit",
+        "credit", "operatingBalance.value", "operatingBalance.type",
+        "balances.previous.value", "balances.previous.type",
+        "balances.current.value", "balances.current.type",
+        "initialPeriod", "desconsiderClosingBalance",
     ],
     # Saldo da conta da construtora por centro de custo; id é o código reduzido da conta. Lançamento e lote
     # não entram, porque o staging lê só o saldo do mês.

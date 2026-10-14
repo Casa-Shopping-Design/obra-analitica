@@ -78,6 +78,8 @@ CHAVES = {
     "accountancy/accountCostCenterBalance": Chave(("costCenterId", "accountId", "monthYear")),
     "building-projects/progress-logs/items": Chave(("buildingId", "measurementNumber", "buildingUnitId"), grupo=True),
     "defaulters-receivable-bills/by-aging": Chave(("receivableBillId",)),
+    "companies": Chave(("id",)),
+    "trial-balance": Chave(("companyId", "account", "initialPeriod", "desconsiderClosingBalance")),
 }
 
 # Planos como dados: acrescentar endpoint é acrescentar uma Tarefa (e a estratégia, se for nova).
@@ -93,6 +95,13 @@ PLANO_COMUM = (
     Tarefa("building-projects/progress-logs/items", "medicoes_obra", "building-projects/progress-logs"),
 )
 
+# Os dois são REST e valem nos dois caminhos. Ficam fora do plano comum para entrar na ordem pela
+# marca: a primeira carga do balancete é longa e, na frente fixa, uma cota curta travaria o resto.
+PLANO_CONTABIL = (
+    Tarefa("companies", "cadastro", "companies", completa=True),
+    Tarefa("trial-balance", "balancete_mensal", "trial-balance"),
+)
+
 PLANO_BULK = PLANO_COMUM + (
     Tarefa("sales", "vendas_por_obra", "sales"),
     Tarefa("income", "receber_alterados", "income"),
@@ -100,12 +109,12 @@ PLANO_BULK = PLANO_COMUM + (
     Tarefa("building-cost-estimation-items", "bulk_completo", "building-cost-estimation-items", completa=True),
     Tarefa("defaulters-receivable-bills/by-aging", "inadimplencia_por_faixa",
            "defaulters-receivable-bills/by-aging", completa=True),
-)
+) + PLANO_CONTABIL
 
 PLANO_SO_REST = PLANO_COMUM + (
     Tarefa("accounts-statements", "extrato", "accounts-statements"),
     Tarefa("bills", "titulos_rest", "bills"),
-)
+) + PLANO_CONTABIL
 
 
 @dataclass
@@ -117,6 +126,9 @@ class Contexto:
     horizonte_dias: int = 3650
     dias_pagamento: int = 7
     indexador_correcao: str = ""
+    inicio_contabil: date | None = None
+    empresas_contabeis: tuple = ()
+    empresas_com_balancete: set = field(default_factory=set)
     concluidas: set = field(default_factory=set)
     compartilhado: dict = field(default_factory=dict)
 
@@ -127,8 +139,12 @@ class Contexto:
         return (self.hoje + timedelta(days=self.horizonte_dias)).isoformat()
 
 
+# Parâmetros fixos de cadastro. Sem additionalData=ALL a unidade pode vir sem specialValues, onde fica a tabela de preço.
+PARAMETROS_CADASTRO = {"units": {"additionalData": "ALL"}}
+
+
 def cadastro(ctx, tarefa, marca):
-    for pagina in ctx.cliente.listar(tarefa.recurso):
+    for pagina in ctx.cliente.listar(tarefa.recurso, PARAMETROS_CADASTRO.get(tarefa.recurso, {})):
         for registro in pagina:
             yield tarefa.endpoint, registro
 
@@ -290,11 +306,10 @@ def inadimplencia_por_faixa(ctx, tarefa, marca):
     Usuário de API sem permissão para este recurso (403 ou 404 do gateway) não tira o tenant do Bulk:
     a posição anterior fica, com a data dela, e o aviso vai para o log.
     """
-    obras = set(ctx.obras)
-    if not obras:
+    if not ctx.obras:
         return
-    empresas = sorted({c["idCompany"] for pagina in ctx.cliente.listar("cost-centers") for c in pagina
-                       if c.get("id") in obras and c.get("idCompany") is not None})
+    obras = set(ctx.obras)
+    empresas = empresas_das_obras(ctx)
     posicao = ctx.hoje.isoformat()
     lidos = 0
     for empresa in empresas:
@@ -315,6 +330,79 @@ def inadimplencia_por_faixa(ctx, tarefa, marca):
     yield tarefa.endpoint, {"positionDate": posicao}
 
 
+def empresas_das_obras(ctx):
+    """Empresas donas das obras do tenant, pelo idCompany do centro de custo. Uma leitura por execução."""
+    if "empresas_das_obras" not in ctx.compartilhado:
+        obras = set(ctx.obras)
+        ctx.compartilhado["empresas_das_obras"] = sorted(
+            {c["idCompany"] for pagina in ctx.cliente.listar("cost-centers") for c in pagina
+             if c.get("id") in obras and c.get("idCompany") is not None}) if obras else []
+    return ctx.compartilhado["empresas_das_obras"]
+
+
+MESES_REVISAO_CONTABIL = 3
+PASSAGENS_BALANCETE = (False, True)
+
+
+def _somar_meses(mes, quantidade):
+    indice = mes.year * 12 + mes.month - 1 + quantidade
+    return date(indice // 12, indice % 12 + 1, 1)
+
+
+def _fim_mes(mes):
+    return _somar_meses(mes, 1) - timedelta(days=1)
+
+
+def meses_contabeis(ctx, marca, empresa):
+    """Empresa que já tem balancete em raw revê os últimos meses a partir da marca (lançamento
+    retroativo em mês aberto); empresa nova, ou primeira carga, vem desde o início contábil."""
+    atual = _inicio_mes(ctx.hoje)
+    inicio = ctx.inicio_contabil or _inicio_mes(ctx.hoje - timedelta(days=ctx.janela_dias))
+    if marca and empresa in ctx.empresas_com_balancete:
+        inicio = max(inicio, _somar_meses(_inicio_mes(marca), -(MESES_REVISAO_CONTABIL - 1)))
+    meses = []
+    while inicio <= atual:
+        meses.append(inicio)
+        inicio = _somar_meses(inicio, 1)
+    return meses
+
+
+def _rotulo_passagem(sem_zeramento):
+    return "sem zeramento" if sem_zeramento else "com zeramento"
+
+
+# O(e x m x 2 x p) chamadas REST: e empresas, m meses, duas passagens e p páginas de 200 contas
+# (p perto de 3). Primeira carga de uma SPE com 42 meses: cerca de 250 chamadas; noite comum, com
+# 3 meses de revisão: cerca de 18 por empresa. Memória O(contas de uma passagem) para a checagem.
+def balancete_mensal(ctx, tarefa, marca):
+    """Balancete por empresa e mês, nas duas passagens (com e sem zeramento do resultado).
+
+    A paginação do balancete não está documentada. Se a página seguinte repetir conta da anterior,
+    a API ignora o offset: a tarefa falha inteira, sem gravar, em vez de duplicar ou perder contas.
+    """
+    empresas = sorted(set(empresas_das_obras(ctx)) | set(ctx.empresas_contabeis))
+    for empresa in empresas:
+        for mes in meses_contabeis(ctx, marca, empresa):
+            for sem_zeramento in PASSAGENS_BALANCETE:
+                parametros = {"companyId": empresa, "initialPeriod": mes.isoformat(),
+                              "finalPeriod": _fim_mes(mes).isoformat(),
+                              "desconsiderClosingBalance": "true" if sem_zeramento else "false",
+                              "reportType": "CORPORATE", "onlyAccountsWithMovements": "false",
+                              "thirdParties": "false"}
+                vistas = set()
+                for pagina in ctx.cliente.listar(tarefa.recurso, parametros):
+                    contas = {r.get("account") for r in pagina if r.get("account") is not None}
+                    if contas & vistas:
+                        raise ErroOrigem(0, tarefa.recurso,
+                                         f"página repetida na empresa {empresa}, mês {mes:%Y-%m}, "
+                                         f"{_rotulo_passagem(sem_zeramento)}: a API não pagina pelo "
+                                         f"offset; nada foi gravado, confira com a sondagem")
+                    vistas |= contas
+                    for registro in pagina:
+                        yield tarefa.endpoint, {"companyId": empresa, **registro, "initialPeriod": mes.isoformat(),
+                                                "desconsiderClosingBalance": sem_zeramento}
+
+
 ESTRATEGIAS = {
     "cadastro": cadastro,
     "saldos_do_dia": saldos_do_dia,
@@ -328,6 +416,7 @@ ESTRATEGIAS = {
     "mapa_imobiliario": mapa_imobiliario,
     "medicoes_obra": medicoes_obra,
     "inadimplencia_por_faixa": inadimplencia_por_faixa,
+    "balancete_mensal": balancete_mensal,
 }
 
 
@@ -415,6 +504,14 @@ class RepositorioBanco:
             obras = [linha[0] for linha in cur.fetchall()]
         return marcas, modo, obras
 
+    def ler_empresas_contabeis(self, tenant):
+        """Empresas que já têm balancete em raw. A chave começa pelo companyId e o índice
+        (tenant_id, endpoint, chave_origem) cobre a leitura."""
+        with self.conexao.cursor() as cur:
+            cur.execute("select distinct split_part(chave_origem, '|', 1) from raw.registro "
+                        "where tenant_id = %s and endpoint = 'trial-balance'", (tenant,))
+            return {int(valor) for (valor,) in cur.fetchall() if valor and valor.isdigit()}
+
     def gravar_modo(self, tenant, so_rest):
         with self.conexao.transaction(), self.conexao.cursor() as cur:
             cur.execute(
@@ -479,6 +576,9 @@ class RepositorioBanco:
             cur.execute("select staging.recarregar(%s)", (tenant,))
             cur.execute("select staging.recarregar_precos(%s)", (tenant,))
             cur.execute("select staging.recarregar_complementos(%s)", (tenant,))
+        # Transação própria: um valor anômalo do balancete não desfaz o staging das obras.
+        with self.conexao.transaction(), self.conexao.cursor() as cur:
+            cur.execute("select staging.recarregar_contabil(%s)", (tenant,))
 
     def ler_eventos_pendentes(self, tenant, origem, limite):
         with self.conexao.cursor() as cur:
@@ -841,6 +941,13 @@ def ordenar_pela_marca(plano, marcas):
     return comuns + demais
 
 
+# O usuário de API do cliente vem com recursos liberados um a um; 403 num endpoint não para a carga dos outros.
+def motivo_falha(erro):
+    if isinstance(erro, ErroOrigem) and erro.status == 403:
+        return f"sem permissão para {erro.caminho}: libere o recurso para o usuário de API no ERP"
+    return str(erro)
+
+
 def _usar_bulk(modo, hoje, reverificar_dias):
     if not modo or not modo[0]:
         return True
@@ -854,6 +961,7 @@ def executar(cliente, repositorio, tenant, hoje, **opcoes):
     limites_fila = {"rest": opcoes.pop("limite_fila_rest", 100), "bulk": opcoes.pop("limite_fila_bulk", 4)}
     marcas, modo, obras = repositorio.ler_estado(tenant)
     ctx = Contexto(cliente=cliente, hoje=hoje, obras=obras, **opcoes)
+    ctx.empresas_com_balancete = repositorio.ler_empresas_contabeis(tenant)
     usar_bulk = _usar_bulk(modo, hoje, reverificar_dias)
     relatorio = Relatorio(caminho="bulk" if usar_bulk else "so_rest")
     plano_fila = None
@@ -886,8 +994,9 @@ def executar(cliente, repositorio, tenant, hoje, **opcoes):
                             tarefa.endpoint, marca.isoformat() if marca else "a primeira execução")
             break
         except (ErroOrigem, EndpointSemLista, ValueError) as erro:
-            log.error("%s falhou: %s", tarefa.endpoint, erro)
-            relatorio.falhas.append((tarefa.endpoint, str(erro)))
+            motivo = motivo_falha(erro)
+            log.error("%s falhou: %s", tarefa.endpoint, motivo)
+            relatorio.falhas.append((tarefa.endpoint, motivo))
             continue
         except Exception as erro:
             # erro do banco pode trazer valor de linha no detalhe; o log leva só o tipo
@@ -895,7 +1004,7 @@ def executar(cliente, repositorio, tenant, hoje, **opcoes):
             relatorio.falhas.append((tarefa.endpoint, type(erro).__name__))
             continue
         ctx.concluidas.add(tarefa.endpoint)
-        if tarefa in PLANO_BULK and tarefa not in PLANO_COMUM:
+        if tarefa in PLANO_BULK and tarefa not in PLANO_SO_REST:
             bulk_respondeu = True
         relatorio.linhas.extend(contagens.items())
     if usar_bulk and bulk_respondeu and modo and modo[0]:
@@ -912,9 +1021,28 @@ def executar(cliente, repositorio, tenant, hoje, **opcoes):
     return relatorio
 
 
+def _mes_de_texto(texto):
+    if not texto:
+        return None
+    try:
+        ano, mes = texto.split("-")
+        return date(int(ano), int(mes), 1)
+    except ValueError:
+        raise ValueError("ORIGEM_INICIO_CONTABIL deve estar no formato aaaa-mm, por exemplo 2023-01") from None
+
+
+def _empresas_de_texto(texto):
+    partes = [p.strip() for p in (texto or "").split(",") if p.strip()]
+    if not all(p.isdigit() for p in partes):
+        raise ValueError("ORIGEM_EMPRESAS_CONTABEIS deve ser uma lista de códigos de empresa separados por vírgula")
+    return tuple(sorted({int(p) for p in partes}))
+
+
 def opcoes_de_ambiente(ambiente=None):
     amb = os.environ if ambiente is None else ambiente
     return {
+        "inicio_contabil": _mes_de_texto(amb.get("ORIGEM_INICIO_CONTABIL", "").strip()),
+        "empresas_contabeis": _empresas_de_texto(amb.get("ORIGEM_EMPRESAS_CONTABEIS")),
         "janela_dias": int(amb.get("ORIGEM_JANELA_INICIAL_DIAS") or 400),
         "horizonte_dias": int(amb.get("ORIGEM_HORIZONTE_DIAS") or 3650),
         "dias_pagamento": int(amb.get("ORIGEM_DIAS_PAGAMENTO") or 7),
@@ -938,13 +1066,13 @@ def main():
         sys.exit("Informe TENANT_ID (ou --tenant) e DATABASE_URL no .env")
     try:
         config = ConfiguracaoOrigem.de_ambiente()
+        opcoes = opcoes_de_ambiente()
     except ValueError as erro:
         sys.exit(str(erro))
     cliente = ClienteOrigem(config)
     with psycopg.connect(os.environ["DATABASE_URL"], autocommit=True) as conexao:
         repositorio = RepositorioBanco(conexao)
-        relatorio = executar(cliente, repositorio, args.tenant, date.today(), fila_eventos=repositorio,
-                             **opcoes_de_ambiente())
+        relatorio = executar(cliente, repositorio, args.tenant, date.today(), fila_eventos=repositorio, **opcoes)
         repositorio.limpar_eventos_processados(args.tenant, "erp")
     print(relatorio.texto())
     if relatorio.cota_esgotada:

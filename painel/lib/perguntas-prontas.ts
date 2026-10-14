@@ -4,6 +4,7 @@
 
 import type { TipoAlerta } from "./alertas";
 import { perfisDre } from "./dre";
+import { perfisEmpresa } from "./empresa";
 
 export type FormatoColuna = "texto" | "real" | "inteiro" | "percentual" | "mes" | "data" | "area";
 
@@ -20,6 +21,7 @@ export type PerguntaPronta = {
 };
 
 const semObraDre = "Nenhuma obra com estudo de viabilidade liberada para o seu perfil.";
+const semEmpresa = "Nenhuma empresa com contabilidade carregada liberada para o seu perfil.";
 
 export const perguntasProntas = [
   {
@@ -290,6 +292,45 @@ export const perguntasProntas = [
     ],
     semResultado: "Nenhuma obra com alíquota de imposto informada liberada para o seu perfil.",
     perfis: perfisDre,
+  },
+  {
+    id: "caixa-lucro-empresas",
+    pergunta: "Quanto cada empresa tem em caixa e quanto lucrou até o último mês carregado?",
+    sql: "select nome, ultima_competencia, caixa_equivalentes, fluxo_operacional, lucro_liquido from marts.empresa_resumo where ultima_competencia is not null order by nome",
+    colunas: [
+      { chave: "nome", rotulo: "Empresa", formato: "texto" },
+      { chave: "ultima_competencia", rotulo: "Mês", formato: "mes" },
+      { chave: "caixa_equivalentes", rotulo: "Caixa e equivalentes", formato: "real" },
+      { chave: "fluxo_operacional", rotulo: "Fluxo operacional acumulado", formato: "real" },
+      { chave: "lucro_liquido", rotulo: "Lucro líquido acumulado", formato: "real" },
+    ],
+    semResultado: semEmpresa,
+    perfis: perfisEmpresa,
+  },
+  {
+    id: "lucro-mensal-empresas",
+    pergunta: "Qual o lucro líquido de cada empresa mês a mês neste ano?",
+    sql: "select empresa, competencia, valor_mes from marts.dre_societaria_mensal where linha = 'lucro_liquido' and competencia >= date_trunc('year', current_date) order by empresa, competencia",
+    colunas: [
+      { chave: "empresa", rotulo: "Empresa", formato: "texto" },
+      { chave: "competencia", rotulo: "Mês", formato: "mes" },
+      { chave: "valor_mes", rotulo: "Lucro líquido do mês", formato: "real" },
+    ],
+    semResultado: semEmpresa,
+    perfis: perfisEmpresa,
+  },
+  {
+    id: "empresas-sem-fechamento",
+    pergunta: "Alguma empresa não fecha as Fontes e Usos com o caixa ou tem conta sem mapa?",
+    sql: "select nome, ultima_competencia, diferenca_identidade, contas_sem_mapa from marts.empresa_resumo where diferenca_identidade <> 0 or contas_sem_mapa > 0 order by nome",
+    colunas: [
+      { chave: "nome", rotulo: "Empresa", formato: "texto" },
+      { chave: "ultima_competencia", rotulo: "Mês", formato: "mes" },
+      { chave: "diferenca_identidade", rotulo: "Diferença contra o caixa", formato: "real" },
+      { chave: "contas_sem_mapa", rotulo: "Contas sem mapa", formato: "inteiro" },
+    ],
+    semResultado: "Todas as empresas liberadas para o seu perfil fecham com o caixa e não têm conta sem mapa.",
+    perfis: perfisEmpresa,
   },
 ] as const satisfies readonly PerguntaPronta[];
 

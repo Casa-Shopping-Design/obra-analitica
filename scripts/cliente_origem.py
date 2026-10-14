@@ -8,6 +8,7 @@ até a sondagem real dizer qual o piloto aceita. Nenhum log leva credencial, tok
 import base64
 import json
 import logging
+import re
 import os
 import time
 import urllib.error
@@ -23,6 +24,17 @@ TAMANHO_PAGINA = 200
 # Nestas rotas a documentação dá 404 como requisição mal formada, não como consulta vazia; tratar como
 # vazio faria a carga avançar a marca e perder o que mudou.
 ROTAS_404_MALFORMADA = frozenset({"bills", "bills/by-change-date"})
+
+
+CAMINHO_BULK_PADRAO = "group/v2/bulk-data/v1"
+
+
+def validar_caminho_bulk(caminho):
+    """O caminho entra depois do host já validado; mesmo assim só aceita segmentos simples, sem .. nem esquema."""
+    caminho = (caminho or CAMINHO_BULK_PADRAO).strip().strip("/")
+    if not re.fullmatch(r"[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*", caminho) or ".." in caminho:
+        raise ValueError("ORIGEM_CAMINHO_BULK precisa ser um caminho como group/v2/bulk-data/v1")
+    return caminho
 
 
 def validar_url_base(url):
@@ -58,6 +70,10 @@ class ConfiguracaoOrigem:
     tenant_oauth: str = ""
     cliente_oauth: str = ""
     segredo_oauth: str = ""
+    # Rota do Bulk no gateway v2. A documentação pública só mostra a v1 (public/api/bulk-data/v1), e a sondagem
+    # de 11/10/2026 recebeu 404 "Unknown endpoint" em group/v2/bulk-data/v1; quando a rota certa for confirmada,
+    # muda só a variável.
+    caminho_bulk_oauth: str = CAMINHO_BULK_PADRAO
     limite_rest_minuto: int = 200
     limite_bulk_minuto: int = 20
     cota_diaria_rest: int = 1000
@@ -91,6 +107,7 @@ class ConfiguracaoOrigem:
             tenant_oauth=amb.get("ORIGEM_TENANT", ""),
             cliente_oauth=amb.get("ORIGEM_CLIENT_ID", ""),
             segredo_oauth=amb.get("ORIGEM_CLIENT_SECRET", ""),
+            caminho_bulk_oauth=validar_caminho_bulk(amb.get("ORIGEM_CAMINHO_BULK")),
             limite_rest_minuto=inteiro("ORIGEM_LIMITE_REST_MINUTO", 200),
             limite_bulk_minuto=inteiro("ORIGEM_LIMITE_BULK_MINUTO", 20),
             cota_diaria_rest=inteiro("ORIGEM_COTA_DIARIA", 1000),
@@ -132,7 +149,7 @@ class ClienteOrigem:
         self.chamadas = {"rest": 0, "bulk": 0}
         self._token = None
         if config.autenticacao == "oauth":
-            self.base = {"rest": f"{config.url_base}/group/v2", "bulk": f"{config.url_base}/group/v2/bulk-data/v1"}
+            self.base = {"rest": f"{config.url_base}/group/v2", "bulk": f"{config.url_base}/{config.caminho_bulk_oauth}"}
         else:
             self.base = {"rest": f"{config.url_base}/public/api/v1",
                          "bulk": f"{config.url_base}/public/api/bulk-data/v1"}
@@ -292,7 +309,8 @@ def _bulk_indisponivel(status, texto):
 
     404 é ambíguo: a própria API responde 404 quando o filtro não acha parcela. Se o corpo é o erro
     padrão da API (developerMessage ou clientMessage), é consulta vazia; 404 sem esse corpo vem do
-    gateway e quer dizer que a rota não existe para o cliente. Hipótese a confirmar na sondagem.
+    gateway e quer dizer que a rota não existe para o cliente. A sondagem de 11/10/2026 confirmou: a rota
+    inexistente volta 404 com {"msg": "Unknown endpoint"}, sem developerMessage.
     """
     if status == 403:
         return True

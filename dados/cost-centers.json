@@ -3,17 +3,17 @@
   {
    "id": 101,
    "name": "Residencial Aurora",
-   "idCompany": 1
+   "idCompany": 11
   },
   {
    "id": 102,
    "name": "Parque das Águas",
-   "idCompany": 1
+   "idCompany": 12
   },
   {
    "id": 103,
    "name": "Torre Comercial Sul",
-   "idCompany": 1
+   "idCompany": 13
   }
  ]
 }

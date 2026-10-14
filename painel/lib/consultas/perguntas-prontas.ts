@@ -1,6 +1,7 @@
 import "server-only";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
 import { ErroConsulta } from "@/lib/consultas/posicao";
+import { consultasEmpresa } from "@/lib/consultas/perguntas-empresa";
 import { rotuloLinha } from "@/lib/dre";
 import { rotulosAlerta, type IdPerguntaPronta } from "@/lib/perguntas-prontas";
 
@@ -344,6 +345,8 @@ const consultas: Record<IdPerguntaPronta, ConsultaPergunta> = {
         .limit(limiteLinhas),
     );
   },
+
+  ...consultasEmpresa,
 };
 
 export type RespostaPerguntaPronta = { linhas: LinhaResposta[]; consultadoEm: string };

@@ -3,22 +3,20 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MarcaApo } from "@/componentes/MarcaApo";
-
-const itens = [
-  { rotulo: "Visão geral", destino: "/" },
-  { rotulo: "DRE de viabilidade", destino: "/dre" },
-  { rotulo: "Obras", destino: "/obras" },
-  { rotulo: "Mapa de unidades", destino: "/unidades" },
-  { rotulo: "Assistente", destino: "/assistente" },
-];
-
-function estaAtivo(caminho: string, destino: string): boolean {
-  return destino === "/" ? caminho === "/" : caminho === destino || caminho.startsWith(`${destino}/`);
-}
+import { itemAtivo, itensMenu } from "@/lib/menu";
 
 const classeFoco = "focus-visible:outline-menu-texto";
 
-export function MenuLateral({ perfil, construtora }: { perfil: string; construtora: string }) {
+// perfil é o nome mostrado; codigoPerfil é o valor cru que decide os itens.
+export function MenuLateral({
+  perfil,
+  codigoPerfil,
+  construtora,
+}: {
+  perfil: string;
+  codigoPerfil: string | null;
+  construtora: string;
+}) {
   const caminho = usePathname();
 
   return (
@@ -28,8 +26,8 @@ export function MenuLateral({ perfil, construtora }: { perfil: string; construto
     >
       <MarcaApo className="px-3 pb-3 text-[22px] md:pb-7" />
       <ul className="flex flex-wrap gap-1.5 md:flex-col">
-        {itens.map((item) => {
-          const ativo = estaAtivo(caminho, item.destino);
+        {itensMenu(codigoPerfil).map((item) => {
+          const ativo = itemAtivo(caminho, item.destino);
           return (
             <li key={item.destino}>
               <Link

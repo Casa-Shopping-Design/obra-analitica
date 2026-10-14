@@ -42,6 +42,8 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 - Limite relatado por terceiros: 200 requisições por minuto por conta, compartilhado com outras integrações (CV CRM incluído). 429 ao estourar. REST pagina em 200 registros.
 - Campos que resolvem a separação direta x repasse: `paymentConditions[].conditionType` no `sales` e `paymentTerm` no `income`; `financialInstitutionNumber` e `financialInstitutionDate` marcam repasse.
 - Documentação oficial: https://api.sienge.com.br/docs/ (bloqueia leitura automática; abrir no navegador).
+- API v2, sondada em 11/10/2026 (ADR 0020): token em `POST https://api.sienge.com.br/group/v2/auth/token` (Basic do usuário, `grant_type=client_credentials` e `tenant`), consultas em `group/v2/{recurso}` com Bearer. Bulk em `group/v2/bulk-data/v1` deu 404 "Unknown endpoint"; a rota vem de `ORIGEM_CAMINHO_BULK`. O usuário de teste recebeu 403 em `trial-balance`, `real-estate-map`, `accounts-balances`, `accounts-statements` e medições; João libera depois.
+- Rodar a sondagem e a conferência: `sondar_origem.py --plano carga --mes aaaa-mm` e `conferir_amostras.py`. As credenciais ficam no `.env` do worktree, fora do git.
 
 ## Negociação
 
@@ -70,6 +72,16 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 
 - Migrations 0025 a 0029 (01/10/2026), sem aplicar em projeto hospedado: 0025 grava no banco o SQL executado pelo assistente e exige assinatura no SQL gerado (ADR 0014; publicar junto com o painel novo, senão o assistente para); 0026 repasse por banco e leads por origem; 0027 comparativo entre obras em `/obras`; 0028 não existe (o resumo semanal não precisou); 0029 corrige o alerta de estoque para obra sem data de entrega.
 - Resumo semanal por e-mail (`scripts/enviar_resumo_semanal.py`, workflow `resumo_semanal.yml`): falta conta no Resend, domínio com SPF, DKIM e DMARC, e os segredos no GitHub. Decidir com os sócios se o e-mail de diretor e financeiro leva valores em real, já que sai da barreira do segundo fator.
+
+## Fontes e Usos por empresa (10/10/2026)
+
+O cliente piloto acompanha cada SPE numa planilha de Fontes e Usos (F&U, DRE societária e custo incorrido) montada a partir dos lançamentos do ERP e de um de-para conta para linha. A visão por empresa reproduz as três abas com as mesmas linhas, rótulos, ordem e sinais (ADR 0019, migrations 0036 a 0038, que não dependem da 0035).
+
+- Fonte: `GET /companies` e `GET /trial-balance` por empresa e mês, em duas passagens (`desconsiderClosingBalance` false para o F&U e true para a DRE e o custo), `reportType=CORPORATE`, `onlyAccountsWithMovements=false`, `thirdParties=false`. Variáveis `ORIGEM_INICIO_CONTABIL` e `ORIGEM_EMPRESAS_CONTABEIS`.
+- De-para em `app.mapa_conta_linha`, editável por diretor e financeiro em `/empresas/mapa-contas` ou importado da planilha do cliente com `scripts/importar_mapa_contas.py` (o arquivo do cliente nunca entra no git).
+- Telas: `/empresas` e `/empresas/[id]` com as abas Fontes e Usos, DRE, Custo incorrido e Conferência (esta só diretor e financeiro), modo acumulado (como na planilha) ou movimento do período e visão mês a mês.
+- Demo: três SPEs fictícias (11 Aurora, 12 Parque, 13 Torre) e a holding 1; o balancete sintético sai de `scripts/gerar_dados_contabeis.py` e fica fora do git, como `income.json`.
+- Antes da carga real: sondar `trial-balance` no Mac (`python scripts/sondar_origem.py --so trial-balance --mes aaaa-mm --empresa N`) para confirmar paginação, permissão do usuário de API e que a passagem sem zeramento acumula desde o início.
 
 ## Links
 

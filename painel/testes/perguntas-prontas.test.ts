@@ -24,6 +24,8 @@ const perguntasDre = [
   "imposto-a-gerar-obras",
 ];
 
+const perguntasEmpresa = ["caixa-lucro-empresas", "lucro-mensal-empresas", "empresas-sem-fechamento"];
+
 describe("perguntas prontas", () => {
   it("tem ids únicos", () => {
     const ids = perguntasProntas.map((pergunta) => pergunta.id);
@@ -115,7 +117,7 @@ describe("perguntas prontas sobre viabilidade, tendência e imposto", () => {
       expect(ids).not.toContain(id);
       expect(buscarPerguntaPronta(id, perfil)).toBeUndefined();
     });
-    expect(ids).toHaveLength(perguntasProntas.length - perguntasDre.length);
+    expect(ids).toHaveLength(perguntasProntas.length - perguntasDre.length - perguntasEmpresa.length);
     expect(ids).toContain("exposicao-maxima");
   });
 
@@ -137,5 +139,27 @@ describe("perguntas prontas sobre viabilidade, tendência e imposto", () => {
     const fracoes = colunas.filter((coluna) => /pct|margem|aliquota/.test(coluna.chave));
     expect(fracoes.length).toBeGreaterThan(0);
     fracoes.forEach((coluna) => expect(coluna.formato).toBe("percentual"));
+  });
+});
+
+describe("perguntas prontas da visão por empresa", () => {
+  it("leem só o resumo e a DRE mensal da empresa", () => {
+    const views = new Set(perguntasEmpresa.flatMap((id) => viewsDoSql(buscarPerguntaPronta(id, "leitura")!.sql)));
+    expect(views).toEqual(new Set(["marts.empresa_resumo", "marts.dre_societaria_mensal"]));
+  });
+
+  it.each(["diretor", "financeiro", "leitura"])("aparecem para %s", (perfil) => {
+    const ids = perguntasProntasDoPerfil(perfil).map((pergunta) => pergunta.id);
+    expect(ids).toEqual(expect.arrayContaining(perguntasEmpresa));
+  });
+
+  it.each(["gerente_obra", "comercial", null])("não aparecem para %s, nem por id", (perfil) => {
+    perguntasEmpresa.forEach((id) => expect(buscarPerguntaPronta(id, perfil)).toBeUndefined());
+  });
+
+  it("filtram a DRE mensal por linha, sem somar total com linha", () => {
+    const sql = buscarPerguntaPronta("lucro-mensal-empresas", "diretor")!.sql;
+    expect(sql).toContain("linha = 'lucro_liquido'");
+    expect(sql).not.toMatch(/\bsum\(/);
   });
 });

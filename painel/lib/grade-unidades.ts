@@ -50,11 +50,23 @@ export function normalizarSituacao(situacao: string | null): SituacaoUnidade {
   return situacoesUnidade.find((conhecida) => conhecida === situacao) ?? "indisponivel";
 }
 
-// Nome no padrão TIPO-AAPP: andar nos dois primeiros dígitos, posição nos dois últimos.
+// Cada construtora nomeia a unidade do seu jeito (3Q-0202, Apto 101, Torre A - 1203, 1204). Vale o número de
+// três ou quatro dígitos no fim do nome: os dois últimos são a posição e o resto o andar; o texto antes dele é a
+// tipologia. Número colado em outro número, ou nome sem número no fim, fica fora da grade e aparece na lista.
+export const tipologiaSemNome = "Unidades";
+
 export function lerNomeUnidade(nome: string): { tipologia: string; andar: number; posicao: number } | null {
-  const partes = /^(.+)-(\d{2})(\d{2})$/.exec(nome.trim());
-  if (!partes) return null;
-  return { tipologia: partes[1], andar: Number(partes[2]), posicao: Number(partes[3]) };
+  const limpo = nome.trim();
+  const partes = /^(.*?)[\s\-_/]*(\d{3,4})$/.exec(limpo);
+  if (!partes || /^[\s\-_/]/.test(limpo)) return null;
+  const [, prefixo, digitos] = partes;
+  if (/\d$/.test(prefixo)) return null;
+  const tipologia = prefixo.trim();
+  return {
+    tipologia: tipologia || tipologiaSemNome,
+    andar: Number(digitos.slice(0, -2)),
+    posicao: Number(digitos.slice(-2)),
+  };
 }
 
 export function rotuloAndar(andar: number): string {

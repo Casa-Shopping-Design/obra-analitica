@@ -36,10 +36,22 @@ describe("lerNomeUnidade", () => {
     expect(lerNomeUnidade("BLOCO-A-0301")).toEqual({ tipologia: "BLOCO-A", andar: 3, posicao: 1 });
   });
 
+  it("aceita os padrões de nome mais comuns entre construtoras", () => {
+    expect(lerNomeUnidade("2Q-101")).toEqual({ tipologia: "2Q", andar: 1, posicao: 1 });
+    expect(lerNomeUnidade("Apto 1203")).toEqual({ tipologia: "Apto", andar: 12, posicao: 3 });
+    expect(lerNomeUnidade("Torre A - 0804")).toEqual({ tipologia: "Torre A", andar: 8, posicao: 4 });
+    expect(lerNomeUnidade("Apto101")).toEqual({ tipologia: "Apto", andar: 1, posicao: 1 });
+    expect(lerNomeUnidade("1204")).toEqual({ tipologia: "Unidades", andar: 12, posicao: 4 });
+    expect(lerNomeUnidade("Casa 001")).toEqual({ tipologia: "Casa", andar: 0, posicao: 1 });
+  });
+
   it("devolve nulo para nome fora do padrão", () => {
     expect(lerNomeUnidade("Loja 1")).toBeNull();
-    expect(lerNomeUnidade("2Q-101")).toBeNull();
     expect(lerNomeUnidade("-0101")).toBeNull();
+    expect(lerNomeUnidade("10101010")).toBeNull();
+    expect(lerNomeUnidade("Sala 10101")).toBeNull();
+    expect(lerNomeUnidade("Unidade sem número")).toBeNull();
+    expect(lerNomeUnidade("")).toBeNull();
   });
 });
 
