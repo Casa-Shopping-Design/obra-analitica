@@ -228,7 +228,7 @@ def primeiro(conteudo, campo):
     return None
 
 
-# Cerca de 20 REST e 5 Bulk, uma página pequena de cada. Os códigos de empresa, obra e indexador saem das
+# Cerca de 25 REST e 5 Bulk, uma página pequena de cada. Os códigos de empresa, obra e indexador saem das
 # primeiras respostas, para os endpoints que exigem filtro responderem com dado da própria base.
 def sondar_plano_carga(sondar, respostas, args, hoje):
     pagina = {"limit": 20, "offset": 0}
@@ -261,6 +261,16 @@ def sondar_plano_carga(sondar, respostas, args, hoje):
             sondar("progress-logs-items", f"{caminho}/items/{unidade}", pagina)
     sondar("accounts-statements", "accounts-statements", {**pagina, "startDate": trinta, "endDate": hoje.isoformat()})
     sondar("bills", "bills", {**pagina, "startDate": trinta, "endDate": hoje.isoformat()})
+    # Parcelas e rateio do título a pagar e o orçamento por planilha: o caminho só REST lê os três (ADR 0021).
+    titulo_pagar = primeiro(respostas.get("bills"), "id")
+    if titulo_pagar is not None:
+        sondar("bills-installments", f"bills/{titulo_pagar}/installments", pagina)
+        sondar("bills-buildings-cost", f"bills/{titulo_pagar}/buildings-cost", pagina)
+    if obra is not None:
+        sondar("budget-sheets", f"building-cost-estimations/{obra}/sheets", pagina)
+        planilha = primeiro(respostas.get("budget-sheets"), "id")
+        if planilha is not None:
+            sondar("budget-sheet-items", f"building-cost-estimations/{obra}/sheets/{planilha}/items", pagina)
     # Sem Bulk, a parcela a receber só sai por título, a partir do receivableBillId do contrato.
     titulo = primeiro(respostas.get("sales-contracts"), "receivableBillId")
     if titulo is not None:

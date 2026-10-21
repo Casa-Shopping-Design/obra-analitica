@@ -42,11 +42,13 @@ class Tarefa:
     """Uma unidade de carga: endpoint gravado em raw, estratégia de busca e recurso da API.
 
     `completa` diz que a estratégia traz o conjunto inteiro; no fim, o que não veio sai de raw.
+    `intervalo_dias` espaça a releitura de quem não tem filtro de alteração na API; aviso do webhook antecipa.
     """
     endpoint: str
     estrategia: str
     recurso: str
     completa: bool = False
+    intervalo_dias: int = 0
 
 
 # Campos que identificam o registro na origem. `grupo` quer dizer que a chave repete entre linhas
@@ -73,6 +75,8 @@ CHAVES = {
     "bills/installments": Chave(("billId",), grupo=True),
     "bills/buildings-cost": Chave(("billId",), grupo=True),
     "accounts-statements": Chave(("id",)),
+    "receivable-bills/installments": Chave(("receivableBillId",), grupo=True),
+    "building-cost-estimations/items": Chave(("buildingId", "buildingUnitId"), grupo=True),
     "defaulters-receivable-bills": Chave(("receivableBillId",)),
     "real-estate-map": Chave(("enterpriseData.enterpriseId", "enterpriseData.monthYear")),
     "accountancy/accountCostCenterBalance": Chave(("costCenterId", "accountId", "monthYear")),
@@ -111,10 +115,18 @@ PLANO_BULK = PLANO_COMUM + (
            "defaulters-receivable-bills/by-aging", completa=True),
 ) + PLANO_CONTABIL
 
+# O extrato vem antes das parcelas a receber: com a mesma marca a ordem do plano se mantém, e o título a receber
+# que teve movimento no dia entra na releitura da noite.
 PLANO_SO_REST = PLANO_COMUM + (
     Tarefa("accounts-statements", "extrato", "accounts-statements"),
     Tarefa("bills", "titulos_rest", "bills"),
+    Tarefa("receivable-bills/installments", "parcelas_receber_rest", "accounts-receivable/receivable-bills"),
+    Tarefa("building-cost-estimations/items", "orcamento_rest", "building-cost-estimations",
+           completa=True, intervalo_dias=7),
 ) + PLANO_CONTABIL
+
+# No caminho só REST, o aviso de orçamento alterado é atendido por outra tarefa do plano.
+EVENTO_DA_TAREFA_REST = {"building-cost-estimations/items": "building-cost-estimation-items"}
 
 
 @dataclass
@@ -129,6 +141,7 @@ class Contexto:
     inicio_contabil: date | None = None
     empresas_contabeis: tuple = ()
     empresas_com_balancete: set = field(default_factory=set)
+    titulos_receber: dict = field(default_factory=dict)
     concluidas: set = field(default_factory=set)
     compartilhado: dict = field(default_factory=dict)
 
@@ -157,10 +170,12 @@ def saldos_do_dia(ctx, tarefa, marca):
 
 def contratos_alterados(ctx, tarefa, marca):
     alteradas = ctx.compartilhado.setdefault("obras_venda_alterada", set())
+    titulos = ctx.compartilhado.setdefault("titulos_receber_alterados", set())
     parametros = {"modifiedAfter": marca.isoformat()} if marca else {}
     for pagina in ctx.cliente.listar(tarefa.recurso, parametros):
         for registro in pagina:
             alteradas.add(registro.get("enterpriseId"))
+            titulos.update(_inteiros(registro.get("receivableBillId")))
             yield tarefa.endpoint, registro
 
 
@@ -226,28 +241,88 @@ def bulk_completo(ctx, tarefa, marca):
 def extrato(ctx, tarefa, marca):
     # lançamento retroativo no extrato entra pela sobreposição de alguns dias
     inicio = (marca - timedelta(days=ctx.dias_pagamento)).isoformat() if marca else ctx.inicio_janela()
+    movimentados = ctx.compartilhado.setdefault("titulos_receber_movimentados", set())
     for pagina in ctx.cliente.listar(tarefa.recurso, {"startDate": inicio, "endDate": ctx.hoje.isoformat()}):
         for registro in pagina:
+            if str(registro.get("type") or "").lower() in ("income", "entrada"):
+                movimentados.update(_inteiros(registro.get("billId")))
             yield tarefa.endpoint, registro
 
 
 # O(t) chamadas por título alterado (parcelas e rateio): N+1 de rede, porque o caminho só REST
 # não tem consulta em lote. Roda de madrugada; o limite é a cota diária, não o banco.
 def titulos_rest(ctx, tarefa, marca):
+    """Sub-recurso vazio grava só o billId: o grupo do título é trocado inteiro e a parcela ou o rateio que
+    sumiu na origem sai de raw, em vez de ficar com a versão anterior."""
     if marca:
         recurso, parametros = "bills/by-change-date", {"startDate": marca.isoformat(), "endDate": ctx.hoje.isoformat()}
     else:
         recurso, parametros = "bills", {"startDate": ctx.inicio_janela(), "endDate": ctx.hoje.isoformat()}
     for pagina in ctx.cliente.listar(recurso, parametros):
         for titulo in pagina:
-            id_titulo = titulo.get("id")
-            if id_titulo is None:
+            ids = _inteiros(titulo.get("id"))
+            if not ids:
                 continue
+            id_titulo = ids[0]
             yield "bills", titulo
             for sub in ("installments", "buildings-cost"):
+                lidos = 0
                 for itens in ctx.cliente.listar(f"bills/{id_titulo}/{sub}"):
                     for item in itens:
+                        lidos += 1
                         yield f"bills/{sub}", {**item, "billId": id_titulo}
+                if not lidos:
+                    yield f"bills/{sub}", {"billId": id_titulo}
+
+
+DIAS_RODIZIO_RECEBER = 7
+
+
+def titulos_receber_da_noite(ctx, marca):
+    """Primeira carga lê todos os títulos a receber dos contratos. Nas seguintes, os que nunca foram lidos, os de
+    contrato alterado, os com recebimento no extrato, os avisados pelo webhook e um sétimo do resto em
+    rodízio, para nenhum ficar mais de uma semana sem conferir saldo e vencimento."""
+    compartilhado = ctx.compartilhado
+    alterados = (compartilhado.get("titulos_receber_alterados", set())
+                 | compartilhado.get("titulos_receber_movimentados", set())
+                 | compartilhado.get("titulos_receber_avisados", set()))
+    todos = set(ctx.titulos_receber) | compartilhado.get("titulos_receber_alterados", set())
+    if not marca:
+        return sorted(todos)
+    rodizio = ctx.hoje.toordinal() % DIAS_RODIZIO_RECEBER
+    return sorted(t for t in todos
+                  if not ctx.titulos_receber.get(t) or t in alterados or t % DIAS_RODIZIO_RECEBER == rodizio)
+
+
+# O(c/7 + a) chamadas por noite, uma por título a receber (c contratos, a alterados ou com recebimento no dia):
+# a API só devolve parcela por título. Com 300 contratos e 15 alterados, cerca de 60 chamadas; a primeira carga
+# faz c. Memória O(c) nos códigos de título.
+def parcelas_receber_rest(ctx, tarefa, marca):
+    """Título lido sem parcela grava só o receivableBillId, para a parcela quitada que sumiu da resposta sair de raw.
+    O carregador acrescenta receivableBillId a cada parcela."""
+    for titulo in titulos_receber_da_noite(ctx, marca):
+        lidas = 0
+        for pagina in ctx.cliente.listar(f"{tarefa.recurso}/{titulo}/installments"):
+            for parcela_titulo in pagina:
+                lidas += 1
+                yield tarefa.endpoint, {**parcela_titulo, "receivableBillId": titulo}
+        if not lidas:
+            yield tarefa.endpoint, {"receivableBillId": titulo}
+
+
+# O(o x (1 + s x p)) chamadas: o obras, s planilhas (unidades construtivas) por obra e p páginas de 200 itens.
+# Cinco obras com três planilhas de até 400 itens dão cerca de 35 chamadas, uma vez por semana ou quando o
+# webhook avisa mudança no orçamento.
+def orcamento_rest(ctx, tarefa, marca):
+    for obra in ctx.obras:
+        for planilhas in ctx.cliente.listar(f"{tarefa.recurso}/{obra}/sheets"):
+            for planilha in planilhas:
+                if planilha.get("id") is None:
+                    continue
+                id_planilha = int(planilha["id"])
+                for itens in ctx.cliente.listar(f"{tarefa.recurso}/{obra}/sheets/{id_planilha}/items"):
+                    for item in itens:
+                        yield tarefa.endpoint, {**item, "buildingId": obra, "buildingUnitId": id_planilha}
 
 
 OBRAS_POR_CHAMADA = 50
@@ -413,6 +488,8 @@ ESTRATEGIAS = {
     "bulk_completo": bulk_completo,
     "extrato": extrato,
     "titulos_rest": titulos_rest,
+    "parcelas_receber_rest": parcelas_receber_rest,
+    "orcamento_rest": orcamento_rest,
     "mapa_imobiliario": mapa_imobiliario,
     "medicoes_obra": medicoes_obra,
     "inadimplencia_por_faixa": inadimplencia_por_faixa,
@@ -512,6 +589,21 @@ class RepositorioBanco:
                         "where tenant_id = %s and endpoint = 'trial-balance'", (tenant,))
             return {int(valor) for (valor,) in cur.fetchall() if valor and valor.isdigit()}
 
+    def ler_titulos_receber(self, tenant):
+        """Título a receber de cada contrato em raw e se ele já foi lido alguma vez (com parcela ou só o marcador
+        de título sem parcela). Duas leituras pelo índice (tenant_id, endpoint); O(c) em contratos."""
+        with self.conexao.cursor() as cur:
+            cur.execute("select distinct (payload->>'receivableBillId')::int from raw.registro "
+                        "where tenant_id = %s and endpoint = 'sales-contracts' "
+                        "and payload->>'receivableBillId' ~ '^\\d{1,9}$'", (tenant,))
+            titulos = {titulo: False for (titulo,) in cur.fetchall()}
+            cur.execute("select distinct chave_origem from raw.registro "
+                        "where tenant_id = %s and endpoint = 'receivable-bills/installments'", (tenant,))
+            for (chave,) in cur.fetchall():
+                if chave and chave.isdigit():
+                    titulos[int(chave)] = True
+        return titulos
+
     def gravar_modo(self, tenant, so_rest):
         with self.conexao.transaction(), self.conexao.cursor() as cur:
             cur.execute(
@@ -574,6 +666,8 @@ class RepositorioBanco:
     def recarregar(self, tenant):
         with self.conexao.transaction(), self.conexao.cursor() as cur:
             cur.execute("select staging.recarregar(%s)", (tenant,))
+            # depois da recarga do Bulk: o REST só entra na obra que o Bulk não preencheu
+            cur.execute("select staging.recarregar_financeiro_rest(%s)", (tenant,))
             cur.execute("select staging.recarregar_precos(%s)", (tenant,))
             cur.execute("select staging.recarregar_complementos(%s)", (tenant,))
         # Transação própria: um valor anômalo do balancete não desfaz o staging das obras.
@@ -794,6 +888,7 @@ class PlanoFila:
     eventos: dict = field(default_factory=dict)
     cobertos: dict = field(default_factory=dict)
     sem_busca: list = field(default_factory=list)
+    titulos_receber: set = field(default_factory=set)
     adiados: int = 0
 
 
@@ -810,11 +905,13 @@ def planejar_fila(eventos, usar_bulk, limites):
             continue
         grupo = regra.grupo
         if grupo in GRUPOS_POR_TITULO and not usar_bulk:
-            # Só REST: o a pagar vem de bills/by-change-date no plano e o a receber não é carregado.
+            # Só REST: o a pagar vem de bills/by-change-date no plano; o título a receber avisado entra na
+            # releitura de parcelas da noite.
             if grupo == "outcome":
                 plano.cobertos.setdefault("bills", []).append(id_evento)
             else:
-                plano.sem_busca.append(id_evento)
+                plano.cobertos.setdefault("receivable-bills/installments", []).append(id_evento)
+                plano.titulos_receber.update(ids_do_evento(regra, ids))
             continue
         if grupo not in BUSCAS_FILA:
             plano.cobertos.setdefault(grupo, []).append(id_evento)
@@ -948,6 +1045,20 @@ def motivo_falha(erro):
     return str(erro)
 
 
+def releitura_adiada(tarefa, marca, hoje, avisados):
+    """Tarefa com intervalo lida há menos dias que ele fica para outra noite, sem mexer na marca. Aviso do webhook
+    para o que ela carrega faz a releitura sair na hora."""
+    if not tarefa.intervalo_dias or marca is None:
+        return False
+    if tarefa.endpoint in avisados or EVENTO_DA_TAREFA_REST.get(tarefa.endpoint) in avisados:
+        return False
+    return (hoje - marca).days < tarefa.intervalo_dias
+
+
+def _com_evento_equivalente(endpoints):
+    return set(endpoints) | {EVENTO_DA_TAREFA_REST[e] for e in endpoints if e in EVENTO_DA_TAREFA_REST}
+
+
 def _usar_bulk(modo, hoje, reverificar_dias):
     if not modo or not modo[0]:
         return True
@@ -962,16 +1073,22 @@ def executar(cliente, repositorio, tenant, hoje, **opcoes):
     marcas, modo, obras = repositorio.ler_estado(tenant)
     ctx = Contexto(cliente=cliente, hoje=hoje, obras=obras, **opcoes)
     ctx.empresas_com_balancete = repositorio.ler_empresas_contabeis(tenant)
+    ctx.titulos_receber = repositorio.ler_titulos_receber(tenant)
     usar_bulk = _usar_bulk(modo, hoje, reverificar_dias)
     relatorio = Relatorio(caminho="bulk" if usar_bulk else "so_rest")
     plano_fila = None
     if fila_eventos is not None:
         plano_fila = consumir_fila(ctx, fila_eventos, tenant, usar_bulk, limites_fila, relatorio)
+    avisados = set(plano_fila.cobertos) if plano_fila else set()
+    if plano_fila:
+        ctx.compartilhado["titulos_receber_avisados"] = set(plano_fila.titulos_receber)
     fila = [] if relatorio.cota_esgotada else ordenar_pela_marca(PLANO_BULK if usar_bulk else PLANO_SO_REST, marcas)
     tentadas = set()
     bulk_respondeu = False
     while fila:
         tarefa = fila.pop(0)
+        if releitura_adiada(tarefa, marcas.get(tarefa.endpoint), hoje, avisados):
+            continue
         tentadas.add(tarefa.endpoint)
         try:
             lote = LoteTarefa(tarefa, ESTRATEGIAS[tarefa.estrategia](ctx, tarefa, marcas.get(tarefa.endpoint)))
@@ -1010,7 +1127,8 @@ def executar(cliente, repositorio, tenant, hoje, **opcoes):
     if usar_bulk and bulk_respondeu and modo and modo[0]:
         repositorio.gravar_modo(tenant, False)
     if fila_eventos is not None:
-        marcar_cobertos(fila_eventos, tenant, plano_fila, ctx.concluidas, tentadas, relatorio)
+        marcar_cobertos(fila_eventos, tenant, plano_fila, _com_evento_equivalente(ctx.concluidas),
+                        _com_evento_equivalente(tentadas), relatorio)
     if ctx.concluidas:
         try:
             repositorio.recarregar(tenant)
