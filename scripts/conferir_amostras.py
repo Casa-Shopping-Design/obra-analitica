@@ -1,4 +1,4 @@
-"""Confere as respostas da sondagem (dados/brutos/*__v2.json) contra a documentação do ERP de origem e contra os
+"""Confere as respostas da sondagem (dados/brutos/*__v1.json ou *__v2.json) contra a documentação do ERP de origem e contra os
 campos que a carga guarda (campos_permitidos.py). Não chama a API: lê só o que a sondagem gravou.
 
 Para cada endpoint diz quantos campos a documentação promete, quantos vieram, quantos a carga guarda e quais
@@ -114,8 +114,10 @@ def main():
     texto = REFERENCIA.read_text(encoding="utf-8")
     achou = False
     for nome, (caminho_doc, lista) in AMOSTRAS.items():
-        arquivo = PASTA_BRUTOS / f"{nome}__v2.json"
-        if not arquivo.exists():
+        # v1 vem do usuario de API (Basic), v2 do OAuth; a sondagem grava um ou outro
+        arquivo = next((a for a in (PASTA_BRUTOS / f"{nome}__v2.json", PASTA_BRUTOS / f"{nome}__v1.json")
+                        if a.exists()), None)
+        if arquivo is None:
             continue
         achou = True
         lidos = registros(json.loads(arquivo.read_text(encoding="utf-8")))

@@ -1,9 +1,11 @@
 """Sonda a API do ERP de origem com um usuario de testes e guarda o que voltar.
 
-Pega o token OAuth em group/v2/auth/token (Basic com client/secret, corpo
-grant_type=client_credentials e tenant) e chama group/v2/{recurso} com
-Bearer, paginando por limit/offset. Grava as respostas brutas em
-dados/brutos/, que fica fora do git. So a primeira pagina de cada recurso.
+ORIGEM_AUTENTICACAO escolhe a porta, como na carga. Em oauth pega o token em
+group/v2/auth/token (Basic com client/secret, corpo grant_type=client_credentials
+e tenant) e chama group/v2/{recurso} com Bearer. Em basic manda o usuario de API
+em public/api/v1/{recurso} e public/api/bulk-data/v1/{recurso}, com ORIGEM_URL_BASE
+ja trazendo o subdominio. Grava as respostas brutas em dados/brutos/, que fica
+fora do git. So a primeira pagina de cada recurso.
 
 O balancete (trial-balance) e sondado num mes so, nas duas passagens (com e sem zeramento), mais
 uma chamada com offset 200 para ver se a API pagina. A empresa vem de --empresa, da primeira de
@@ -30,7 +32,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from cliente_origem import validar_caminho_bulk  # noqa: E402
+from cliente_origem import validar_caminho_bulk, validar_url_base  # noqa: E402
 
 RAIZ = Path(__file__).resolve().parent.parent
 PASTA_BRUTOS = RAIZ / "dados" / "brutos"
@@ -48,12 +50,17 @@ def ler_env():
             if linha and not linha.startswith("#") and "=" in linha:
                 chave, valor = linha.split("=", 1)
                 os.environ.setdefault(chave.strip(), valor.strip().strip('"'))
-    faltando = [c for c in ("ORIGEM_URL_BASE", "ORIGEM_TENANT", "ORIGEM_CLIENT_ID", "ORIGEM_CLIENT_SECRET") if not os.environ.get(c)]
+    autenticacao = os.environ.get("ORIGEM_AUTENTICACAO", "basic").strip().lower()
+    obrigatorias = {"basic": ("ORIGEM_URL_BASE", "ORIGEM_USUARIO", "ORIGEM_SENHA"),
+                    "oauth": ("ORIGEM_URL_BASE", "ORIGEM_TENANT", "ORIGEM_CLIENT_ID", "ORIGEM_CLIENT_SECRET")}
+    if autenticacao not in obrigatorias:
+        sys.exit("ORIGEM_AUTENTICACAO deve ser basic ou oauth")
+    faltando = [c for c in obrigatorias[autenticacao] if not os.environ.get(c)]
     if faltando:
         sys.exit(f"Faltam no .env: {', '.join(faltando)}")
     global BASE
-    BASE = os.environ["ORIGEM_URL_BASE"].rstrip("/")
-    return os.environ["ORIGEM_TENANT"], os.environ["ORIGEM_CLIENT_ID"], os.environ["ORIGEM_CLIENT_SECRET"]
+    BASE = validar_url_base(os.environ["ORIGEM_URL_BASE"])
+    return autenticacao
 
 
 def chamar(metodo, url, cabecalhos, corpo=None, tentativas=3):
@@ -74,6 +81,13 @@ def chamar(metodo, url, cabecalhos, corpo=None, tentativas=3):
             return erro.code, texto, round(time.time() - inicio, 2)
         except urllib.error.URLError as erro:
             return 0, str(erro.reason), round(time.time() - inicio, 2)
+        # timeout na leitura nao vira URLError; sem isso um recurso lento derruba a sondagem inteira
+        except (TimeoutError, ConnectionError) as erro:
+            if tentativa < tentativas - 1:
+                print(f"    {type(erro).__name__}, tentando de novo em 10s")
+                time.sleep(10)
+                continue
+            return 0, f"sem resposta: {type(erro).__name__}", round(time.time() - inicio, 2)
     return 0, "sem resposta", 0
 
 
@@ -156,6 +170,32 @@ def url_v2(caminho):
         rota = validar_caminho_bulk(os.environ.get("ORIGEM_CAMINHO_BULK"))
         return f"{BASE}/{rota}/{caminho[5:]}"
     return f"{BASE}/group/v2/{caminho}"
+
+
+def url_v1(caminho):
+    """Na v1 o subdominio ja vem em ORIGEM_URL_BASE; o Bulk tem prefixo proprio."""
+    if caminho.startswith("bulk:"):
+        return f"{BASE}/public/api/bulk-data/v1/{caminho[5:]}"
+    return f"{BASE}/public/api/v1/{caminho}"
+
+
+def autorizacao_oauth():
+    print("Pedindo token...")
+    token = pegar_token(os.environ["ORIGEM_TENANT"], os.environ["ORIGEM_CLIENT_ID"], os.environ["ORIGEM_CLIENT_SECRET"])
+    claims = claims_do_jwt(token["access_token"])
+    # guarda so o que ajuda a entender o acesso; o token em si nao vai pro disco
+    (PASTA_BRUTOS / "_token_info.json").write_text(json.dumps({
+        "expires_in": token.get("expires_in"),
+        "scope": token.get("scope", "").split(),
+        "claims": {k: v for k, v in claims.items() if k not in ("jti",)},
+    }, ensure_ascii=False, indent=1), encoding="utf-8")
+    print(f"  ok, expira em {token.get('expires_in')}s, {len(token.get('scope', '').split())} escopos")
+    return f"Bearer {token['access_token']}"
+
+
+def autorizacao_basic():
+    par = f"{os.environ['ORIGEM_USUARIO']}:{os.environ['ORIGEM_SENHA']}".encode()
+    return "Basic " + base64.b64encode(par).decode()
 
 
 def primeira_empresa(companies):
@@ -256,26 +296,19 @@ def main():
                         help="carga: a primeira pagina de cada endpoint que a carga usa, com os parametros dela")
     args = parser.parse_args()
 
-    tenant, cliente, segredo = ler_env()
+    autenticacao = ler_env()
     PASTA_BRUTOS.mkdir(parents=True, exist_ok=True)
 
-    print("Pedindo token...")
-    token = pegar_token(tenant, cliente, segredo)
-    claims = claims_do_jwt(token["access_token"])
-    # guarda so o que ajuda a entender o acesso; o token em si nao vai pro disco
-    (PASTA_BRUTOS / "_token_info.json").write_text(json.dumps({
-        "expires_in": token.get("expires_in"),
-        "scope": token.get("scope", "").split(),
-        "claims": {k: v for k, v in claims.items() if k not in ("jti",)},
-    }, ensure_ascii=False, indent=1), encoding="utf-8")
-    print(f"  ok, expira em {token.get('expires_in')}s, {len(token.get('scope', '').split())} escopos")
-
-    cabecalhos = {"Authorization": f"Bearer {token['access_token']}", "Accept": "application/json"}
+    if autenticacao == "oauth":
+        formato, montar_url, autorizacao = "v2", url_v2, autorizacao_oauth()
+    else:
+        formato, montar_url, autorizacao = "v1", url_v1, autorizacao_basic()
+    cabecalhos = {"Authorization": autorizacao, "Accept": "application/json"}
     relatorio = []
     respostas = {}
 
     def sondar(nome, caminho, params, pausa=PAUSA):
-        formato, url = "v2", url_v2(caminho)
+        url = montar_url(caminho)
         completa = url + ("?" + urllib.parse.urlencode(params) if params else "")
         status, texto, segundos = chamar("GET", completa, cabecalhos)
         qtd = contar_registros(texto) if status == 200 else None
