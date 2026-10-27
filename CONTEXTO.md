@@ -1,6 +1,6 @@
 # Contexto do projeto
 
-Atualizado em 06/10/2026. Este arquivo é o resumo para retomar o trabalho em outra sessão.
+Atualizado em 27/10/2026. Este arquivo é o resumo para retomar o trabalho em outra sessão.
 
 ## O que é
 
@@ -68,7 +68,7 @@ Camada analítica em cima do ERP de origem para gestores de construtoras: consol
 - Rodar `scripts/sondar_origem.py` no terminal do Mac (a rede das sessões do Claude bloqueia a API do ERP) e depois `sanitizar_amostras.py`.
 - Gerador: desde 30/09 só a Parque das Águas paga à frente da medição (18 pontos), para a demo ter um alerta de execução. Na Aurora a medição segue a curva do custo, e `staging.item_orcamento.pct_concluido` dela ficou em 55% contra 78% medido; nenhuma tela lê essa coluna.
 - Exposição máxima só enxerga títulos já lançados; no ERP real o custo futuro sem título fica só no total (`custo_a_incorrer`). Decidir como distribuir por mês.
-- Staging lê só `buildingsCosts[0]` do título a pagar: rateio entre obras vai inteiro para a primeira e título sem obra (despesa da empresa, devolução de distrato) some. Conferir com as amostras reais.
+- O rateio do título a pagar entre obras já existe (`staging.rateio_titulo`, migrations 0012 e 0039). Falta a parcela: o raw guarda `outcome` por título e parcela, mas `staging.titulo_pagar` e o rateio têm chave só por título. Com duas parcelas no mesmo título, `staging.recarregar` falha no `rateio_titulo_fracao_check` e o staging inteiro fica na noite anterior. Provado em 27/10 contra o banco local; a demo tem uma parcela por título e nenhum teste pegou. Título sem obra (despesa da empresa, devolução de distrato) continua fora de todas as views.
 
 - Migrations 0025 a 0029 (01/10/2026), sem aplicar em projeto hospedado: 0025 grava no banco o SQL executado pelo assistente e exige assinatura no SQL gerado (ADR 0014; publicar junto com o painel novo, senão o assistente para); 0026 repasse por banco e leads por origem; 0027 comparativo entre obras em `/obras`; 0028 não existe (o resumo semanal não precisou); 0029 corrige o alerta de estoque para obra sem data de entrega.
 - Resumo semanal por e-mail (`scripts/enviar_resumo_semanal.py`, workflow `resumo_semanal.yml`): falta conta no Resend, domínio com SPF, DKIM e DMARC, e os segredos no GitHub. Decidir com os sócios se o e-mail de diretor e financeiro leva valores em real, já que sai da barreira do segundo fator.
@@ -102,10 +102,10 @@ O cliente piloto acompanha cada SPE numa planilha de Fontes e Usos (F&U, DRE soc
 Plano de 28/09/2026 para carga real do ERP, fila de webhooks e CRM como segunda origem: `docs/plano_origens.md` (grafo N1 a N8, migrations 0016 a 0019). As skills `erp-origem-api` e `crm-vendas-api` ficam em `.claude/skills/`.
 
 
-Situação em 06/10/2026. O APO está no ar em https://obra-analitica.vercel.app, com a `main` no merge do PR 9 (1faf515) e as migrations 0001 a 0034 aplicadas no projeto oficial `xwqwjawlbzvqpkxtqfld` (não existe 0028). Os três sócios entram com o perfil leitura, sem segundo fator, e veem a DRE de viabilidade, o gráfico da tendência e a gestão de imposto. Do plano APO estão publicadas as etapas 1 a 6, 9, 10, 11 e 13.
+Situação em 27/10/2026. O APO está no ar em https://obra-analitica.vercel.app. A `main` está no merge do PR 11 (d03a009, 13/10). O PR 10, do mesmo dia, levou as etapas 7, 8 e 14 do plano APO: o realizado contábil das linhas fora do orçamento (0035), o saldo contábil da demo e o roteiro, o ensaio e o checklist da demo de 16/10. O PR 11 levou a visão por empresa (0036 a 0038) e a carga no formato real da API v2 (0039). O repositório tem as migrations 0001 a 0039, sem a 0028. Os três sócios entram com o perfil leitura, sem segundo fator.
 
-Sem commit, no worktree `project-scope-31c6ef`: a 0035 (realizado contábil das linhas fora do orçamento, etapa 7), o saldo contábil da demo no gerador e na carga (etapa 8) e o roteiro, o ensaio e o checklist da etapa 14. A etapa 7 ainda pede a revisão de segurança da regra 16 do plano antes do commit. A etapa 12 (Onde agir agora) espera a pergunta P13 ao Braga.
+O repositório não registra três coisas: se as migrations 0035 a 0039 estão no projeto `xwqwjawlbzvqpkxtqfld` (em 06/10 estavam 0001 a 0034), se o painel no ar roda o d03a009 e como foi a demo de 16/10. O `docs/planejamento/plano-apo.md`, citado acima, nunca entrou no git. O workflow Resumo semanal falhou em 26/10; sem conta no Resend e sem os segredos, é o esperado.
 
-Falta, nesta ordem: commit das etapas 7, 8 e 14; `supabase db push` da 0035 antes do merge; merge; Carga noturna por `workflow_dispatch`; conferência e medições no hospedado (seção 9 de `docs/operacao/publicar-demo.md` e `docs/relatorios/ensaio-demo-16-10.md`); ensaio do roteiro `docs/planejamento/roteiro-demo-16-10.md` do começo ao fim. Seguem pendentes trocar a senha do banco, desligar o cadastro livre e confirmar a `ASSISTENTE_CHAVE_ASSINATURA` nas duas pontas.
+Em 27/10, numa sessão na nuvem, o projeto rodou do zero: Supabase local com as 39 migrations, 694 asserções pgTAP, 578 testes Vitest, 229 testes Python, build e os 7 cenários do Playwright, todos passando. A auditoria de dependências do painel reprovava por três alertas do Next.js 16.3.8, dois deles de execução remota sem login (GHSA-2464-fhr4-w9xw e GHSA-673q-mjm6-r5xr). A troca para o 16.4.3, com eslint-config-next 16.4.3, vitest 5.0.5 e zod 4.6.7 no lockfile, ficou no worktree sem commit e passou em tudo isso. Também no worktree: a trava do assistente que impede número fora do banco passou a pegar número por extenso e algarismo Unicode, que antes passavam (`painel/lib/assistente/responder.ts`, dois testes novos). O relatório da revisão de segurança e confiabilidade está em `docs/relatorios/revisao-27-10.md`.
 
-Demo em 16/10/2026.
+Seguem pendentes trocar a senha do banco, desligar o cadastro livre e confirmar a `ASSISTENTE_CHAVE_ASSINATURA` nas duas pontas. A etapa 12 (Onde agir agora) espera a pergunta P13 ao Braga. A carga real espera a liberação das permissões do usuário de API (403 em trial-balance, real-estate-map, accounts-balances, accounts-statements e medições) e a rota do Bulk. A entrega 1 do MVP vence em 18/12/2026.
