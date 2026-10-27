@@ -22,6 +22,11 @@ const formatoInteiro = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 0
 const formatoDecimal = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 });
 const referencia = /\{\{(\d+)\.([a-z_][a-z0-9_]*)\}\}/g;
 
+// \d do JavaScript só pega 0 a 9: algarismo de largura cheia e número por extenso passavam pela trava.
+// "um" e "uma" ficam de fora porque também são artigo.
+const numeroForaDoBanco =
+  /\p{N}|(?<!\p{L})(?:zero|dois|duas|tr[eê]s|quatro|cinco|seis|sete|oito|nove|dez|onze|doze|treze|[cq]uatorze|quinze|dezesseis|dezessete|dezoito|dezenove|vinte|trinta|quarenta|cinquenta|sessenta|setenta|oitenta|noventa|cem|cento|duzent[oa]s|trezent[oa]s|quatrocent[oa]s|quinhent[oa]s|seiscent[oa]s|setecent[oa]s|oitocent[oa]s|novecent[oa]s|mil|milh(?:ão|ões|ao|oes)|bilh(?:ão|ões|ao|oes)|metade|dobro|triplo|por\s+cento)(?!\p{L})/iu;
+
 export function formatarValor(valor: unknown, formato: FormatoColunaLivre): string {
   if (valor === null || valor === undefined || valor === "") return "sem valor";
   switch (formato) {
@@ -77,14 +82,14 @@ export function montarTabela(linhas: readonly LinhaConsulta[], formatos: readonl
   return { colunas, linhas: linhasTabela };
 }
 
-// Troca cada {{linha.coluna}} pelo valor formatado. Algarismo escrito pelo modelo fora de uma referência,
+// Troca cada {{linha.coluna}} pelo valor formatado. Número escrito pelo modelo fora de uma referência,
 // ou referência a linha ou coluna que não existe, descarta o texto: número só entra se veio do banco.
 export function preencherReferencias(
   modelo: string,
   linhas: readonly LinhaConsulta[],
   formatos: readonly FormatoDevolvido[],
 ): string | null {
-  if (/\d/.test(modelo.replace(referencia, ""))) return null;
+  if (numeroForaDoBanco.test(modelo.replace(referencia, ""))) return null;
   const formatoPorColuna = new Map(formatos.map(({ coluna, formato }) => [coluna, formato]));
   let valida = true;
   const texto = modelo.replace(referencia, (_trecho, indice: string, coluna: string) => {

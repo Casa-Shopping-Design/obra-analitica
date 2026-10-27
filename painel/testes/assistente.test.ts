@@ -581,6 +581,24 @@ describe("redação da resposta", () => {
     expect(preencherReferencias("A Aurora precisa de R$ 5 milhões.", linhas, formatos)).toBeNull();
   });
 
+  it("descarta número por extenso e algarismo fora do ASCII escritos pelo modelo", async () => {
+    const { preencherReferencias } = await import("../lib/assistente/responder");
+    for (const texto of [
+      "A {{0.obra}} vai precisar de dois milhões e meio de reais.",
+      "Caixa de R$ １２３.４５６,００ na {{0.obra}}.",
+      "Cerca de quarenta por cento de margem na {{0.obra}}.",
+      "A exposição é o dobro do estudo.",
+    ]) {
+      expect(preencherReferencias(texto, linhas, formatos)).toBeNull();
+    }
+  });
+
+  it("aceita texto sem número próprio, mesmo com palavras que contêm numeral", async () => {
+    const { preencherReferencias } = await import("../lib/assistente/responder");
+    expect(preencherReferencias("A {{0.obra}} tem uma exposição de {{0.exposicao_maxima}} e decisão pendente.", linhas, formatos))
+      .not.toBeNull();
+  });
+
   it("descarta referência a linha ou coluna que não veio da consulta", async () => {
     const { preencherReferencias } = await import("../lib/assistente/responder");
     expect(preencherReferencias("Valor: {{1.obra}}.", linhas, formatos)).toBeNull();
