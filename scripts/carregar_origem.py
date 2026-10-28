@@ -28,6 +28,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from campos_permitidos import EndpointSemLista, filtrar  # noqa: E402
 from cliente_origem import BulkIndisponivel, ClienteOrigem, ConfiguracaoOrigem, CotaEsgotada, ErroOrigem  # noqa: E402
+from registro_execucao import RegistroExecucao  # noqa: E402
 
 log = logging.getLogger("carregar_origem")
 
@@ -726,6 +727,35 @@ class RepositorioBanco:
                 for e in set(lote.lidos) | set(substituidos) | set(removidos)}
 
 
+# marts.ultima_carga só considera a carga feita quando esta etapa termina com sucesso.
+ETAPA_STAGING = "staging"
+
+
+class RepositorioComRegistro(RepositorioBanco):
+    """RepositorioBanco que deixa uma linha em app.carga_execucao por tarefa, por grupo da fila e na
+    etapa de staging, como a carga da demo. É o que main() usa; os testes em memória seguem no pai."""
+
+    def __init__(self, conexao):
+        super().__init__(conexao)
+        self.registro = RegistroExecucao(conexao)
+
+    def gravar_tarefa(self, tenant, lote, nova_marca):
+        with self.registro.etapa(tenant, lote.tarefa.endpoint) as etapa:
+            contagens = super().gravar_tarefa(tenant, lote, nova_marca)
+            etapa.contar(contagens)
+        return contagens
+
+    def gravar_fila(self, tenant, lote):
+        with self.registro.etapa(tenant, lote.tarefa.endpoint) as etapa:
+            contagens = super().gravar_fila(tenant, lote)
+            etapa.contar(contagens)
+        return contagens
+
+    def recarregar(self, tenant):
+        with self.registro.etapa(tenant, ETAPA_STAGING):
+            super().recarregar(tenant)
+
+
 @dataclass
 class Relatorio:
     linhas: list = field(default_factory=list)
@@ -1189,7 +1219,7 @@ def main():
         sys.exit(str(erro))
     cliente = ClienteOrigem(config)
     with psycopg.connect(os.environ["DATABASE_URL"], autocommit=True) as conexao:
-        repositorio = RepositorioBanco(conexao)
+        repositorio = RepositorioComRegistro(conexao)
         relatorio = executar(cliente, repositorio, args.tenant, date.today(), fila_eventos=repositorio, **opcoes)
         repositorio.limpar_eventos_processados(args.tenant, "erp")
     print(relatorio.texto())

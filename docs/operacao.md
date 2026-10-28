@@ -32,6 +32,8 @@ Com 503, olhe `idade_horas`: nulo com `ultima_carga_em` nulo quer dizer banco fo
 
 O job `.github/workflows/carga_noturna.yml` roda às 02:17 de Brasília. Cada endpoint e a recarga do staging gravam uma linha em `app.carga_execucao` com início, fim, registros lidos, registros novos, situação e duração. A data "Dados carregados em" das telas sai só da etapa `staging` concluída com `ok`.
 
+A carga real (`scripts/carregar_origem.py`) grava no mesmo formato: uma linha por tarefa do plano, uma por grupo da fila do webhook (`fila:income`, `fila:units`) e uma `staging`. Tarefa que falha fecha a própria linha como `falha` e a carga segue para a próxima; só o staging deixa de rodar quando nenhuma tarefa concluiu. As recargas do staging tomam uma trava por cliente no banco, então uma carga manual rodando junto com a noturna do mesmo cliente espera a outra terminar em vez de misturar as tabelas.
+
 Para ver as últimas execuções, no SQL Editor do Supabase:
 
 ```sql
@@ -63,6 +65,19 @@ gh run watch
 ### Agendamento que para sozinho
 
 A documentação do GitHub diz que, em repositório público, o agendamento é desativado depois de 60 dias sem atividade no repositório. Para repositório privado a documentação não cita a regra. Por isso, uma vez por mês, confira em Actions que a Carga noturna rodou nos últimos dias; se o workflow aparecer desativado, reative no botão "Enable workflow". A rota de saúde também acusa: com a carga parada, ela vira 503 depois de 26 horas.
+
+## Excluir um cliente
+
+`app.excluir_tenant(uuid)` apaga o tenant e, pela chave estrangeira em cascata, tudo que tem `tenant_id` em `app`, `raw` e `staging`: obras, usuários vinculados, registros brutos, staging, marcas de carga, histórico de execuções, estudos de viabilidade e perguntas ao assistente. Só o dono do banco executa (`DATABASE_URL` do servidor ou SQL Editor); `anon` e `authenticated` não têm `execute`. A função só aceita tenant com `status = 'inativo'`, para a exclusão ser sempre o segundo passo, e espera qualquer carga do mesmo cliente terminar antes de apagar.
+
+```sql
+update app.tenant set status = 'inativo' where id = '<uuid do tenant>';
+select jsonb_pretty(app.excluir_tenant('<uuid do tenant>'));
+```
+
+A resposta lista, por relação, quantas linhas saíram, e em `fora_da_funcao` o que a função não toca: as contas de login em `auth.users`. Elas ficam sem vínculo e não enxergam nada; apague pelo Dashboard (Authentication, Users) ou pela API de admin as que não pertencem a outro cliente. Backup e réplica seguem a retenção do Supabase e não entram nessa conta.
+
+Antes de apagar, desligue o agendamento da carga desse cliente e guarde o que o contrato pedir para guardar. Não há como desfazer.
 
 ## Secrets e variáveis
 
