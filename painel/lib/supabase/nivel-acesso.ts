@@ -10,8 +10,8 @@ export const caminhosAcesso = {
 
 const perfisComSegundoFator: ReadonlySet<string> = new Set(["diretor", "financeiro"]);
 
-// Rotas que nunca recebem redirecionamento: entrada, saída, saúde e as próprias telas do segundo fator.
-const caminhosSemBarreira: ReadonlySet<string> = new Set(["/entrar", "/sair", "/api/saude"]);
+// Rotas que nunca recebem redirecionamento: entrada, saída, manutenção, saúde e as próprias telas do segundo fator.
+const caminhosSemBarreira: ReadonlySet<string> = new Set(["/entrar", "/sair", "/manutencao", "/api/saude"]);
 
 export function perfilExigeSegundoFator(perfil: string | null | undefined): boolean {
   return typeof perfil === "string" && perfisComSegundoFator.has(perfil);

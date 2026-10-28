@@ -1,7 +1,21 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { caminhoManutencao, decidirManutencao, manutencaoLigada } from "@/lib/manutencao";
+import { mensagens } from "@/lib/mensagens";
 import { caminhosAcesso, decidirDestino } from "@/lib/supabase/nivel-acesso";
 import { aplicarSessao, renovarSessao } from "@/lib/supabase/sessao";
 import { montarPoliticaConteudo } from "@/lib/politica-conteudo";
+
+// Tempo sugerido ao navegador e ao monitor antes de tentar de novo durante a manutenção, em segundos.
+const novaTentativaManutencao = "300";
+
+// A página lê o nonce da CSP e o id da requisição destes cabeçalhos.
+function cabecalhosPagina(request: NextRequest, idRequisicao: string, nonce: string, politicaConteudo: string): Headers {
+  const cabecalhos = new Headers(request.headers);
+  cabecalhos.set("x-id-requisicao", idRequisicao);
+  cabecalhos.set("x-nonce", nonce);
+  cabecalhos.set("content-security-policy", politicaConteudo);
+  return cabecalhos;
+}
 
 // O proxy só redireciona. A checagem de verdade se repete no layout do painel e em cada rota.
 export async function proxy(request: NextRequest) {
@@ -9,6 +23,25 @@ export async function proxy(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const politicaConteudo = montarPoliticaConteudo(nonce);
   const caminho = request.nextUrl.pathname;
+
+  // Antes da sessão: durante a manutenção o painel não chama o Auth nem o banco.
+  const manutencao = decidirManutencao(caminho, manutencaoLigada(process.env.MODO_MANUTENCAO));
+  if (manutencao === "api") {
+    const resposta = NextResponse.json({ ok: false, erro: mensagens.paginas.manutencaoApi }, { status: 503 });
+    resposta.headers.set("retry-after", novaTentativaManutencao);
+    resposta.headers.set("x-id-requisicao", idRequisicao);
+    return resposta;
+  }
+  if (manutencao === "pagina") {
+    const resposta = NextResponse.rewrite(new URL(caminhoManutencao, request.url), {
+      status: 503,
+      request: { headers: cabecalhosPagina(request, idRequisicao, nonce, politicaConteudo) },
+    });
+    resposta.headers.set("retry-after", novaTentativaManutencao);
+    resposta.headers.set("content-security-policy", politicaConteudo);
+    resposta.headers.set("x-id-requisicao", idRequisicao);
+    return resposta;
+  }
 
   const sessao = await renovarSessao(request);
   const destino = decidirDestino({ ...sessao, caminho });
@@ -20,11 +53,7 @@ export async function proxy(request: NextRequest) {
     resposta = NextResponse.redirect(new URL("/", request.url));
   } else {
     // Cabeçalhos montados depois da renovação, para a página já ler o cookie novo.
-    const cabecalhosRequisicao = new Headers(request.headers);
-    cabecalhosRequisicao.set("x-id-requisicao", idRequisicao);
-    cabecalhosRequisicao.set("x-nonce", nonce);
-    cabecalhosRequisicao.set("content-security-policy", politicaConteudo);
-    resposta = NextResponse.next({ request: { headers: cabecalhosRequisicao } });
+    resposta = NextResponse.next({ request: { headers: cabecalhosPagina(request, idRequisicao, nonce, politicaConteudo) } });
   }
 
   resposta.headers.set("content-security-policy", politicaConteudo);

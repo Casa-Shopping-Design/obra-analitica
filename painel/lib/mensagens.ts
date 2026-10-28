@@ -95,4 +95,14 @@ export const mensagens = {
       "Esta obra ainda não tem estudo de viabilidade com alíquota de imposto informada. Peça ao diretor ou ao financeiro para cadastrar.",
     restrita: "O seu perfil não abre a gestão de imposto. Peça ao diretor da construtora para liberar.",
   },
+  paginas: {
+    naoEncontradaTitulo: "Página não encontrada",
+    naoEncontrada: "O endereço pode ter mudado ou ter sido digitado errado. Confira o endereço ou volte para a visão geral.",
+    erroTitulo: "Não foi possível abrir esta tela",
+    erro: "Algo falhou ao montar a tela. Tente de novo; se continuar, avise o suporte com o código abaixo.",
+    erroCodigo: "Código para o suporte:",
+    manutencaoTitulo: "Painel em manutenção",
+    manutencao: "Estamos atualizando o painel. Tente de novo em alguns minutos.",
+    manutencaoApi: "O painel está em manutenção. Tente de novo em alguns minutos.",
+  },
 } as const;
