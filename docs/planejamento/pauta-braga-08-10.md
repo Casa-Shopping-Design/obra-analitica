@@ -71,7 +71,7 @@ O que muda: se a alíquota for da SPE ou da empresa, o cadastro sobe de nível e
 
 ### E-mail do Braga
 
-Pergunta: o endereço cadastrado para o acesso dele é jbraga1956@pronto.me. O certo é proton.me?
+Pergunta: o endereço cadastrado para o acesso dele termina em pronto.me. O certo é proton.me?
 
 Nossa hipótese: é proton.me e o domínio chegou errado no grupo.
 
