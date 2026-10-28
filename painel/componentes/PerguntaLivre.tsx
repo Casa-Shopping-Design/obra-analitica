@@ -81,7 +81,7 @@ export function PerguntaLivre({ limiteLinhas, semDados }: { limiteLinhas: number
 
       <div aria-live="polite" aria-busy={enviando} className="flex flex-col gap-3">
         {enviando && (
-          <div className="flex flex-col gap-2 rounded-xl border border-borda bg-superficie p-4" aria-label="Consultando os dados">
+          <div className="flex flex-col gap-2 secao" aria-label="Consultando os dados">
             <div className="h-5 w-2/3 animate-pulse rounded bg-trilho" />
             <div className="h-4 w-full animate-pulse rounded bg-trilho" />
             <div className="h-4 w-5/6 animate-pulse rounded bg-trilho" />

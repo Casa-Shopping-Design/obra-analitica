@@ -88,9 +88,9 @@ export function SecaoAlertas({
   comLinks?: boolean;
 }) {
   return (
-    <section aria-labelledby="titulo-alertas" className="flex flex-col gap-4 rounded-xl border border-borda bg-superficie p-5">
+    <section aria-labelledby="titulo-alertas" className="flex flex-col gap-4 secao">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id="titulo-alertas" className="font-serif text-2xl font-semibold">
+        <h2 id="titulo-alertas" className="font-serif text-xl font-semibold">
           Pede atenção
         </h2>
         {alertas && alertas.length > 0 && (

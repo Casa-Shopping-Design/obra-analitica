@@ -46,7 +46,7 @@ export function FormularioMapaContas({ contas, opcoesPorGrupo, rotulosLinha }: P
   return (
     <form action={acao} className="flex flex-col gap-4" noValidate aria-describedby={idAviso}>
       <input type="hidden" name="itens" value={JSON.stringify(mudancas)} />
-      <div className="relative overflow-x-auto rounded-xl border border-borda bg-superficie">
+      <div className="relative overflow-x-auto quadro">
         <table className="w-full min-w-[900px] border-collapse text-sm">
           <caption className="sr-only">
             Plano de contas com a linha de relatório em vigor e o seletor para escolher outra linha.

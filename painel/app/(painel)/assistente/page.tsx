@@ -88,7 +88,7 @@ export default async function PaginaAssistente({
   return (
     <>
       <header className="flex flex-col gap-2">
-        <h1 className="font-serif text-[34px] font-semibold">Assistente</h1>
+        <h1 className="font-serif text-[28px] font-semibold">Assistente</h1>
         <p className="max-w-2xl text-suave">
           Escolha uma pergunta pronta ou escreva a sua. A resposta sai direto das tabelas do painel, só com as obras
           liberadas para o seu perfil.
@@ -108,7 +108,7 @@ export default async function PaginaAssistente({
                   name="pergunta"
                   value={opcao.id}
                   aria-pressed={escolhida}
-                  className={`min-h-12 cursor-pointer rounded-xl border px-4 py-2.5 text-left text-[15px] ${
+                  className={`min-h-12 cursor-pointer rounded-lg border px-4 py-2.5 text-left text-[15px] ${
                     escolhida
                       ? "border-menu bg-menu font-semibold text-menu-texto"
                       : "border-borda bg-superficie hover:border-texto"

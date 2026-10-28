@@ -8,7 +8,7 @@ export function CabecalhoEmpresa({ nome, subtitulo, nota }: { nome: string; subt
       <Link href="/empresas" className="w-fit text-sm text-suave underline underline-offset-4 hover:text-texto print:hidden">
         Voltar para as empresas
       </Link>
-      <h1 className="font-serif text-[34px] leading-tight font-semibold">{nome}</h1>
+      <h1 className="font-serif text-[28px] leading-tight font-semibold">{nome}</h1>
       {subtitulo && <p className="text-sm text-suave">{subtitulo}</p>}
       {nota && <p className="text-sm text-suave">{nota}</p>}
     </header>
@@ -19,7 +19,7 @@ export function CabecalhoEmpresa({ nome, subtitulo, nota }: { nome: string; subt
 export function AvisoTelaEmpresa({ tela, mensagem, erro = false }: { tela: string; mensagem: string; erro?: boolean }) {
   return (
     <>
-      <h1 className="font-serif text-[34px] font-semibold">{tela}</h1>
+      <h1 className="font-serif text-[28px] font-semibold">{tela}</h1>
       <p role={erro ? "alert" : undefined} className={erro ? "text-alerta" : undefined}>
         {mensagem}
       </p>

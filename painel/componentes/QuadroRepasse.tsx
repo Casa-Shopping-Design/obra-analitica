@@ -1,14 +1,15 @@
 import type { RepasseObra } from "@/lib/consultas/repasse";
 import { formatarReal } from "@/lib/formatar";
+import { classeValorGrande } from "@/lib/valor-grande";
 
 const inteiro = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 0 });
 const umaCasa = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
 function Etapa({ rotulo, quantidade, valor, destaque }: { rotulo: string; quantidade: number; valor: number; destaque?: boolean }) {
   return (
-    <div className="flex min-w-0 flex-col gap-1 rounded-xl border border-borda bg-superficie p-5">
+    <div className="@container flex min-w-0 flex-col gap-1 figura">
       <p className="text-sm text-suave">{rotulo}</p>
-      <p className={`text-2xl font-semibold break-words ${destaque ? "text-alerta" : ""}`}>{formatarReal(valor)}</p>
+      <p className={`${classeValorGrande} ${destaque ? "text-alerta" : ""}`}>{formatarReal(valor)}</p>
       <p className="text-sm text-suave">
         {inteiro.format(quantidade)} {quantidade === 1 ? "contrato" : "contratos"}
       </p>
@@ -45,7 +46,7 @@ export function QuadroRepasse({ repasse }: { repasse: RepasseObra }) {
         A etapa vem das datas do CRM. Atrasado é o repasse ainda sem recurso liberado cuja parcela do financiamento já
         venceu no ERP; ele também aparece em análise ou assinado.
       </p>
-      <dl className="rounded-xl border border-borda bg-superficie px-5 py-2">
+      <dl className="quadro px-5 py-2">
         <Linha rotulo="Contratos financiados no ERP" valor={inteiro.format(repasse.contratos_financiados_origem)} />
         <Linha rotulo="Contratos com repasse no CRM" valor={inteiro.format(repasse.contratos_com_repasse)} />
         <Linha rotulo="Financiados sem repasse aberto no CRM" valor={inteiro.format(repasse.contratos_sem_repasse)} />

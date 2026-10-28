@@ -1,8 +1,12 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 type Mensagem = { tipo: "usuario" | "assistente"; texto: string; erro?: boolean };
+
+const semConexao = "Não foi possível falar com o assistente. Confira a conexão e tente de novo.";
+const semResposta = "O assistente não conseguiu responder agora. Tente de novo em alguns minutos.";
 
 export function ChatAssistente() {
   const [aberto, setAberto] = useState(false);
@@ -11,9 +15,23 @@ export function ChatAssistente() {
   const [entrada, setEntrada] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const gatilhoRef = useRef<HTMLButtonElement>(null);
+
+  // O foco volta ao campo só depois que ele deixa de estar desativado; antes disso o navegador ignora.
+  useEffect(() => {
+    if (aberto && !carregando) inputRef.current?.focus();
+  }, [aberto, carregando]);
 
   useEffect(() => {
-    if (aberto) inputRef.current?.focus();
+    if (!aberto) return;
+    const fecharComEsc = (evento: KeyboardEvent) => {
+      if (evento.key === "Escape") {
+        setAberto(false);
+        gatilhoRef.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", fecharComEsc);
+    return () => document.removeEventListener("keydown", fecharComEsc);
   }, [aberto]);
 
   useEffect(() => {
@@ -39,116 +57,114 @@ export function ChatAssistente() {
       const dados = await res.json();
 
       if (!res.ok || !dados.ok) {
-        setMensagens((prev) => [
-          ...prev,
-          { tipo: "assistente", texto: dados.erro || "Erro ao processar pergunta", erro: true },
-        ]);
+        setMensagens((prev) => [...prev, { tipo: "assistente", texto: dados.erro || semResposta, erro: true }]);
       } else {
-        const resposta = dados.resposta || "Sem resposta disponível";
+        const resposta = dados.resposta || semResposta;
         setMensagens((prev) => [...prev, { tipo: "assistente", texto: resposta }]);
       }
-    } catch (erro) {
-      setMensagens((prev) => [
-        ...prev,
-        {
-          tipo: "assistente",
-          texto: erro instanceof Error ? erro.message : "Erro de conexão",
-          erro: true,
-        },
-      ]);
+    } catch {
+      // Mensagem do navegador ("Failed to fetch") ou JSON quebrado não dizem ao usuário o que fazer.
+      setMensagens((prev) => [...prev, { tipo: "assistente", texto: semConexao, erro: true }]);
     } finally {
       setCarregando(false);
-      inputRef.current?.focus();
     }
   }
 
+  function fechar() {
+    setAberto(false);
+    gatilhoRef.current?.focus();
+  }
+
+  // O gatilho fica no pé do menu, junto dos outros caminhos, e o painel abre colado na borda direita, na
+  // altura toda. A conversa é lida como registro: quem falou em cima, o texto embaixo.
+  // O painel vai para o body: o menu é sticky e prenderia o z-index dele abaixo das tabelas da tela.
   return (
-    <>
-      {/* Botão flutuante */}
+    <div className="print:hidden">
       <button
-        onClick={() => setAberto(!aberto)}
-        className="fixed bottom-6 right-6 z-40 bg-blue-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg hover:bg-blue-700 transition-colors"
-        aria-label="Abrir chat do assistente"
-        title="Pergunte ao assistente"
+        ref={gatilhoRef}
+        type="button"
+        onClick={() => (aberto ? fechar() : setAberto(true))}
+        aria-expanded={aberto}
+        aria-controls="chat-assistente"
+        className="flex min-h-11 w-full cursor-pointer items-center gap-2 px-4 text-left text-suave hover:text-texto hover:underline hover:underline-offset-4 md:px-5"
       >
-        <span className="text-2xl">💬</span>
+        <svg aria-hidden="true" viewBox="0 0 20 20" className="size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <path d="M3 4h14v9H8l-5 4z" strokeLinejoin="round" />
+        </svg>
+        Pergunta rápida
       </button>
 
-      {/* Widget */}
-      {aberto && (
-        <div className="fixed bottom-24 right-6 z-50 w-96 max-w-[calc(100vw-24px)] h-96 bg-white rounded-lg shadow-2xl border border-cinza-200 flex flex-col overflow-hidden">
-          {/* Cabeçalho */}
-          <div className="bg-blue-600 text-white p-4 flex justify-between items-center">
-            <h2 className="text-lg font-semibold">APO Assistente</h2>
-            <button
-              onClick={() => setAberto(false)}
-              className="text-white hover:bg-blue-700 p-1 rounded"
-              aria-label="Fechar"
-            >
-              ✕
-            </button>
-          </div>
-
-          {/* Mensagens */}
+      {aberto &&
+        createPortal(
           <div
-            ref={containerRef}
-            className="flex-1 overflow-y-auto p-4 space-y-3 bg-cinza-50"
+            id="chat-assistente"
+            role="dialog"
+            aria-labelledby="titulo-chat-assistente"
+            className="fixed inset-y-0 right-0 z-50 flex w-full flex-col border-l border-borda bg-superficie text-texto shadow-[-12px_0_32px_rgb(22_33_31/0.10)] sm:w-[420px]"
           >
-            {mensagens.length === 0 && (
-              <p className="text-cinza-500 text-sm">
-                Olá! Faça uma pergunta sobre as obras, vendas, custos ou recebíveis.
-              </p>
-            )}
-
-            {mensagens.map((msg, i) => (
-              <div
-                key={i}
-                className={`flex ${msg.tipo === "usuario" ? "justify-end" : "justify-start"}`}
+            <div className="flex items-center justify-between border-b border-borda px-5 py-3">
+              <div>
+                <h2 id="titulo-chat-assistente" className="font-serif text-lg font-semibold">
+                  Pergunta rápida
+                </h2>
+                <p className="text-sm text-suave">Usa só os números que o seu perfil pode ver.</p>
+              </div>
+              <button
+                type="button"
+                onClick={fechar}
+                className="flex size-11 cursor-pointer items-center justify-center rounded-lg text-suave hover:bg-trilho hover:text-texto"
+                aria-label="Fechar a pergunta rápida"
               >
-                <div
-                  className={`max-w-xs px-4 py-2 rounded-lg text-sm ${
-                    msg.tipo === "usuario"
-                      ? "bg-blue-600 text-white rounded-br-none"
-                      : msg.erro
-                        ? "bg-vermelho-100 text-vermelho-800 rounded-bl-none"
-                        : "bg-cinza-200 text-cinza-900 rounded-bl-none"
-                  }`}
-                >
-                  {msg.texto}
+                <svg aria-hidden="true" viewBox="0 0 20 20" className="size-4" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M5 5l10 10M15 5L5 15" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
+  
+            <div ref={containerRef} aria-live="polite" className="flex flex-1 flex-col gap-5 overflow-y-auto px-5 py-4">
+              {mensagens.length === 0 && (
+                <p className="text-sm text-suave">Pergunte sobre as obras, vendas, custos ou recebíveis.</p>
+              )}
+  
+              {mensagens.map((msg, i) => (
+                <div key={i} className={`flex flex-col gap-1 ${msg.tipo === "usuario" ? "border-l-2 border-menu pl-3" : ""}`}>
+                  <p className="text-xs font-semibold text-suave">{msg.tipo === "usuario" ? "Você" : "Assistente"}</p>
+                  <p className={`text-[15px] leading-relaxed ${msg.erro ? "text-alerta" : ""}`}>{msg.texto}</p>
                 </div>
-              </div>
-            ))}
-
-            {carregando && (
-              <div className="flex justify-start">
-                <div className="bg-cinza-200 text-cinza-900 px-4 py-2 rounded-lg rounded-bl-none text-sm">
-                  <span className="animate-pulse">Processando...</span>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Input */}
-          <form onSubmit={enviarPergunta} className="border-t border-cinza-200 p-4 flex gap-2">
-            <input
-              ref={inputRef}
-              type="text"
-              placeholder="Sua pergunta..."
-              value={entrada}
-              onChange={(e) => setEntrada(e.target.value)}
-              disabled={carregando}
-              className="flex-1 px-3 py-2 border border-cinza-300 rounded text-sm focus:outline-none focus:border-blue-500 disabled:bg-cinza-100"
-            />
-            <button
-              type="submit"
-              disabled={carregando || !entrada.trim()}
-              className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 disabled:bg-cinza-400 transition-colors"
-            >
-              Enviar
-            </button>
-          </form>
-        </div>
-      )}
-    </>
+              ))}
+  
+              {carregando && (
+                <p role="status" className="text-sm text-suave">
+                  Consultando os números...
+                </p>
+              )}
+            </div>
+  
+            <form onSubmit={enviarPergunta} className="flex gap-2 border-t border-borda px-5 py-4">
+              <label htmlFor="pergunta-chat" className="sr-only">
+                Sua pergunta
+              </label>
+              <input
+                id="pergunta-chat"
+                ref={inputRef}
+                type="text"
+                placeholder="Sua pergunta"
+                value={entrada}
+                onChange={(e) => setEntrada(e.target.value)}
+                disabled={carregando}
+                className="min-h-11 min-w-0 flex-1 rounded-lg border border-borda px-3 text-[15px] disabled:bg-trilho"
+              />
+              <button
+                type="submit"
+                disabled={carregando || !entrada.trim()}
+                className="min-h-11 cursor-pointer rounded-lg bg-menu px-4 text-sm font-semibold text-menu-texto hover:bg-menu-ativo disabled:cursor-not-allowed disabled:bg-trilho disabled:text-suave"
+              >
+                Enviar
+              </button>
+            </form>
+          </div>,
+          document.body,
+        )}
+    </div>
   );
 }

@@ -82,11 +82,11 @@ export function TabelaObras({ obras }: { obras: PosicaoObra[] }) {
 
   return (
     <section aria-labelledby="titulo-tabela-obras" className="flex flex-col gap-3">
-      <h2 id="titulo-tabela-obras" className="font-serif text-2xl font-semibold">
+      <h2 id="titulo-tabela-obras" className="font-serif text-xl font-semibold">
         Todas as colunas por obra
       </h2>
 
-      <div className="hidden max-h-[70vh] overflow-auto rounded-xl border border-borda bg-superficie md:block">
+      <div className="hidden max-h-[70vh] overflow-auto quadro md:block">
         <table className="w-full text-sm tabular-nums">
           <caption className="sr-only">
             Posição financeira por obra, em reais. Os botões do cabeçalho ordenam a tabela.
@@ -167,7 +167,7 @@ export function TabelaObras({ obras }: { obras: PosicaoObra[] }) {
         </div>
         <ul className="flex flex-col gap-3">
           {ordenadas.map((obra) => (
-            <li key={obra.centro_custo_id} className="rounded-xl border border-borda bg-superficie p-4">
+            <li key={obra.centro_custo_id} className="secao">
               <LinkObra obra={obra} />
               <dl className="mt-3 flex flex-col gap-1.5 text-sm">
                 {colunas.map((item) => (

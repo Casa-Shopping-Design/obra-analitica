@@ -55,7 +55,7 @@ export function TabelaDre({ linhas }: { linhas: LinhaTabelaDre[] }) {
       </h2>
       <p className="text-sm text-suave md:hidden print:hidden">Arraste a tabela para o lado para ver todas as colunas.</p>
       {/* relative segura dentro da rolagem os textos sr-only, que são absolutos e alargariam a página no celular */}
-      <div className="relative overflow-x-auto rounded-xl border border-borda bg-superficie print:overflow-visible print:rounded-none print:border-0">
+      <div className="relative overflow-x-auto quadro print:overflow-visible print:rounded-none print:border-0">
         <table className="w-full min-w-[1320px] border-collapse text-sm tabular-nums print:min-w-0 print:text-[8pt]">
           <caption className="sr-only">
             Cada linha do resultado no estudo de viabilidade, no realizado e na tendência, com o desvio contra o estudo.

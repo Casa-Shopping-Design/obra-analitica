@@ -4,6 +4,7 @@ import { useId, useState } from "react";
 import { explicacoes, type ChaveExplicacao } from "@/lib/explicacoes";
 
 // O title cobre quem passa o mouse; o botão abre o texto para toque e teclado. Esc ou sair do foco fecha.
+// O "?" é chamada de nota, sem círculo, para não pesar mais que o número ao lado do rótulo.
 export function ExplicacaoIndicador({
   chave,
   rotulo,
@@ -30,7 +31,7 @@ export function ExplicacaoIndicador({
         onKeyDown={(evento) => {
           if (evento.key === "Escape") setAberta(false);
         }}
-        className="inline-flex size-6 cursor-help items-center justify-center rounded-full border border-borda text-xs font-semibold text-suave hover:text-texto"
+        className="inline-flex size-6 cursor-help items-start justify-center pt-0.5 text-xs font-semibold text-menu underline decoration-dotted underline-offset-2 hover:text-texto"
       >
         ?
       </button>
@@ -38,7 +39,7 @@ export function ExplicacaoIndicador({
         id={idTexto}
         role="tooltip"
         hidden={!aberta}
-        className={`absolute top-7 z-20 ${alinhamento === "direita" ? "right-0" : "left-0"} w-64 rounded-lg border border-borda bg-superficie p-3 text-left text-sm leading-snug font-normal text-texto shadow-md`}
+        className={`absolute top-7 z-20 ${alinhamento === "direita" ? "right-0" : "left-0"} w-64 rounded-sm border border-texto bg-superficie p-3 text-left text-sm leading-snug font-normal text-texto shadow-sm`}
       >
         {texto}
       </span>

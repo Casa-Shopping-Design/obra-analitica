@@ -39,7 +39,7 @@ export default async function PaginaVisaoGeral() {
 
   return (
     <>
-      <h1 className="font-serif text-[34px] font-semibold">Visão geral</h1>
+      <h1 className="font-serif text-[28px] font-semibold">Visão geral</h1>
       {resultado && <FaixaResultado resumo={resultado} />}
       {obras === null && (
         <p role="alert" className="text-alerta">
@@ -51,12 +51,12 @@ export default async function PaginaVisaoGeral() {
         <>
           {carteira && carteira.obras > 1 && <FaixaCarteira carteira={carteira} />}
           <SecaoAlertas alertas={alertas} mostrarObra={obras.length > 1} />
-          <ul aria-label="Obras" className="grid grid-cols-1 gap-4 xl:grid-cols-2 2xl:grid-cols-3">
+          <ul aria-label="Obras" className="grid grid-cols-1 gap-x-10 gap-y-10 xl:grid-cols-2 2xl:grid-cols-3">
             {obras.map((obra) => (
               <li key={obra.centro_custo_id}>
                 <article
                   aria-labelledby={`obra-${obra.centro_custo_id}`}
-                  className="flex h-full flex-col gap-5 rounded-xl border border-borda bg-superficie p-5"
+                  className="flex h-full flex-col gap-5 secao"
                 >
                   <h2 id={`obra-${obra.centro_custo_id}`} className="font-serif text-xl font-semibold">
                     <Link href={`/obras/${obra.centro_custo_id}`} className="underline underline-offset-4 hover:text-menu">

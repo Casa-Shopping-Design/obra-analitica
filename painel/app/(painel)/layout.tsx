@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { CarimboCarga } from "@/componentes/CarimboCarga";
-import { ChatAssistente } from "@/componentes/ChatAssistente";
 import { MenuLateral } from "@/componentes/MenuLateral";
 import { exigirIdentidade } from "@/lib/consultas/identidade";
 import { caminhosAcesso, decidirDestino } from "@/lib/supabase/nivel-acesso";
@@ -27,12 +26,11 @@ export default async function LayoutPainel({ children }: LayoutProps<"/">) {
     <div className="flex min-h-screen flex-col md:flex-row">
       <MenuLateral perfil={identidade.perfil} codigoPerfil={codigoPerfil} construtora={identidade.construtora} />
       <div className="flex min-w-0 flex-1 flex-col">
-        <main className="flex flex-1 flex-col gap-7 px-4 py-6 md:px-12 md:py-9 print:p-0">{children}</main>
+        <main className="flex flex-1 flex-col gap-10 px-4 py-6 md:px-12 md:py-9 print:p-0">{children}</main>
         <footer className="border-t border-borda px-4 py-4 md:px-12 print:px-0">
           <CarimboCarga />
         </footer>
       </div>
-      <ChatAssistente />
     </div>
   );
 }

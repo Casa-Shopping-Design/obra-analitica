@@ -21,7 +21,7 @@ export default async function PaginaEscolherObra() {
 
   return (
     <>
-      <h1 className="font-serif text-[34px] font-semibold">Mapa de unidades</h1>
+      <h1 className="font-serif text-[28px] font-semibold">Mapa de unidades</h1>
       {obras === null && (
         <p role="alert" className="text-alerta">
           {mensagens.unidades.indisponivel}
@@ -36,7 +36,7 @@ export default async function PaginaEscolherObra() {
               <li key={obra.id}>
                 <Link
                   href={`/obras/${obra.id}/unidades`}
-                  className="flex min-h-12 items-center rounded-xl border border-borda bg-superficie px-4 font-semibold hover:border-texto"
+                  className="flex min-h-12 items-center quadro px-4 font-semibold hover:border-texto"
                 >
                   {obra.nome}
                 </Link>

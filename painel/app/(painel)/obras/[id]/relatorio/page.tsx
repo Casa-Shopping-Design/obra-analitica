@@ -21,7 +21,7 @@ import { mesCorrente, montarSerieFluxo } from "@/lib/serie-fluxo";
 export const metadata: Metadata = { title: "Relatório da obra" };
 
 const tela = "Relatório da obra";
-const classeSecao = "flex flex-col gap-4 rounded-xl border border-borda bg-superficie p-5 break-inside-avoid";
+const classeSecao = "flex flex-col gap-4 secao break-inside-avoid";
 
 // Sete consultas em paralelo, as mesmas das telas da obra e do estoque; nada é calculado aqui.
 async function carregar(id: string) {
@@ -67,7 +67,7 @@ export default async function PaginaRelatorioObra({ params }: PageProps<"/obras/
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="flex flex-col gap-1">
             <p className="text-sm text-suave">{tela}</p>
-            <h1 className="font-serif text-[34px] leading-tight font-semibold">{posicao.obra}</h1>
+            <h1 className="font-serif text-[28px] leading-tight font-semibold">{posicao.obra}</h1>
             <p className="text-sm text-suave">Emitido em {formatarData(hoje)}. A data dos dados está no rodapé.</p>
           </div>
           <BotaoImprimir />
@@ -85,7 +85,7 @@ export default async function PaginaRelatorioObra({ params }: PageProps<"/obras/
 
       <section aria-labelledby="titulo-fluxo" className={classeSecao}>
         <div className="flex flex-col gap-1">
-          <h2 id="titulo-fluxo" className="font-serif text-2xl font-semibold">
+          <h2 id="titulo-fluxo" className="font-serif text-xl font-semibold">
             Fluxo de caixa por mês
           </h2>
           <p className="text-sm text-suave">12 meses para trás e 24 para frente, a partir do mês atual, sem atraso de repasse.</p>
@@ -101,7 +101,7 @@ export default async function PaginaRelatorioObra({ params }: PageProps<"/obras/
         <>
           <ResumoEstoque estoque={dados.estoque} cobertura={dados.cobertura} estreito />
           <section aria-labelledby="titulo-tipologia" className={classeSecao}>
-            <h2 id="titulo-tipologia" className="font-serif text-2xl font-semibold">
+            <h2 id="titulo-tipologia" className="font-serif text-xl font-semibold">
               Estoque por tipologia
             </h2>
             <TabelaEstoqueTipologia linhas={dados.tipologias} />
@@ -111,7 +111,7 @@ export default async function PaginaRelatorioObra({ params }: PageProps<"/obras/
 
       {dados.vso.length > 0 && (
         <section aria-labelledby="titulo-vso" className={classeSecao}>
-          <h2 id="titulo-vso" className="font-serif text-2xl font-semibold">
+          <h2 id="titulo-vso" className="font-serif text-xl font-semibold">
             Vendas e VSO dos últimos 12 meses
           </h2>
           <GraficoVso linhas={dados.vso} />

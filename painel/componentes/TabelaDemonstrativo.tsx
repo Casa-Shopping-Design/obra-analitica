@@ -36,11 +36,11 @@ type Propriedades = {
 export function TabelaDemonstrativo({ id, titulo, legenda, linhas, rotuloPercentual }: Propriedades) {
   return (
     <section aria-labelledby={id} className="flex flex-col gap-3">
-      <h2 id={id} className="font-serif text-2xl font-semibold">
+      <h2 id={id} className="font-serif text-xl font-semibold">
         {titulo}
       </h2>
       {/* relative segura dentro da rolagem os textos sr-only, que são absolutos e alargariam a página no celular */}
-      <div className="relative overflow-x-auto rounded-xl border border-borda bg-superficie print:overflow-visible print:rounded-none print:border-0">
+      <div className="relative overflow-x-auto quadro print:overflow-visible print:rounded-none print:border-0">
         <table className="w-full min-w-[560px] border-collapse text-sm tabular-nums print:min-w-0 print:text-[8pt]">
           <caption className="sr-only">{legenda}</caption>
           <thead>

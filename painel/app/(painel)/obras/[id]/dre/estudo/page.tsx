@@ -82,8 +82,8 @@ export default async function PaginaEstudoObra({ params, searchParams }: PagePro
         </Link>
       </p>
 
-      <section aria-labelledby="titulo-estudo" className="flex flex-col gap-5 rounded-xl border border-borda bg-superficie p-5">
-        <h2 id="titulo-estudo" className="font-serif text-2xl font-semibold">
+      <section aria-labelledby="titulo-estudo" className="flex flex-col gap-5 secao">
+        <h2 id="titulo-estudo" className="font-serif text-xl font-semibold">
           Estudo de viabilidade
         </h2>
         <FormularioEstudo
@@ -96,15 +96,15 @@ export default async function PaginaEstudoObra({ params, searchParams }: PagePro
       </section>
 
       <section aria-labelledby="titulo-versoes" className="flex flex-col gap-4">
-        <h2 id="titulo-versoes" className="font-serif text-2xl font-semibold">
+        <h2 id="titulo-versoes" className="font-serif text-xl font-semibold">
           Versões gravadas
         </h2>
         <ListaVersoesEstudo centroCustoId={id} usuarioId={identidade.usuarioId} pagina={dados.versoes} />
       </section>
 
-      <section aria-labelledby="titulo-aliquota" className="flex flex-col gap-4 rounded-xl border border-borda bg-superficie p-5">
+      <section aria-labelledby="titulo-aliquota" className="flex flex-col gap-4 secao">
         <div className="flex flex-col gap-1">
-          <h2 id="titulo-aliquota" className="font-serif text-2xl font-semibold">
+          <h2 id="titulo-aliquota" className="font-serif text-xl font-semibold">
             Alíquota de imposto
           </h2>
           <p className="text-sm text-suave">

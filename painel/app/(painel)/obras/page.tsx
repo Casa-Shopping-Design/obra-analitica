@@ -25,7 +25,7 @@ export default async function PaginaObras() {
     <>
       {/* Só esta tela imprime deitada: a tabela não cabe na folha em pé. */}
       <style>{"@page { size: A4 landscape; }"}</style>
-      <h1 className="font-serif text-[34px] font-semibold">Comparativo entre obras</h1>
+      <h1 className="font-serif text-[28px] font-semibold">Comparativo entre obras</h1>
       {linhas === null && (
         <p role="alert" className="text-alerta">
           {mensagens.posicao.indisponivel}

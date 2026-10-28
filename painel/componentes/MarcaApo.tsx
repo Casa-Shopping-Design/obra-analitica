@@ -23,7 +23,7 @@ export function MarcaApo({ comAssinatura = false, className = "" }: { comAssinat
           </span>
         ))}
       </p>
-      {comAssinatura && <p className="text-sm text-menu-suave">Agente da Governança Financeira</p>}
+      {comAssinatura && <p className="text-sm text-suave">Agente da Governança Financeira</p>}
     </div>
   );
 }

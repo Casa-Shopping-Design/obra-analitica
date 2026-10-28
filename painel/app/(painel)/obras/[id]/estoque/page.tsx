@@ -59,8 +59,8 @@ export default async function PaginaEstoqueObra({ params }: PageProps<"/obras/[i
         <>
           <ResumoEstoque estoque={estoque} cobertura={dados.cobertura} />
 
-          <section aria-labelledby="titulo-tipologia" className="flex flex-col gap-4 rounded-xl border border-borda bg-superficie p-5">
-            <h2 id="titulo-tipologia" className="font-serif text-2xl font-semibold">
+          <section aria-labelledby="titulo-tipologia" className="flex flex-col gap-4 secao">
+            <h2 id="titulo-tipologia" className="font-serif text-xl font-semibold">
               Estoque por tipologia
             </h2>
             <TabelaEstoqueTipologia linhas={dados.tipologias} />
@@ -68,9 +68,9 @@ export default async function PaginaEstoqueObra({ params }: PageProps<"/obras/[i
         </>
       )}
 
-      <section aria-labelledby="titulo-vso" className="flex flex-col gap-4 rounded-xl border border-borda bg-superficie p-5">
+      <section aria-labelledby="titulo-vso" className="flex flex-col gap-4 secao">
         <div className="flex flex-col gap-1">
-          <h2 id="titulo-vso" className="font-serif text-2xl font-semibold">
+          <h2 id="titulo-vso" className="font-serif text-xl font-semibold">
             Vendas e VSO por mês
           </h2>
           <p className="text-sm text-suave">

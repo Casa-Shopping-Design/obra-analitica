@@ -10,7 +10,7 @@ export default function CarregandoMapaUnidades() {
             <div key={posicao} className="h-12 animate-pulse rounded-md bg-trilho" />
           ))}
         </div>
-        <div className="h-64 animate-pulse rounded-xl bg-trilho" />
+        <div className="h-64 animate-pulse rounded-sm bg-trilho" />
       </div>
     </div>
   );
