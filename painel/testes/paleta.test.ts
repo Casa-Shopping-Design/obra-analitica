@@ -43,16 +43,17 @@ describe("paleta APO", () => {
 
   it("os pares de texto e fundo do anexo E dão o contraste calculado à mão", () => {
     const pares: [string, string, number][] = [
-      [tokens.texto, tokens.fundo, 15.06],
+      [tokens.texto, tokens.fundo, 16.52],
+      [tokens.texto, tokens.lateral, 14.83],
       [tokens.suave, tokens.superficie, 6.59],
-      [tokens.suave, tokens.fundo, 6.01],
+      [tokens.suave, tokens.lateral, 5.92],
+      [tokens.menu, tokens.superficie, 10.74],
       [tokens.entrada, tokens.superficie, 5.08],
-      [tokens.entrada, tokens.fundo, 4.63],
       [tokens["menu-texto"], tokens.menu, 9.65],
       [tokens["menu-suave"], tokens.menu, 6.66],
       [tokens.superficie, tokens["menu-ativo"], 7.73],
-      [tokens.alerta, tokens.fundo, 5.96],
-      [tokens.atencao, tokens.fundo, 5.4],
+      [tokens.alerta, tokens.fundo, 6.54],
+      [tokens.atencao, tokens.fundo, 5.92],
     ];
     for (const [texto, fundo, esperado] of pares) {
       const calculado = contraste(texto, fundo);
@@ -69,10 +70,10 @@ describe("paleta APO", () => {
 
   it("o cinza de referência serve para linha de gráfico e não para texto", () => {
     const sobreSuperficie = contraste(tokens.referencia, tokens.superficie);
-    const sobreFundo = contraste(tokens.referencia, tokens.fundo);
+    const sobreLateral = contraste(tokens.referencia, tokens.lateral);
     expect(arredondar(sobreSuperficie)).toBe(3.82);
-    expect(arredondar(sobreFundo)).toBe(3.48);
-    expect(Math.min(sobreSuperficie, sobreFundo)).toBeGreaterThanOrEqual(3);
+    expect(arredondar(sobreLateral)).toBe(3.43);
+    expect(Math.min(sobreSuperficie, sobreLateral)).toBeGreaterThanOrEqual(3);
     expect(sobreSuperficie).toBeLessThan(4.5);
   });
 });

@@ -63,10 +63,10 @@ export default async function PaginaDreObra({ params }: PageProps<"/obras/[id]/d
         <>
           <section
             aria-labelledby="titulo-tendencia-mensal"
-            className="flex flex-col gap-4 rounded-xl border border-borda bg-superficie p-5"
+            className="flex flex-col gap-4 secao"
           >
             <div className="flex flex-col gap-1">
-              <h2 id="titulo-tendencia-mensal" className="flex items-center gap-1.5 font-serif text-2xl font-semibold">
+              <h2 id="titulo-tendencia-mensal" className="flex items-center gap-1.5 font-serif text-xl font-semibold">
                 Margem operacional mês a mês
                 <ExplicacaoIndicador chave="tendencia_margem_mensal" rotulo="Margem operacional mês a mês" />
               </h2>

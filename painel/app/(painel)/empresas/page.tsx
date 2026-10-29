@@ -34,7 +34,7 @@ function SeloIdentidade({ empresa }: { empresa: ResumoEmpresa }) {
   const fecha = situacao === "fecha";
   return (
     <span
-      className={`w-fit rounded-full border px-3 py-1 text-sm font-semibold ${
+      className={`w-fit rounded-sm border px-2 py-0.5 text-sm font-semibold ${
         fecha ? "border-entrada text-entrada" : "border-atencao text-atencao"
       }`}
     >
@@ -47,9 +47,9 @@ function CartaoEmpresa({ empresa }: { empresa: ResumoEmpresa }) {
   const idTitulo = `empresa-${empresa.empresaId}`;
   const carregada = empresa.ultimaCompetencia !== null;
   return (
-    <article aria-labelledby={idTitulo} className="flex h-full flex-col gap-4 rounded-xl border border-borda bg-superficie p-5">
+    <article aria-labelledby={idTitulo} className="flex h-full flex-col gap-4 secao">
       <header className="flex flex-col gap-1">
-        <h2 id={idTitulo} className="font-serif text-2xl font-semibold">
+        <h2 id={idTitulo} className="font-serif text-xl font-semibold">
           <Link href={`/empresas/${empresa.empresaId}`} className="underline underline-offset-4 hover:text-menu">
             {nomeExibido(empresa)}
           </Link>
@@ -101,7 +101,7 @@ export default async function PaginaEmpresas() {
   return (
     <>
       <header className="flex flex-col gap-2">
-        <h1 className="font-serif text-[34px] font-semibold">{titulo}</h1>
+        <h1 className="font-serif text-[28px] font-semibold">{titulo}</h1>
         <p className="max-w-3xl text-suave">
           Fontes e Usos, DRE e custo incorrido de cada empresa, montados a partir do balancete do ERP, com as mesmas
           linhas da planilha. Os valores são acumulados até o último mês carregado.
@@ -119,7 +119,7 @@ export default async function PaginaEmpresas() {
       )}
       {empresas?.length === 0 && <p>{mensagensEmpresa.semEmpresas}</p>}
       {empresas && empresas.length > 0 && (
-        <ul aria-label="Empresas" className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <ul aria-label="Empresas" className="grid grid-cols-1 gap-x-10 gap-y-10 xl:grid-cols-2">
           {empresas.map((empresa) => (
             <li key={empresa.empresaId}>
               <CartaoEmpresa empresa={empresa} />

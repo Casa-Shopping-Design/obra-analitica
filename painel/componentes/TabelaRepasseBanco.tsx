@@ -33,7 +33,7 @@ function Prazo({ dias, lento }: { dias: number | null; lento: boolean }) {
 // Mesmas etapas do quadro de repasse, aberto por banco. A soma das linhas fecha com o quadro.
 export function TabelaRepasseBanco({ linhas, diasMediosObra }: { linhas: RepasseBanco[]; diasMediosObra: number | null }) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-borda bg-superficie">
+    <div className="overflow-x-auto quadro">
       <table className="w-full min-w-[820px] border-collapse text-sm">
         <caption className="sr-only">Repasse do financiamento por banco</caption>
         <thead>

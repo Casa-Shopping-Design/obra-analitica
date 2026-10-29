@@ -5,9 +5,9 @@ import { formatarReal } from "@/lib/formatar";
 // Os nove cartões do deck, na ordem dele. Cada imposto chega pronto da view; a nota só repete a base de onde saiu.
 export function CartoesImposto({ imposto }: { imposto: ImpostoObra }) {
   return (
-    <section aria-labelledby="titulo-imposto" className="flex flex-col gap-5 rounded-xl border border-borda bg-superficie p-5">
+    <section aria-labelledby="titulo-imposto" className="flex flex-col gap-5 secao">
       <div className="flex flex-col gap-1">
-        <h2 id="titulo-imposto" className="font-serif text-2xl font-semibold">
+        <h2 id="titulo-imposto" className="font-serif text-xl font-semibold">
           Projeção tributária
         </h2>
         <p className="text-sm text-alerta" role="note">

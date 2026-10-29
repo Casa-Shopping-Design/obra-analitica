@@ -7,9 +7,9 @@ import { formatarReal } from "@/lib/formatar";
 // lucro líquido ter definição, e o desvio da margem aparece em texto, sem depender de cor.
 export function FaixaResultado({ resumo }: { resumo: ResumoCarteiraDre }) {
   return (
-    <section aria-labelledby="titulo-resultado" className="flex flex-col gap-5 rounded-xl border border-borda bg-superficie p-5">
+    <section aria-labelledby="titulo-resultado" className="flex flex-col gap-5 secao">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id="titulo-resultado" className="font-serif text-2xl font-semibold">
+        <h2 id="titulo-resultado" className="font-serif text-xl font-semibold">
           Resultado
         </h2>
         <p className="text-sm text-suave">

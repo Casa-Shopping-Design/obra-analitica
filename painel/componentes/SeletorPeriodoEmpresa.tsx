@@ -14,7 +14,7 @@ const modos = [
 // Funciona sem JavaScript e o endereço pode ser guardado ou mandado a outra pessoa.
 export function SeletorPeriodoEmpresa({ periodo, meses }: { periodo: PeriodoEmpresa; meses: string[] }) {
   return (
-    <form method="get" className="flex flex-col gap-4 rounded-xl border border-borda bg-superficie p-5 print:hidden">
+    <form method="get" className="flex flex-col gap-4 secao print:hidden">
       {periodo.aba !== "fontes-usos" && <input type="hidden" name="aba" value={periodo.aba} />}
       <div className="flex flex-wrap items-end gap-4">
         <div className="flex flex-col gap-1.5">

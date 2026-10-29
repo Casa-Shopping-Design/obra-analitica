@@ -35,7 +35,7 @@ async function carregar(filtro: FiltroMapa) {
 // Formulário GET: o filtro fica na URL e a página refaz a consulta no servidor.
 function FiltroContas({ filtro }: { filtro: FiltroMapa }) {
   return (
-    <form method="get" className="flex flex-wrap items-end gap-4 rounded-xl border border-borda bg-superficie p-5">
+    <form method="get" className="flex flex-wrap items-end gap-4 secao">
       <div className="flex flex-col gap-1.5">
         <label htmlFor="filtro-grupo" className="text-sm font-medium">
           Grupo
@@ -109,7 +109,7 @@ export default async function PaginaMapaContas({ searchParams }: PageProps<"/emp
         <Link href="/empresas" className="w-fit text-sm text-suave underline underline-offset-4 hover:text-texto">
           Voltar para as empresas
         </Link>
-        <h1 className="font-serif text-[34px] font-semibold">{tela}</h1>
+        <h1 className="font-serif text-[28px] font-semibold">{tela}</h1>
         <p className="max-w-3xl text-suave">
           Em que linha das Fontes e Usos, da DRE ou do custo incorrido cada conta contábil entra. O mapa vale para todas
           as empresas da construtora. Conta analítica com linha própria vence; sem ela, vale a linha da conta sintética

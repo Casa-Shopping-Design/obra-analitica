@@ -14,11 +14,11 @@ type Propriedades = {
 export function TabelaDemonstrativoMensal({ id, titulo, legenda, meses, linhas }: Propriedades) {
   return (
     <section aria-labelledby={id} className="flex flex-col gap-3">
-      <h2 id={id} className="font-serif text-2xl font-semibold">
+      <h2 id={id} className="font-serif text-xl font-semibold">
         {titulo}
       </h2>
       <p className="text-sm text-suave print:hidden">Arraste a tabela para o lado para ver todos os meses.</p>
-      <div className="relative overflow-x-auto rounded-xl border border-borda bg-superficie print:overflow-visible print:rounded-none print:border-0">
+      <div className="relative overflow-x-auto quadro print:overflow-visible print:rounded-none print:border-0">
         <table className="w-full min-w-[960px] border-collapse text-sm tabular-nums print:min-w-0 print:text-[7pt]">
           <caption className="sr-only">{legenda}</caption>
           <thead>

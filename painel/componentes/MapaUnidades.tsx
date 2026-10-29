@@ -141,7 +141,7 @@ function TotaisObra({ totais, vgv }: { totais: Record<SituacaoUnidade, number>; 
   return (
     <section
       aria-labelledby="titulo-totais"
-      className="flex flex-col gap-4 rounded-xl border border-borda bg-superficie p-4 md:p-5 xl:sticky xl:top-6"
+      className="flex flex-col gap-4 secao xl:sticky xl:top-6"
     >
       <h2 id="titulo-totais" className="font-serif text-xl font-semibold">
         Totais da obra

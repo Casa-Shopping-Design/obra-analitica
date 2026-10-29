@@ -74,7 +74,7 @@ function Resumo({ resumo }: { resumo: ResumoSimulacao }) {
 
 function Premissas({ ritmo, desconto, vendasMedia }: { ritmo: Ritmo; desconto: DescontoPercentual; vendasMedia: number | null }) {
   return (
-    <section aria-labelledby="titulo-premissas" className="flex flex-col gap-3 rounded-xl border border-borda bg-superficie p-5">
+    <section aria-labelledby="titulo-premissas" className="flex flex-col gap-3 secao">
       <h2 id="titulo-premissas" className="font-serif text-xl font-semibold">
         Como a simulação calcula
       </h2>
@@ -126,8 +126,8 @@ export default async function PaginaSimulacaoObra({ params, searchParams }: Page
         <p>{mensagens.simulacao.semEstoque}</p>
       ) : (
         <>
-          <section aria-labelledby="titulo-simulacao" className="flex flex-col gap-5 rounded-xl border border-borda bg-superficie p-5">
-            <h2 id="titulo-simulacao" className="font-serif text-2xl font-semibold">
+          <section aria-labelledby="titulo-simulacao" className="flex flex-col gap-5 secao">
+            <h2 id="titulo-simulacao" className="font-serif text-xl font-semibold">
               Saldo acumulado da obra
             </h2>
             <SeletorSimulacao ritmo={dados.ritmo} desconto={dados.desconto} />

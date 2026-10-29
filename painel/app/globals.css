@@ -1,12 +1,14 @@
 @import "tailwindcss";
 
-/* Paleta das cores do logo APO: petróleo no menu, verde é dinheiro que entra, grafite é o que sai,
+/* Paleta das cores do logo APO: petróleo marca o que é clicável e o item ativo (o menu é cinza claro, para o
+   número da tela pesar mais que a moldura), verde é dinheiro que entra, grafite é o que sai,
    vermelho vivo só em alerta. O verde claro do repasse tem contraste 2,41 sobre branco, então só preenche
    gráfico e nunca vira texto. O cinza de referência marca o estudo nos gráficos de linha: claro o bastante
    para a linha da tendência se destacar, com contraste 3,82 sobre branco; também não vira texto. */
 @theme {
-  --color-fundo: #f3f5f1;
+  --color-fundo: #ffffff;
   --color-superficie: #ffffff;
+  --color-lateral: #f2f3f0;
   --color-texto: #16211f;
   --color-suave: #52605c;
   --color-borda: #d5dcd6;
@@ -26,6 +28,29 @@
   /* O nome font-serif ficou para não mexer em 22 arquivos; a fonte dos títulos é sem serifa. */
   --font-serif: var(--fonte-titulo), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--fonte-numero), ui-monospace, monospace;
+
+  /* Canto quase reto em botão e campo: o raio pequeno ainda mostra que o botão é clicável, sem dar à tela
+     o ar de cartão arredondado dos modelos prontos. */
+  --radius-lg: 0.1875rem;
+}
+
+/* Bloco do relatório: um traço no alto e o título logo abaixo, como num demonstrativo impresso. Separa as
+   partes da tela sem caixa, sombra nem fundo, e a leitura segue de cima para baixo. */
+@utility secao {
+  border-top: 2px solid var(--color-texto);
+  padding-top: 1rem;
+}
+
+/* Moldura de tabela larga: precisa de borda para a rolagem lateral ter limite visível. */
+@utility quadro {
+  border: 1px solid var(--color-borda);
+  border-radius: 2px;
+  background: var(--color-superficie);
+}
+
+/* Número de valor em coluna: algarismos da mesma largura para os reais alinharem de uma linha para outra. */
+body {
+  font-variant-numeric: tabular-nums;
 }
 
 html {
@@ -52,4 +77,10 @@ body {
   body {
     background: #ffffff;
   }
+}
+
+/* Número solto, fora de tabela: um fio vertical à esquerda junta rótulo e valor sem fechar o cartão. */
+@utility figura {
+  border-left: 2px solid var(--color-borda);
+  padding-left: 1rem;
 }

@@ -45,7 +45,7 @@ export function RespostaPergunta({
   const quantidade = linhas.length === 1 ? "1 linha" : `${linhas.length} linhas`;
 
   return (
-    <section aria-labelledby={idTitulo} className="flex flex-col gap-3 rounded-xl border border-borda bg-superficie p-4 md:p-5">
+    <section aria-labelledby={idTitulo} className="flex flex-col gap-3 secao">
       <h2 id={idTitulo} className="font-serif text-xl font-semibold">
         {pergunta.pergunta}
       </h2>

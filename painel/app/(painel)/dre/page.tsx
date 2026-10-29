@@ -57,7 +57,7 @@ export default async function PaginaDre() {
   if (!permitido) {
     return (
       <>
-        <h1 className="font-serif text-[34px] font-semibold">{titulo}</h1>
+        <h1 className="font-serif text-[28px] font-semibold">{titulo}</h1>
         <p>{mensagens.dre.restrita}</p>
       </>
     );
@@ -67,7 +67,7 @@ export default async function PaginaDre() {
 
   return (
     <>
-      <h1 className="font-serif text-[34px] font-semibold">{titulo}</h1>
+      <h1 className="font-serif text-[28px] font-semibold">{titulo}</h1>
       {linhas === null && (
         <p role="alert" className="text-alerta">
           {mensagens.dre.indisponivel}
@@ -90,7 +90,7 @@ export default async function PaginaDre() {
             <h2 id="titulo-resumo-dre" className="sr-only">
               Margem operacional por obra
             </h2>
-            <div className="relative overflow-x-auto rounded-xl border border-borda bg-superficie">
+            <div className="relative overflow-x-auto quadro">
               <table className="w-full min-w-[800px] border-collapse text-sm tabular-nums">
                 <caption className="sr-only">
                   Margem operacional de cada obra no estudo, na tendência, o desvio em pontos percentuais e a margem da

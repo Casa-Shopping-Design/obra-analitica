@@ -46,7 +46,7 @@ export default async function PaginaMapaUnidades({ params }: { params: Promise<{
   if (dados === "erro") {
     return (
       <>
-        <h1 className="font-serif text-[34px] font-semibold">Mapa de unidades</h1>
+        <h1 className="font-serif text-[28px] font-semibold">Mapa de unidades</h1>
         <p role="alert" className="text-alerta">
           {mensagens.unidades.indisponivel}
         </p>
@@ -57,7 +57,7 @@ export default async function PaginaMapaUnidades({ params }: { params: Promise<{
   if (!dados.obra) {
     return (
       <>
-        <h1 className="font-serif text-[34px] font-semibold">Mapa de unidades</h1>
+        <h1 className="font-serif text-[28px] font-semibold">Mapa de unidades</h1>
         <p>{mensagens.unidades.obraNaoEncontrada}</p>
         <LinkListaObras />
       </>
@@ -68,7 +68,7 @@ export default async function PaginaMapaUnidades({ params }: { params: Promise<{
     <>
       <header className="flex flex-col gap-1">
         <p className="text-sm text-suave">Mapa de unidades</p>
-        <h1 className="font-serif text-[34px] leading-tight font-semibold">{dados.obra.nome}</h1>
+        <h1 className="font-serif text-[28px] leading-tight font-semibold">{dados.obra.nome}</h1>
         <p className="text-sm text-suave">{dados.unidades.length} unidades</p>
       </header>
       {dados.unidades.length === 0 ? (

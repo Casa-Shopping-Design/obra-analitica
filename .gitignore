@@ -11,3 +11,4 @@ dados/brutos/
 negocio/
 .DS_Store
 dados/contabil/trial-balance.json
+.claude/launch.json

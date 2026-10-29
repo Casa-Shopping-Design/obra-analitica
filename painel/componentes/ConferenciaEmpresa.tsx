@@ -11,7 +11,7 @@ const rotulo = "py-2.5 pr-3 pl-3 text-left align-top font-normal";
 function Selo({ fecha, textoFecha, textoDiferenca }: { fecha: boolean; textoFecha: string; textoDiferenca: string }) {
   return (
     <p
-      className={`w-fit rounded-full border px-3 py-1 text-sm font-semibold ${
+      className={`w-fit rounded-sm border px-2 py-0.5 text-sm font-semibold ${
         fecha ? "border-entrada text-entrada" : "border-atencao text-atencao"
       }`}
     >
@@ -22,8 +22,8 @@ function Selo({ fecha, textoFecha, textoDiferenca }: { fecha: boolean; textoFech
 
 function Quadro({ id, titulo, children }: { id: string; titulo: string; children: ReactNode }) {
   return (
-    <section aria-labelledby={id} className="flex flex-col gap-3 rounded-xl border border-borda bg-superficie p-5">
-      <h2 id={id} className="font-serif text-2xl font-semibold">
+    <section aria-labelledby={id} className="flex flex-col gap-3 secao">
+      <h2 id={id} className="font-serif text-xl font-semibold">
         {titulo}
       </h2>
       {children}
@@ -36,7 +36,7 @@ export function QuadrosControle({ controle }: { controle: ControleEmpresa }) {
   const fechaCaixa = situacaoIdentidade(controle.diferencaIdentidade) === "fecha";
   const semAjuste = situacaoIdentidade(controle.ajusteExerciciosAnteriores) === "fecha";
   return (
-    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+    <div className="grid grid-cols-1 gap-x-10 gap-y-8 xl:grid-cols-2">
       <Quadro id="titulo-identidade" titulo="Fontes menos usos contra o caixa">
         <p className="text-sm text-suave">Posição acumulada no fim de {rotuloMes(controle.competencia.slice(0, 7))}.</p>
         <table className="w-full border-collapse text-sm tabular-nums">

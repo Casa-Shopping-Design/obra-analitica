@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { AbasObra } from "@/componentes/AbasObra";
 
-// Topo comum das telas de detalhe da obra: volta para a obra, diz a tela e o nome da obra.
+// Topo comum das telas de detalhe da obra: volta para a obra, diz a tela e o nome da obra e abre as abas.
 export function CabecalhoTelaObra({ id, tela, obra, nota }: { id: string; tela: string; obra: string; nota?: string }) {
   return (
     <header className="flex flex-col gap-1">
@@ -8,8 +9,11 @@ export function CabecalhoTelaObra({ id, tela, obra, nota }: { id: string; tela: 
         Voltar para a obra
       </Link>
       <p className="text-sm text-suave">{tela}</p>
-      <h1 className="font-serif text-[34px] leading-tight font-semibold">{obra}</h1>
+      <h1 className="font-serif text-[28px] leading-tight font-semibold">{obra}</h1>
       {nota && <p className="text-sm text-suave">{nota}</p>}
+      <div className="pt-3">
+        <AbasObra id={id} />
+      </div>
     </header>
   );
 }
@@ -18,7 +22,7 @@ export function CabecalhoTelaObra({ id, tela, obra, nota }: { id: string; tela: 
 export function AvisoTelaObra({ tela, mensagem, erro = false }: { tela: string; mensagem: string; erro?: boolean }) {
   return (
     <>
-      <h1 className="font-serif text-[34px] font-semibold">{tela}</h1>
+      <h1 className="font-serif text-[28px] font-semibold">{tela}</h1>
       <p role={erro ? "alert" : undefined} className={erro ? "text-alerta" : undefined}>
         {mensagem}
       </p>

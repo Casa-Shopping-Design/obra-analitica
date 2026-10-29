@@ -21,7 +21,7 @@ export function ListaVersoesEstudo({ centroCustoId, usuarioId, pagina }: Proprie
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="overflow-x-auto rounded-xl border border-borda bg-superficie">
+      <div className="overflow-x-auto quadro">
         <table className="w-full min-w-[640px] border-collapse text-sm">
           <caption className="sr-only">Versões do estudo de viabilidade, da mais nova para a mais antiga.</caption>
           <thead>

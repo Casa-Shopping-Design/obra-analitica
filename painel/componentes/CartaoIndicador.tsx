@@ -2,6 +2,7 @@ import { ExplicacaoIndicador } from "@/componentes/ExplicacaoIndicador";
 import type { PosicaoObra } from "@/lib/consultas/posicao";
 import type { ChaveExplicacao } from "@/lib/explicacoes";
 import { formatarReal } from "@/lib/formatar";
+import { classeValorGrande } from "@/lib/valor-grande";
 
 type ValorIndicador = { rotulo?: string; valor: number };
 
@@ -18,15 +19,15 @@ export function CartaoIndicador({
   valores: ValorIndicador[];
   emCartao?: boolean;
 }) {
-  const moldura = emCartao ? "rounded-xl border border-borda bg-superficie p-5" : "";
+  const moldura = emCartao ? "figura" : "";
   return (
-    <div className={`flex min-w-0 flex-col gap-1.5 ${moldura}`}>
+    <div className={`@container flex min-w-0 flex-col gap-1.5 ${moldura}`}>
       <p className="flex items-center gap-1.5 text-sm text-suave">
         {rotulo}
         <ExplicacaoIndicador chave={chave} rotulo={rotulo} />
       </p>
       {valores.length === 1 ? (
-        <p className="text-2xl font-semibold break-words">{formatarReal(valores[0].valor)}</p>
+        <p className={classeValorGrande}>{formatarReal(valores[0].valor)}</p>
       ) : (
         <dl className="flex flex-col gap-0.5">
           {valores.map((item) => (

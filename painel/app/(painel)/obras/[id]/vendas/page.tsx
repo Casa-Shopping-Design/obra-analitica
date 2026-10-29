@@ -50,7 +50,7 @@ export default async function PaginaVendasObra({ params }: { params: Promise<{ i
       ) : (
         <>
           <section aria-labelledby="titulo-repasse" className="flex flex-col gap-4">
-            <h2 id="titulo-repasse" className="font-serif text-2xl font-semibold">
+            <h2 id="titulo-repasse" className="font-serif text-xl font-semibold">
               Repasse do financiamento
             </h2>
             {dados.repasse ? <QuadroRepasse repasse={dados.repasse} /> : <p>{mensagensOrigem.semRepasse}</p>}
@@ -65,9 +65,9 @@ export default async function PaginaVendasObra({ params }: { params: Promise<{ i
               </div>
             )}
           </section>
-          <section aria-labelledby="titulo-funil" className="flex flex-col gap-4 rounded-xl border border-borda bg-superficie p-5">
+          <section aria-labelledby="titulo-funil" className="flex flex-col gap-4 secao">
             <div className="flex flex-col gap-1">
-              <h2 id="titulo-funil" className="font-serif text-2xl font-semibold">
+              <h2 id="titulo-funil" className="font-serif text-xl font-semibold">
                 Funil de vendas
               </h2>
               <p className="text-sm text-suave">
@@ -77,9 +77,9 @@ export default async function PaginaVendasObra({ params }: { params: Promise<{ i
             </div>
             <TabelaFunil linhas={dados.funil} />
           </section>
-          <section aria-labelledby="titulo-leads" className="flex flex-col gap-4 rounded-xl border border-borda bg-superficie p-5">
+          <section aria-labelledby="titulo-leads" className="flex flex-col gap-4 secao">
             <div className="flex flex-col gap-1">
-              <h2 id="titulo-leads" className="font-serif text-2xl font-semibold">
+              <h2 id="titulo-leads" className="font-serif text-xl font-semibold">
                 De onde vêm os leads
               </h2>
               <p className="text-sm text-suave">

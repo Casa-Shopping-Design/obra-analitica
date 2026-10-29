@@ -14,8 +14,8 @@ function Barra({ rotulo, fracao, cor }: { rotulo: string; fracao: number | null;
         <span className="text-sm text-suave">{rotulo}</span>
         <span className="text-lg font-semibold tabular-nums">{percentual(fracao)}</span>
       </div>
-      <div className="h-3 rounded-full bg-trilho" aria-hidden="true">
-        <div className={`h-3 rounded-full ${cor}`} style={{ width: `${largura}%` }} />
+      <div className="h-3 rounded-sm bg-trilho" aria-hidden="true">
+        <div className={`h-3 rounded-sm ${cor}`} style={{ width: `${largura}%` }} />
       </div>
     </div>
   );
@@ -28,7 +28,7 @@ export function TabelaExecucao({ linhas }: { linhas: LinhaExecucao[] }) {
   return (
     <div className="flex flex-col gap-5">
       {atual && (
-        <div className="flex flex-col gap-4 rounded-xl border border-borda bg-superficie p-5">
+        <div className="flex flex-col gap-4 secao">
           <p className="text-sm text-suave">Posição de {formatarMes(atual.competencia)}</p>
           <Barra rotulo="Físico medido" fracao={atual.pct_fisico} cor="bg-entrada" />
           <Barra rotulo="Pago sobre o orçado" fracao={atual.pct_financeiro} cor="bg-saida" />

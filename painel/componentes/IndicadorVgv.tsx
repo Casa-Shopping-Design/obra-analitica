@@ -6,7 +6,7 @@ import { formatarPercentual, formatarReal } from "@/lib/formatar";
 function BarraVendido({ fracao }: { fracao: number }) {
   const largura = Math.min(Math.max(fracao, 0), 1) * 1000;
   return (
-    <svg viewBox="0 0 1000 10" preserveAspectRatio="none" className="h-2.5 w-full overflow-hidden rounded-full" aria-hidden="true" focusable="false">
+    <svg viewBox="0 0 1000 10" preserveAspectRatio="none" className="h-2 w-full" aria-hidden="true" focusable="false">
       <rect width="1000" height="10" className="fill-[#e4efd3]" />
       <rect width={largura} height="10" className="fill-saida" />
     </svg>
@@ -26,7 +26,7 @@ function Amostra({ classe }: { classe: string }) {
 // VGV total em destaque, a parte já vendida na barra e as duas parcelas que somam o total.
 // Nada é somado aqui: os três valores vêm prontos de marts.posicao_financeira_obra.
 export function IndicadorVgv({ valores, emCartao = false }: { valores: ValoresVgv; emCartao?: boolean }) {
-  const moldura = emCartao ? "rounded-xl border border-borda bg-superficie p-5" : "";
+  const moldura = emCartao ? "figura" : "";
   const fracaoLida = Number(valores.pct_vgv_vendido);
   const fracao = valores.pct_vgv_vendido === null || !Number.isFinite(fracaoLida) ? null : fracaoLida;
 

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AbasObra } from "@/componentes/AbasObra";
 import { CartaoIndicador, IndicadoresObra } from "@/componentes/CartaoIndicador";
 import { GraficoFluxo } from "@/componentes/GraficoFluxo";
 import { IndicadorVgv } from "@/componentes/IndicadorVgv";
-import { LinksObra } from "@/componentes/LinksObra";
 import { SecaoAlertas } from "@/componentes/ListaAlertas";
 import { SeletorCenario } from "@/componentes/SeletorCenario";
 import { listarAlertas } from "@/lib/consultas/carteira";
@@ -40,7 +40,7 @@ async function carregarObra(centroCustoId: string, mesesAtraso: MesesAtraso) {
 function ObraNaoEncontrada() {
   return (
     <>
-      <h1 className="font-serif text-[34px] font-semibold">{mensagens.obra.naoEncontrada}</h1>
+      <h1 className="font-serif text-[28px] font-semibold">{mensagens.obra.naoEncontrada}</h1>
       <p>
         <Link href="/" className="underline underline-offset-4 hover:text-menu">
           Voltar para a visão geral
@@ -59,7 +59,7 @@ export default async function PaginaObra({ params, searchParams }: PageProps<"/o
   if (obra === null) {
     return (
       <>
-        <h1 className="font-serif text-[34px] font-semibold">Obra</h1>
+        <h1 className="font-serif text-[28px] font-semibold">Obra</h1>
         <p role="alert" className="text-alerta">
           {mensagens.obra.indisponivel}
         </p>
@@ -78,8 +78,10 @@ export default async function PaginaObra({ params, searchParams }: PageProps<"/o
         <Link href="/" className="text-sm text-suave underline underline-offset-4 hover:text-texto">
           Visão geral
         </Link>
-        <h1 className="font-serif text-[34px] font-semibold">{posicao.obra}</h1>
-        <LinksObra id={posicao.centro_custo_id} />
+        <h1 className="font-serif text-[28px] font-semibold">{posicao.obra}</h1>
+        <div className="pt-3">
+          <AbasObra id={posicao.centro_custo_id} />
+        </div>
       </div>
 
       <section aria-label="Resumo da obra" className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -91,9 +93,9 @@ export default async function PaginaObra({ params, searchParams }: PageProps<"/o
 
       {obra.alertas?.length !== 0 && <SecaoAlertas alertas={obra.alertas} mostrarObra={false} />}
 
-      <section aria-labelledby="titulo-fluxo" className="flex flex-col gap-5 rounded-xl border border-borda bg-superficie p-5">
+      <section aria-labelledby="titulo-fluxo" className="flex flex-col gap-5 secao">
         <div className="flex flex-col gap-1">
-          <h2 id="titulo-fluxo" className="font-serif text-2xl font-semibold">
+          <h2 id="titulo-fluxo" className="font-serif text-xl font-semibold">
             Fluxo de caixa por mês
           </h2>
           <p className="text-sm text-suave">12 meses para trás e 24 para frente, a partir do mês atual.</p>
@@ -106,8 +108,8 @@ export default async function PaginaObra({ params, searchParams }: PageProps<"/o
         )}
       </section>
 
-      <section aria-labelledby="titulo-vencidos" className="flex flex-col gap-4 rounded-xl border border-borda bg-superficie p-5">
-        <h2 id="titulo-vencidos" className="font-serif text-2xl font-semibold">
+      <section aria-labelledby="titulo-vencidos" className="flex flex-col gap-4 secao">
+        <h2 id="titulo-vencidos" className="font-serif text-xl font-semibold">
           Vencidos
         </h2>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
