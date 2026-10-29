@@ -110,6 +110,13 @@ CAMPOS_PERMITIDOS = {
         "id", "value", "date", "documentId", "type", "reconciliationDate", "billId",
         "installmentNumber", "statementOrigin", "statementType", "budgetCategories[].percentage",
     ],
+    # Parcela a receber por título, sem portador nem boleto. receivableBillId vem na resposta e o carregador
+    # repete, porque título sem parcela grava só ele.
+    "receivable-bills/installments": [
+        "receivableBillId", "installmentId", "conditionTypeId", "dueDate", "balanceDue",
+    ],
+    # Item de orçamento por planilha; obra e unidade construtiva vêm do caminho e o carregador acrescenta.
+    "building-cost-estimations/items": ["buildingId", "buildingUnitId", "id", "wbsCode", "description", "totalPrice"],
     # accountNumber é o código da conta da construtora no ERP, não conta de pessoa.
     "accounts-balances": [
         "amount", "reconciledAmount", "balanceDate", "accountNumber", "accountStatus", "companyId",

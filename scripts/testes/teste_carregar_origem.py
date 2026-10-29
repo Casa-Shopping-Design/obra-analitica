@@ -144,6 +144,14 @@ class RepositorioFalso:
     def ler_empresas_contabeis(self, tenant):
         return {p.get("companyId") for (t, e, _), (_, p) in self.raw.items() if t == tenant and e == "trial-balance"}
 
+    def ler_titulos_receber(self, tenant):
+        titulos = {p["receivableBillId"]: False for (t, e, _), (_, p) in self.raw.items()
+                   if t == tenant and e == "sales-contracts" and isinstance(p.get("receivableBillId"), int)}
+        for (t, e, _), (chave, p) in self.raw.items():
+            if t == tenant and e == "receivable-bills/installments":
+                titulos[int(chave)] = True
+        return titulos
+
     def recarregar(self, tenant):
         self.recargas += 1
 

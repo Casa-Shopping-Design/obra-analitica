@@ -231,7 +231,9 @@ class TesteAmbienteEStaging(unittest.TestCase):
 
         RepositorioBanco(Conexao()).recarregar(TENANT)
         self.assertEqual(comandos[-1], "select staging.recarregar_contabil(%s)")
-        self.assertEqual(len(comandos), 4)
+        self.assertEqual(comandos[1], "select staging.recarregar_financeiro_rest(%s)",
+                         "o REST entra logo depois do Bulk, que ele não pode sobrepor")
+        self.assertEqual(len(comandos), 5)
 
 
 CATALOGO = [

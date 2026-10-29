@@ -139,7 +139,9 @@ class TestePlanejamento(unittest.TestCase):
     def test_so_rest_nao_usa_bulk(self):
         eventos = [(1, "RECEIPT_PROCESSED", {"billId": 10}), (2, "PAYMENT_BILL_UPDATED", {"billId": 20})]
         plano = planejar_fila(eventos, False, {"rest": 10, "bulk": 10})
-        self.assertEqual((plano.sem_busca, plano.cobertos, plano.alvos), ([1], {"bills": [2]}, {}))
+        self.assertEqual((plano.sem_busca, plano.alvos), ([], {}))
+        self.assertEqual(plano.cobertos, {"bills": [2], "receivable-bills/installments": [1]})
+        self.assertEqual(plano.titulos_receber, {10}, "título avisado entra na releitura de parcelas da noite")
 
 
 class TesteFilaErp(unittest.TestCase):
