@@ -489,6 +489,8 @@ select is(app.expirar_pedidos(30, 24), 0, 'segunda passagem não expira mais nad
 
 -- Agenda: horário já passado cria uma vez por dia; tenant com pedido aberto espera a próxima passagem
 delete from app.carga_pedido where tenant_id = '0e000000-0000-4000-8000-0000000000d1';
+-- B ficou agendado às 02:30 no teste do check. Sem voltar todos a manual, a contagem dependeria da hora em que o teste roda.
+update app.origem_configuracao set modo_carga = 'manual', horario_carga = null;
 update app.origem_configuracao set modo_carga = 'agendado', horario_carga = '00:00'
   where tenant_id in ('0e000000-0000-4000-8000-0000000000e1', '0e000000-0000-4000-8000-0000000000a1');
 -- Os pedidos de A são do botão, então A vence; E já teve pedido de agenda hoje (o concluído) e não ganha outro.
