@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import { cancelarPedido, pedirCarga, type EstadoPedido } from "@/app/(painel)/carga/acoes";
+import { BarraProporcao } from "@/componentes/BarraProporcao";
 import {
   batimentoAtrasado,
   calcularProgresso,
@@ -127,9 +128,9 @@ function AndamentoPedido({ pedidoInicial, podeCancelar }: { pedidoInicial: Pedid
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuetext={progresso.texto}
-        className="h-3 w-full max-w-2xl bg-trilho"
+        className="w-full max-w-2xl"
       >
-        <div className="h-3 bg-menu" style={{ width: `${progresso.percentual}%` }} />
+        <BarraProporcao fracao={progresso.percentual / 100} cor="fill-menu" />
       </div>
       <p aria-live="polite">
         {progresso.percentual}%: {progresso.texto}
